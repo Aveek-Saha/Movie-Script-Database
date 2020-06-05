@@ -104,31 +104,35 @@ for key in sources:
     print()
 
 
-if not exists(DIR_FILTER):
-    makedirs(DIR_FILTER)
+# if not exists(DIR_FILTER):
+#     makedirs(DIR_FILTER)
 
 
-print("Write cleaned files to new dir")
-for source in tqdm(all_sources):
-    f = open(source, 'r', errors="ignore")
-    data = f.read().strip()
-    out = data.replace(u'\u2018', u"'")
-    out = out.replace(u'\u2019', u"'")
-    out = out.replace(u'\u201c', '')
-    out = out.replace(u'\u201d', '')
-    out = out.replace('"', '')
-    out = out.replace("Script provided for educational purposes. More scripts can be found here: http://www.sellingyourscreenplay.com/library", "")
-    data = out.encode('utf-8', 'ignore').decode('utf-8').strip()
-    f.close()
+# print("Write cleaned files to new dir")
+# for source in tqdm(all_sources):
+#     f = open(source, 'r', errors="ignore")
+#     data = f.read().strip()
+#     out = data.replace(u'\u2018', u"'")
+#     out = out.replace(u'\u2019', u"'")
+#     out = out.replace(u'\u201c', '')
+#     out = out.replace(u'\u201d', '')
+#     out = out.replace('"', '')
+#     out = out.replace("Script provided for educational purposes. More scripts can be found here: http://www.sellingyourscreenplay.com/library", "")
+#     data = out.encode('utf-8', 'ignore').decode('utf-8').strip()
+#     f.close()
 
-    with open(join(DIR_FILTER, source.split(sep)[-1]), 'w', errors="ignore") as out:
-        out.write(data)
+#     with open(join(DIR_FILTER, source.split(sep)[-1]), 'w', errors="ignore") as out:
+#         out.write(data)
 
 
 print("Remove different versions of scripts with same name")
-filtered = [join(DIR_FILTER, f) for f in listdir(DIR_FILTER)
-            if isfile(join(DIR_FILTER, f)) and getsize(join(DIR_FILTER, f)) > 3000]
+# filtered = [join(DIR_FILTER, f) for f in listdir(DIR_FILTER)
+#             if isfile(join(DIR_FILTER, f)) and getsize(join(DIR_FILTER, f)) > 3000]
+
+filtered = [f for f in all_sources if isfile(f) and getsize(f) > 3000]
+
 print(len(filtered))
+
 comb_filter = list(itertools.combinations(filtered, 2))
 
 for (x, y) in tqdm(comb_filter):
@@ -165,6 +169,9 @@ print("Write cleaned files to new dir")
 for source in tqdm(filtered):
     f = open(source, 'r', errors="ignore")
     data = f.read().strip()
+    data = data.replace(
+        "Script provided for educational purposes. More scripts can be found here: http://www.sellingyourscreenplay.com/library", "")
+    data = data.encode('utf-8', 'ignore').decode('utf-8').strip()
     f.close()
 
     whitespace = re.compile(r'^[\s]+')
