@@ -9,44 +9,26 @@ from tqdm import tqdm
 
 URL = "https://www.imsdb.com/all%20scripts"
 BASE_URL = "https://www.imsdb.com"
-# Open the URL
-page = urllib.request.Request(URL)
-result = urllib.request.urlopen(page)
-# Store the HTML page in a variable
-resulttext = result.read()
+DIR = os.path.join("scripts", "ismdb")
 
-soup = BeautifulSoup(resulttext, 'html.parser')
-movielist = soup.find_all('p')
 
-# movie = movielist[3]
-for movie in tqdm(movielist):
+def get_soup(url):
+    page = urllib.request.Request(url)
+    result = urllib.request.urlopen(page)
+    resulttext = result.read()
 
-    script_page_url = movie.contents[0].get('href')
-    movie_name = script_page_url.split("/")[-1].strip('Script.html')
+    soup = BeautifulSoup(resulttext, 'html.parser')
+    return soup
 
-    script_page = urllib.request.Request(BASE_URL + urllib.parse.quote(script_page_url))
-    result_script_page = urllib.request.urlopen(script_page)
-    resulttext_script_page = result_script_page.read()
-
-    script_page_soup = BeautifulSoup(resulttext_script_page, 'html.parser')
-    paras = script_page_soup.find_all('p', align="center")
-    if len(paras) < 1:
-        continue
-    script_url = paras[0].contents[0].get('href')
-
-    # print(BASE_URL + urllib.parse.quote(script_url))
-    name = script_url.split("/")[-1].strip('.html')
+def get_script_from_url(script_url):
     if not script_url.endswith('.html'):
-        continue
-    script = urllib.request.Request(BASE_URL + urllib.parse.quote(script_url))
-    result_script = urllib.request.urlopen(script)
-    resulttext_script = result_script.read()
+        return ""
 
-
-    script_soup = BeautifulSoup(resulttext_script, 'html.parser')
+    script_soup = get_soup(BASE_URL + urllib.parse.quote(script_url))
     if len(script_soup.find_all('td', class_="scrtext")) < 1:
-        continue
-    script_text = script_soup.find_all('td', class_="scrtext")[0].pre 
+        return ""
+    script_text = script_soup.find_all('td', class_="scrtext")[0].pre
+
     text = ""
     if script_text:
         script_text = script_soup.find_all('td', class_="scrtext")[0].pre.pre
@@ -57,8 +39,38 @@ for movie in tqdm(movielist):
             script_text = script_soup.find_all('td', class_="scrtext")[0].pre
             text = script_text.get_text()
 
-        with open(os.path.join("scripts", name + '.txt'), 'w', errors="ignore") as out:
-            out.write(text)
+    return text
+
+def get_script_url(movie):
+    script_page_url = movie.contents[0].get('href')
+    movie_name = script_page_url.split("/")[-1].strip('Script.html')
+
+    script_page_soup = get_soup(BASE_URL + urllib.parse.quote(script_page_url))
+    paras = script_page_soup.find_all('p', align="center")
+    if len(paras) < 1:
+        return ""
+    script_url = paras[0].contents[0].get('href')
+
+    return script_url
+
+
+soup = get_soup(URL)
+movielist = soup.find_all('p')
+
+for movie in tqdm(movielist[:3]):
+    script_url = get_script_url(movie)
+    if script_url == "":
+        continue
+
+    name = script_url.split("/")[-1].strip('.html')
+
+    text = get_script_from_url(script_url)
+
+    if text == "":
+        continue
+
+    with open(os.path.join(DIR, name + '.txt'), 'w', errors="ignore") as out:
+        out.write(text)
 
     # print(name)
 
