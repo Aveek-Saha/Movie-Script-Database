@@ -7,7 +7,7 @@ start = time.time()
 
 from tqdm import tqdm
 
-URL = "https://www.imsdb.com/all%20scripts"
+ALL_URL = "https://www.imsdb.com/all%20scripts"
 BASE_URL = "https://www.imsdb.com"
 DIR = os.path.join("scripts", "ismdb")
 
@@ -54,10 +54,10 @@ def get_script_url(movie):
     return script_url
 
 
-soup = get_soup(URL)
+soup = get_soup(ALL_URL)
 movielist = soup.find_all('p')
 
-for movie in tqdm(movielist[:3]):
+for movie in tqdm(movielist):
     script_url = get_script_url(movie)
     if script_url == "":
         continue
