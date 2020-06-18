@@ -3,6 +3,7 @@ import urllib
 import os
 
 import time
+import string
 start = time.time()
 
 from tqdm import tqdm
