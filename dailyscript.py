@@ -11,9 +11,10 @@ DIR = os.path.join("scripts", "dailyscript")
 
 
 def format_filename(s):
-    valid_chars = "-_,() %s%s" % (string.ascii_letters, string.digits)
+    valid_chars = "-() %s%s%s" % (string.ascii_letters, string.digits, "%")
     filename = ''.join(c for c in s if c in valid_chars)
-    filename = filename.replace(' ', '_')  # I don't like spaces in filenames.
+    filename = filename.replace('%20', ' ')
+    filename = filename.replace(' ', '-') 
     return filename
 
 
@@ -54,12 +55,12 @@ for movie in tqdm(movielist):
             text = script_soup.pre.get_text()
         else:
             text = script_soup.get_text()
-        name = script_url.split("/")[-1].split('.txt')[0]
+        name = script_url.split("/")[-1].split('.html')[0]
     
     elif script_url.endswith('.htm'):
         script_soup = get_soup(BASE_URL + urllib.parse.quote(script_url))
         text = script_soup.pre.get_text()
-        name = script_url.split("/")[-1].split('.txt')[0]
+        name = script_url.split("/")[-1].split('.htm')[0]
     
     elif script_url.endswith('.txt'):
         script_soup = get_soup(BASE_URL + urllib.parse.quote(script_url))
