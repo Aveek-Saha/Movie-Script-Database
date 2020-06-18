@@ -62,7 +62,7 @@ for movie in tqdm(movielist):
     if script_url == "":
         continue
 
-    name = script_url.split("/")[-1].strip('.html')
+    name = script_url.split("/")[-1].split('.txt')[0]
 
     text = get_script_from_url(script_url)
 

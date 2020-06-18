@@ -54,17 +54,17 @@ for movie in tqdm(movielist):
             text = script_soup.pre.get_text()
         else:
             text = script_soup.get_text()
-        name = script_url.split("/")[-1].strip('.html')
+        name = script_url.split("/")[-1].split('.txt')[0]
     
     elif script_url.endswith('.htm'):
         script_soup = get_soup(BASE_URL + urllib.parse.quote(script_url))
         text = script_soup.pre.get_text()
-        name = script_url.split("/")[-1].strip('.htm')
+        name = script_url.split("/")[-1].split('.txt')[0]
     
     elif script_url.endswith('.txt'):
         script_soup = get_soup(BASE_URL + urllib.parse.quote(script_url))
         text = script_soup.get_text()
-        name = script_url.split("/")[-1].strip('.txt')
+        name = script_url.split("/")[-1].split('.txt')[0]
 
     if text == "":
         continue
