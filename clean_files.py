@@ -16,8 +16,9 @@ for x in tqdm(ismdb):
     x = x.split('.txt')[0]
     for y in daily:
         y = y.split('.txt')[0]
-        result = fuzz.ratio(x.lower(), "-".join(y.split("20")).lower())
-        if result > 85:
+        result = fuzz.ratio("".join(x.split("-")).lower(),
+                            "".join(y.split("-")).lower())
+        if result > 98:
             similar.append((x,y))
 
 print(similar)

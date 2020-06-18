@@ -17,6 +17,7 @@ def format_filename(s):
     valid_chars = "-() %s%s%s" % (string.ascii_letters, string.digits, "%")
     filename = ''.join(c for c in s if c in valid_chars)
     filename = filename.replace('%20', ' ')
+    filename = filename.replace('%27', ' ')
     filename = filename.replace(' ', '-')
     return filename
 
@@ -71,7 +72,7 @@ for movie in tqdm(movielist):
     if script_url == "":
         continue
 
-    name = script_url.split("/")[-1].split('.txt')[0]
+    name = script_url.split("/")[-1].split('.html')[0]
 
     text = get_script_from_url(script_url)
 
