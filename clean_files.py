@@ -7,9 +7,11 @@ import itertools
 
 DIR_ISMDB = join("scripts", "ismdb")
 DIR_DAILY = join("scripts", "dailyscript")
+DIR_WEEKLY = join("scripts", "weeklyscript")
 
 ismdb = [join(DIR_ISMDB, f) for f in listdir(DIR_ISMDB) if isfile(join(DIR_ISMDB, f))]
 daily = [join(DIR_DAILY, f) for f in listdir(DIR_DAILY) if isfile(join(DIR_DAILY, f))]
+weekly = [join(DIR_WEEKLY, f) for f in listdir(DIR_WEEKLY) if isfile(join(DIR_WEEKLY, f))]
 
 def remove_duplicates(arr, comb):
 
@@ -29,7 +31,7 @@ def remove_duplicates(arr, comb):
             f2.close()
 
             try: 
-                if len(file_1) >len(file_2):
+                if len(file_2.strip()) > len(file_1.strip()):
                     arr.remove(x + '.txt')
                 else:
                     arr.remove(y + '.txt')
@@ -39,12 +41,21 @@ def remove_duplicates(arr, comb):
 
     return arr
 
-print("Remove duplicates from ismdb")
+
+print("Remove duplicates from ismdb ", len(ismdb))
 comb_ismdb = list(itertools.combinations(ismdb, 2))
 ismdb = remove_duplicates(ismdb, comb_ismdb)
-print("Remove duplicates from dailyscript")
+print()
+
+print("Remove duplicates from dailyscript ", len(daily))
 comb_daily = list(itertools.combinations(daily, 2))
 daily = remove_duplicates(daily, comb_daily)
+print()
+
+print("Remove duplicates from weeklyscript ", len(weekly))
+comb_weekly = list(itertools.combinations(weekly, 2))
+weekly = remove_duplicates(weekly, comb_weekly)
+print()
 
 print("Remove duplicates between sources")
 all_sources = ismdb + daily
@@ -52,6 +63,18 @@ print(len(all_sources))
 comb_all = list(itertools.combinations(all_sources, 2))
 all_sources = remove_duplicates(all_sources, comb_all)
 print(len(all_sources))
+print()
+
+all_sources += weekly
+print(len(all_sources))
+comb_all = list(itertools.combinations(all_sources, 2))
+all_sources = remove_duplicates(all_sources, comb_all)
+print(len(all_sources))
+
+unfiltered = ismdb + daily + weekly
+
+print(sorted([x.split(sep)[-1] for x in ismdb if x not in all_sources]))
+
 
 # similar = []
 # for x in tqdm(ismdb):
