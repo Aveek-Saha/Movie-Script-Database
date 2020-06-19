@@ -9,6 +9,8 @@ DIR_ISMDB = join("scripts", "ismdb")
 DIR_DAILY = join("scripts", "dailyscript")
 DIR_WEEKLY = join("scripts", "weeklyscript")
 
+DIR_FILTER = join("scripts", "filtered")
+
 ismdb = [join(DIR_ISMDB, f) for f in listdir(DIR_ISMDB) if isfile(join(DIR_ISMDB, f))]
 daily = [join(DIR_DAILY, f) for f in listdir(DIR_DAILY) if isfile(join(DIR_DAILY, f))]
 weekly = [join(DIR_WEEKLY, f) for f in listdir(DIR_WEEKLY) if isfile(join(DIR_WEEKLY, f))]
@@ -69,11 +71,21 @@ all_sources += weekly
 print(len(all_sources))
 comb_all = list(itertools.combinations(all_sources, 2))
 all_sources = remove_duplicates(all_sources, comb_all)
-print(len(all_sources))
+# print(len(all_sources))
 
 unfiltered = ismdb + daily + weekly
 
-print(sorted([x.split(sep)[-1] for x in ismdb if x not in all_sources]))
+# print(sorted([x.split(sep)[-1] for x in daily if x not in all_sources]))
+# print(sorted([x.split(sep)[-1] for x in all_sources]))
+
+print("Write cleaned files to new dir")
+for source in tqdm(all_sources):
+    f = open(source, 'r', errors="ignore")
+    data = f.read().strip()
+    f.close()
+
+    with open(join(DIR_FILTER, source.split(sep)[-1]), 'w', errors="ignore") as out:
+        out.write(data)
 
 
 # similar = []
