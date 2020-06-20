@@ -8,12 +8,15 @@ import itertools
 DIR_ISMDB = join("scripts", "ismdb")
 DIR_DAILY = join("scripts", "dailyscript")
 DIR_WEEKLY = join("scripts", "weeklyscript")
+DIR_SCREEN = join("scripts", "screenplays")
 
 DIR_FILTER = join("scripts", "filtered")
 
 ismdb = [join(DIR_ISMDB, f) for f in listdir(DIR_ISMDB) if isfile(join(DIR_ISMDB, f))]
 daily = [join(DIR_DAILY, f) for f in listdir(DIR_DAILY) if isfile(join(DIR_DAILY, f))]
 weekly = [join(DIR_WEEKLY, f) for f in listdir(DIR_WEEKLY) if isfile(join(DIR_WEEKLY, f))]
+screen = [join(DIR_SCREEN, f) for f in listdir(DIR_SCREEN) if isfile(join(DIR_SCREEN, f))]
+
 
 def remove_duplicates(arr, comb):
 
@@ -59,6 +62,11 @@ comb_weekly = list(itertools.combinations(weekly, 2))
 weekly = remove_duplicates(weekly, comb_weekly)
 print()
 
+print("Remove duplicates from screenplays-online ", len(screen))
+comb_screen = list(itertools.combinations(screen, 2))
+screen = remove_duplicates(screen, comb_screen)
+print()
+
 print("Remove duplicates between sources")
 all_sources = ismdb + daily
 print(len(all_sources))
@@ -72,6 +80,13 @@ print(len(all_sources))
 comb_all = list(itertools.combinations(all_sources, 2))
 all_sources = remove_duplicates(all_sources, comb_all)
 # print(len(all_sources))
+print()
+
+all_sources += screen
+print(len(all_sources))
+comb_all = list(itertools.combinations(all_sources, 2))
+all_sources = remove_duplicates(all_sources, comb_all)
+print(len(all_sources))
 
 unfiltered = ismdb + daily + weekly
 
