@@ -4,31 +4,14 @@ import os
 
 import time
 import string
-start = time.time()
 
 from tqdm import tqdm
+from utilities import format_filename, get_soup
 
 ALL_URL = "https://www.imsdb.com/all%20scripts"
 BASE_URL = "https://www.imsdb.com"
 DIR = os.path.join("scripts", "ismdb")
 
-
-def format_filename(s):
-    valid_chars = "-() %s%s%s" % (string.ascii_letters, string.digits, "%")
-    filename = ''.join(c for c in s if c in valid_chars)
-    filename = filename.replace('%20', ' ')
-    filename = filename.replace('%27', '')
-    filename = filename.replace(' ', '-')
-    return filename
-
-
-def get_soup(url):
-    page = urllib.request.Request(url)
-    result = urllib.request.urlopen(page)
-    resulttext = result.read()
-
-    soup = BeautifulSoup(resulttext, 'html.parser')
-    return soup
 
 def get_script_from_url(script_url):
     if not script_url.endswith('.html'):
@@ -67,7 +50,7 @@ def get_script_url(movie):
 soup = get_soup(ALL_URL)
 movielist = soup.find_all('p')
 
-for movie in tqdm(movielist):
+for movie in tqdm(movielist[:10]):
     script_url = get_script_url(movie)
     if script_url == "":
         continue
@@ -86,6 +69,5 @@ for movie in tqdm(movielist):
 
     # print(name)
 
-print('It took', time.time()-start, 'seconds')
 
 

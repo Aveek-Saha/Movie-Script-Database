@@ -3,28 +3,11 @@ import urllib
 import os
 from tqdm import tqdm
 import string
+from utilities import format_filename, get_soup
 
 ALL_URL = "https://www.screenplays-online.de/"
 BASE_URL = "https://www.screenplays-online.de/"
 DIR = os.path.join("scripts", "screenplays")
-
-
-def format_filename(s):
-    valid_chars = "-() %s%s%s" % (string.ascii_letters, string.digits, "%")
-    filename = ''.join(c for c in s if c in valid_chars)
-    filename = filename.replace('%20', ' ')
-    filename = filename.replace('%27', '')
-    filename = filename.replace(' ', '-')
-    return filename
-
-
-def get_soup(url):
-    page = urllib.request.Request(url)
-    result = urllib.request.urlopen(page)
-    resulttext = result.read()
-
-    soup = BeautifulSoup(resulttext, 'html.parser')
-    return soup
 
 
 soup = get_soup(ALL_URL)
