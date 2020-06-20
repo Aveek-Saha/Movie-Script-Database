@@ -11,6 +11,7 @@ DIR_WEEKLY = join("scripts", "weeklyscript")
 DIR_SCREEN = join("scripts", "screenplays")
 
 DIR_FILTER = join("scripts", "filtered")
+DIR_FINAL = join("scripts", "final")
 
 ismdb = [join(DIR_ISMDB, f) for f in listdir(DIR_ISMDB) if isfile(join(DIR_ISMDB, f))]
 daily = [join(DIR_DAILY, f) for f in listdir(DIR_DAILY) if isfile(join(DIR_DAILY, f))]
@@ -43,7 +44,7 @@ def remove_duplicates(arr, comb):
             except:
                 pass
 
-    return arr, dups
+    return arr
 
 
 print("Remove duplicates from ismdb ", len(ismdb))
@@ -127,8 +128,6 @@ for (x, y) in tqdm(comb_filter):
                 filtered.remove(x)
             else:
                 filtered.remove(y)
-            dups.append((x.split(sep)[-1].split('.txt')
-                         [0], y.split(sep)[-1].split('.txt')[0]))
         except:
             pass
 
@@ -136,4 +135,12 @@ print(sorted([x.split(sep)[-1] for x in filtered]))
 print(len(filtered))
 
 
+print("Write cleaned files to new dir")
+for source in tqdm(filtered):
+    f = open(source, 'r', errors="ignore")
+    data = f.read().strip()
+    f.close()
+
+    with open(join(DIR_FINAL, source.split(sep)[-1]), 'w', errors="ignore") as out:
+        out.write(data)
 
