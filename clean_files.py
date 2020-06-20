@@ -1,6 +1,6 @@
 from fuzzywuzzy import fuzz
 from os import listdir
-from os.path import isfile, join, sep
+from os.path import isfile, join, sep, getsize
 from tqdm import tqdm
 import re
 import itertools
@@ -23,11 +23,11 @@ def remove_duplicates(arr, comb):
     for (x, y) in tqdm(comb):
         x = x.split('.txt')[0]
         y = y.split('.txt')[0]
-        if x == y:
-            continue
+        # if x == y:
+        #     continue
         result = fuzz.ratio("".join(x.split(sep)[-1].split("-")).lower(),
                             "".join(y.split(sep)[-1].split("-")).lower())
-        if result > 98:
+        if result > 97:
             f1 = open( x + '.txt', 'r', errors="ignore")
             file_1 = f1.read()
             f1.close()
@@ -41,30 +41,33 @@ def remove_duplicates(arr, comb):
                 else:
                     arr.remove(y + '.txt')
             except:
-                print(x + '.txt', y + '.txt')
-                return []
+                pass
 
-    return arr
+    return arr, dups
 
 
 print("Remove duplicates from ismdb ", len(ismdb))
 comb_ismdb = list(itertools.combinations(ismdb, 2))
 ismdb = remove_duplicates(ismdb, comb_ismdb)
+print("Non duplicates", len(ismdb))
 print()
 
 print("Remove duplicates from dailyscript ", len(daily))
 comb_daily = list(itertools.combinations(daily, 2))
 daily = remove_duplicates(daily, comb_daily)
+print("Non duplicates", len(daily))
 print()
 
 print("Remove duplicates from weeklyscript ", len(weekly))
 comb_weekly = list(itertools.combinations(weekly, 2))
 weekly = remove_duplicates(weekly, comb_weekly)
+print("Non duplicates", len(weekly))
 print()
 
 print("Remove duplicates from screenplays-online ", len(screen))
 comb_screen = list(itertools.combinations(screen, 2))
 screen = remove_duplicates(screen, comb_screen)
+print("Non duplicates", len(screen))
 print()
 
 print("Remove duplicates between sources")
@@ -72,7 +75,7 @@ all_sources = ismdb + daily
 print(len(all_sources))
 comb_all = list(itertools.combinations(all_sources, 2))
 all_sources = remove_duplicates(all_sources, comb_all)
-print(len(all_sources))
+# print(len(all_sources))
 print()
 
 all_sources += weekly
@@ -88,10 +91,10 @@ comb_all = list(itertools.combinations(all_sources, 2))
 all_sources = remove_duplicates(all_sources, comb_all)
 print(len(all_sources))
 
-unfiltered = ismdb + daily + weekly
-
 # print(sorted([x.split(sep)[-1] for x in daily if x not in all_sources]))
 # print(sorted([x.split(sep)[-1] for x in all_sources]))
+
+# unfiltered = ismdb + daily + weekly
 
 print("Write cleaned files to new dir")
 for source in tqdm(all_sources):
@@ -103,38 +106,34 @@ for source in tqdm(all_sources):
         out.write(data)
 
 
-# similar = []
-# for x in tqdm(ismdb):
-#     x = x.split('.txt')[0]
-#     for y in daily:
-#         y = y.split('.txt')[0]
-#         result = fuzz.ratio("".join(x.split("-")).lower(),
-#                             "".join(y.split("-")).lower())
-#         if result > 98:
-#             similar.append((x,y))
+print("Remove different versions of scripts with same name")
+filtered = [join(DIR_FILTER, f) for f in listdir(DIR_FILTER)
+            if isfile(join(DIR_FILTER, f)) and getsize(join(DIR_FILTER, f)) > 3000]
+print(len(filtered))
+comb_filter = list(itertools.combinations(filtered, 2))
+
+for (x, y) in tqdm(comb_filter):
+    f1 = open(x, 'r', errors="ignore")
+    file_1 = f1.read(200)
+    f1.close()
+    f2 = open(y, 'r', errors="ignore")
+    file_2 = f2.read(200)
+    f2.close()
+
+    result = fuzz.ratio(file_1, file_2)
+    if result > 95:
+        try:
+            if len(file_2) > len(file_1):
+                filtered.remove(x)
+            else:
+                filtered.remove(y)
+            dups.append((x.split(sep)[-1].split('.txt')
+                         [0], y.split(sep)[-1].split('.txt')[0]))
+        except:
+            pass
+
+print(sorted([x.split(sep)[-1] for x in filtered]))
+print(len(filtered))
 
 
-# print(similar)
-# print(len(similar))
-
-# same = []
-
-# for (x,y) in tqdm(similar):
-#     ismdb_f = open(join(DIR_ISMDB, x + '.txt'), 'r', errors="ignore")
-#     ismdb_file = ismdb_f.read(5000)
-#     ismdb_file = re.sub(r'\n+', '\n', ismdb_file).strip()
-#     ismdb_f.close()
-
-#     daily_f = open(join(DIR_DAILY, y + '.txt'), 'r', errors="ignore")
-#     daily_file = daily_f.read(5000)
-#     daily_file = re.sub(r'\n+', '\n', daily_file).strip()
-#     daily_f.close()
-
-#     if fuzz.ratio(ismdb_file.lower(), daily_file.lower()) > 60:
-#         same.append((x, y))
-
-# # print(same)
-# not_matched = [x for x in similar if x not in same]
-# print(not_matched)
-# print(len(not_matched))
 
