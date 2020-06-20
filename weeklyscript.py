@@ -12,7 +12,7 @@ def format_filename(s):
     valid_chars = "-() %s%s%s" % (string.ascii_letters, string.digits, "%")
     filename = ''.join(c for c in s if c in valid_chars)
     filename = filename.replace('%20', ' ')
-    filename = filename.replace('%27', ' ')
+    filename = filename.replace('%27', '')
     filename = filename.replace(' ', '-')
     return filename
 
