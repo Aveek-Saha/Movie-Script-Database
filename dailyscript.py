@@ -3,7 +3,7 @@ import urllib
 import os
 from tqdm import tqdm
 import string
-from utilities import format_filename, get_soup
+from utilities import format_filename, get_soup, get_pdf_text
 
 ALL_URL_1 = "https://www.dailyscript.com/movie.html"
 ALL_URL_2 = "https://www.dailyscript.com/movie_n-z.html"
@@ -30,9 +30,11 @@ for movie in tqdm(movielist):
     # print(script_url)
 
     text = ""
+    name = ""
 
     if script_url.endswith('.pdf'):
-        continue
+        text = get_pdf_text(BASE_URL + urllib.parse.quote(script_url))
+        name = script_url.split("/")[-1].split('.pdf')[0]
 
     elif script_url.endswith('.html'):
         script_soup = get_soup(BASE_URL + urllib.parse.quote(script_url))
@@ -53,7 +55,7 @@ for movie in tqdm(movielist):
         text = script_soup.get_text()
         name = script_url.split("/")[-1].split('.txt')[0]
 
-    if text == "":
+    if text == "" or name == "":
         continue
 
     name = format_filename(name)

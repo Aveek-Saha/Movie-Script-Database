@@ -22,10 +22,12 @@ def get_soup(url):
     return soup
 
 def get_pdf_text(url):
+    doc = os.path.join("scripts", "document.pdf")
     result = urllib.request.urlopen(url)
-    f = open(os.path.join("scripts", "document.pdf"), 'wb')
-    f.write(response.read())
+    f = open(doc, 'wb')
+    f.write(result.read())
     f.close()
-    text = textract.process(os.path.join(
-        "scripts", "document.pdf"), encoding='utf-8').decode('utf-8')
+    text = textract.process(doc, encoding='utf-8').decode('utf-8')
+    if os.path.isfile(doc):
+        os.remove(doc)
     return text
