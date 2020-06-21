@@ -56,7 +56,7 @@ def get_script_url(movie):
 soup = get_soup(ALL_URL)
 movielist = soup.find_all('p')
 
-for movie in tqdm(movielist[:10]):
+for movie in tqdm(movielist):
     script_url = get_script_url(movie)
     if script_url == "":
         continue

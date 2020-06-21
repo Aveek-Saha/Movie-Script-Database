@@ -27,7 +27,10 @@ def get_pdf_text(url):
     f = open(doc, 'wb')
     f.write(result.read())
     f.close()
-    text = textract.process(doc, encoding='utf-8').decode('utf-8')
+    try:
+        text = textract.process(doc, encoding='utf-8').decode('utf-8')
+    except:
+        text = ""
     if os.path.isfile(doc):
         os.remove(doc)
     return text
