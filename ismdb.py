@@ -20,7 +20,7 @@ def get_script_from_url(script_url):
     text = ""
 
     if script_url.endswith('.pdf'):
-        text = get_pdf_text(script_url)
+        text = get_pdf_text(BASE_URL + urllib.parse.quote(script_url))
         return text
 
     if script_url.endswith('.html'):
@@ -60,8 +60,10 @@ for movie in tqdm(movielist[:10]):
     script_url = get_script_url(movie)
     if script_url == "":
         continue
-
-    name = script_url.split("/")[-1].split('.html')[0]
+    if script_url.endswith('.html'):
+        name = script_url.split("/")[-1].split('.html')[0]
+    elif script_url.endswith('.pdf'):
+        name = script_url.split("/")[-1].split('.pdf')[0]
 
     text = get_script_from_url(script_url)
 

@@ -22,11 +22,10 @@ for movie in tqdm(movielist):
     name = ""
 
     if script_url.endswith('.pdf'):
-        continue
+        text = get_pdf_text(BASE_URL + urllib.parse.quote(script_url))
+        name = script_url.split("/")[-1].split('.pdf')[0]
 
     else:
-        # print(BASE_URL + urllib.parse.quote(script_url.replace('.txt',
-        #                                                        '.html'), safe="%/:=&?~#+!$,;'@()*[]"))
         script_soup = get_soup(BASE_URL + urllib.parse.quote(
             script_url.replace('.txt', '.html'), safe="%/:=&?~#+!$,;'@()*[]"))
         center = script_soup.find_all("center")[0]
