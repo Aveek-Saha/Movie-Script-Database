@@ -1,6 +1,6 @@
 from fuzzywuzzy import fuzz
-from os import listdir
-from os.path import isfile, join, sep, getsize
+from os import listdir, makedirs
+from os.path import isfile, join, sep, getsize, exists
 from tqdm import tqdm
 import re
 import itertools
@@ -98,8 +98,8 @@ print(len(all_sources))
 # unfiltered = ismdb + daily + weekly
 
 
-if not os.path.exists(DIR_FILTER):
-    os.makedirs(DIR_FILTER)
+if not exists(DIR_FILTER):
+    makedirs(DIR_FILTER)
 
 
 print("Write cleaned files to new dir")
@@ -139,8 +139,8 @@ for (x, y) in tqdm(comb_filter):
 print(sorted([x.split(sep)[-1] for x in filtered]))
 print(len(filtered))
 
-if not os.path.exists(DIR_FINAL):
-    os.makedirs(DIR_FINAL)
+if not exists(DIR_FINAL):
+    makedirs(DIR_FINAL)
 
 
 print("Write cleaned files to new dir")
