@@ -10,6 +10,8 @@ ALL_URL_2 = "https://www.dailyscript.com/movie_n-z.html"
 BASE_URL = "https://www.dailyscript.com/"
 DIR = os.path.join("scripts", "dailyscript")
 
+if not os.path.exists(DIR):
+    os.makedirs(DIR)
 
 soup_1 = get_soup(ALL_URL_1)
 soup_2 = get_soup(ALL_URL_2)

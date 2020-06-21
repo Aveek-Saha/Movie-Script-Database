@@ -12,6 +12,9 @@ ALL_URL = "https://www.imsdb.com/all%20scripts"
 BASE_URL = "https://www.imsdb.com"
 DIR = os.path.join("scripts", "ismdb")
 
+if not os.path.exists(DIR):
+    os.makedirs(DIR)
+
 
 def get_script_from_url(script_url):
     if not script_url.endswith('.html'):

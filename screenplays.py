@@ -9,7 +9,9 @@ ALL_URL = "https://www.screenplays-online.de/"
 BASE_URL = "https://www.screenplays-online.de/"
 DIR = os.path.join("scripts", "screenplays")
 
-
+if not os.path.exists(DIR):
+    os.makedirs(DIR)
+    
 soup = get_soup(ALL_URL)
 mlist = soup.find_all('table', class_="screenplay-listing")[0].find_all("a")
 movielist = [x for x in mlist if x.get('href').startswith("screenplay")]

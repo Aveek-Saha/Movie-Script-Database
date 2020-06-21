@@ -9,6 +9,8 @@ ALL_URL = "https://www.weeklyscript.com/movies_full_list.htm"
 BASE_URL = "https://www.weeklyscript.com/"
 DIR = os.path.join("scripts", "weeklyscript")
 
+if not os.path.exists(DIR):
+    os.makedirs(DIR)
 
 soup = get_soup(ALL_URL)
 movielist = soup.find_all('center')[0].find_all('a')[2:]
