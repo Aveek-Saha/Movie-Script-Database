@@ -34,3 +34,18 @@ def get_pdf_text(url):
     if os.path.isfile(doc):
         os.remove(doc)
     return text
+
+
+def get_doc_text(url):
+    doc = os.path.join("scripts", "document.doc")
+    result = urllib.request.urlopen(url)
+    f = open(doc, 'wb')
+    f.write(result.read())
+    f.close()
+    try:
+        text = textract.process(doc, encoding='utf-8').decode('utf-8')
+    except:
+        text = ""
+    if os.path.isfile(doc):
+        os.remove(doc)
+    return text

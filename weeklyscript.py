@@ -3,7 +3,7 @@ import urllib
 import os
 from tqdm import tqdm
 import string
-from utilities import format_filename, get_soup
+from utilities import format_filename, get_soup, get_pdf_text
 
 ALL_URL = "https://www.weeklyscript.com/movies_full_list.htm"
 BASE_URL = "https://www.weeklyscript.com/"
