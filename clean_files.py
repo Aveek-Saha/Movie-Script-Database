@@ -9,6 +9,7 @@ DIR_ISMDB = join("scripts", "ismdb")
 DIR_DAILY = join("scripts", "dailyscript")
 DIR_WEEKLY = join("scripts", "weeklyscript")
 DIR_SCREEN = join("scripts", "screenplays")
+DIR_AWESOME = join("scripts", "awesomefilm")
 
 DIR_FILTER = join("scripts", "filtered")
 DIR_FINAL = join("scripts", "final")
@@ -21,6 +22,8 @@ weekly = [join(DIR_WEEKLY, f) for f in listdir(DIR_WEEKLY) if isfile(
     join(DIR_WEEKLY, f))and getsize(join(DIR_WEEKLY, f)) > 3000]
 screen = [join(DIR_SCREEN, f) for f in listdir(DIR_SCREEN) if isfile(
     join(DIR_SCREEN, f))and getsize(join(DIR_SCREEN, f)) > 3000]
+awesome = [join(DIR_AWESOME, f) for f in listdir(DIR_AWESOME) if isfile(
+    join(DIR_AWESOME, f))and getsize(join(DIR_AWESOME, f)) > 3000]
 
 
 def remove_duplicates(arr, comb):
@@ -75,6 +78,12 @@ screen = remove_duplicates(screen, comb_screen)
 print("Non duplicates", len(screen))
 print()
 
+print("Remove duplicates from awesomefilm ", len(awesome))
+comb_awesome = list(itertools.combinations(awesome, 2))
+awesome = remove_duplicates(awesome, comb_awesome)
+print("Non duplicates", len(awesome))
+print()
+
 print("Remove duplicates between sources")
 all_sources = ismdb + daily
 print(len(all_sources))
@@ -91,6 +100,13 @@ all_sources = remove_duplicates(all_sources, comb_all)
 print()
 
 all_sources += screen
+print(len(all_sources))
+comb_all = list(itertools.combinations(all_sources, 2))
+all_sources = remove_duplicates(all_sources, comb_all)
+# print(len(all_sources))
+print()
+
+all_sources += awesome
 print(len(all_sources))
 comb_all = list(itertools.combinations(all_sources, 2))
 all_sources = remove_duplicates(all_sources, comb_all)
