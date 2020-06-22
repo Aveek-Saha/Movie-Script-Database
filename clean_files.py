@@ -13,10 +13,14 @@ DIR_SCREEN = join("scripts", "screenplays")
 DIR_FILTER = join("scripts", "filtered")
 DIR_FINAL = join("scripts", "final")
 
-ismdb = [join(DIR_ISMDB, f) for f in listdir(DIR_ISMDB) if isfile(join(DIR_ISMDB, f))]
-daily = [join(DIR_DAILY, f) for f in listdir(DIR_DAILY) if isfile(join(DIR_DAILY, f))]
-weekly = [join(DIR_WEEKLY, f) for f in listdir(DIR_WEEKLY) if isfile(join(DIR_WEEKLY, f))]
-screen = [join(DIR_SCREEN, f) for f in listdir(DIR_SCREEN) if isfile(join(DIR_SCREEN, f))]
+ismdb = [join(DIR_ISMDB, f) for f in listdir(DIR_ISMDB) if isfile(
+    join(DIR_ISMDB, f)) and getsize(join(DIR_ISMDB, f)) > 3000]
+daily = [join(DIR_DAILY, f) for f in listdir(DIR_DAILY) if isfile(
+    join(DIR_DAILY, f))and getsize(join(DIR_DAILY, f)) > 3000]
+weekly = [join(DIR_WEEKLY, f) for f in listdir(DIR_WEEKLY) if isfile(
+    join(DIR_WEEKLY, f))and getsize(join(DIR_WEEKLY, f)) > 3000]
+screen = [join(DIR_SCREEN, f) for f in listdir(DIR_SCREEN) if isfile(
+    join(DIR_SCREEN, f))and getsize(join(DIR_SCREEN, f)) > 3000]
 
 
 def remove_duplicates(arr, comb):
@@ -28,7 +32,7 @@ def remove_duplicates(arr, comb):
         #     continue
         result = fuzz.ratio("".join(x.split(sep)[-1].split("-")).lower(),
                             "".join(y.split(sep)[-1].split("-")).lower())
-        if result > 97:
+        if result > 98:
             f1 = open( x + '.txt', 'r', errors="ignore")
             file_1 = f1.read()
             f1.close()
