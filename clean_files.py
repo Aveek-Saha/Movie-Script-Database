@@ -5,7 +5,7 @@ from tqdm import tqdm
 import re
 import itertools
 
-DIR_ISMDB = join("scripts", "ismdb")
+DIR_IMSDB = join("scripts", "imsdb")
 DIR_DAILY = join("scripts", "dailyscript")
 DIR_WEEKLY = join("scripts", "weeklyscript")
 DIR_SCREEN = join("scripts", "screenplays")
@@ -16,8 +16,8 @@ DIR_SFY = join("scripts", "sfy")
 DIR_FILTER = join("scripts", "filtered")
 DIR_FINAL = join("scripts", "final")
 
-ismdb = [join(DIR_ISMDB, f) for f in listdir(DIR_ISMDB) if isfile(
-    join(DIR_ISMDB, f)) and getsize(join(DIR_ISMDB, f)) > 3000]
+imsdb = [join(DIR_IMSDB, f) for f in listdir(DIR_IMSDB) if isfile(
+    join(DIR_IMSDB, f)) and getsize(join(DIR_IMSDB, f)) > 3000]
 daily = [join(DIR_DAILY, f) for f in listdir(DIR_DAILY) if isfile(
     join(DIR_DAILY, f))and getsize(join(DIR_DAILY, f)) > 3000]
 weekly = [join(DIR_WEEKLY, f) for f in listdir(DIR_WEEKLY) if isfile(
@@ -33,7 +33,7 @@ sfy = [join(DIR_SFY, f) for f in listdir(DIR_SFY) if isfile(
 
 sources = {
     'savant': savant,
-    'ismdb': ismdb,
+    'imsdb': imsdb,
     'daily': daily,
     'weekly': weekly,
     'screen': screen,
