@@ -10,6 +10,7 @@ DIR_DAILY = join("scripts", "dailyscript")
 DIR_WEEKLY = join("scripts", "weeklyscript")
 DIR_SCREEN = join("scripts", "screenplays")
 DIR_AWESOME = join("scripts", "awesomefilm")
+DIR_SAVANT = join("scripts", "scriptsavant")
 
 DIR_FILTER = join("scripts", "filtered")
 DIR_FINAL = join("scripts", "final")
@@ -24,6 +25,8 @@ screen = [join(DIR_SCREEN, f) for f in listdir(DIR_SCREEN) if isfile(
     join(DIR_SCREEN, f))and getsize(join(DIR_SCREEN, f)) > 3000]
 awesome = [join(DIR_AWESOME, f) for f in listdir(DIR_AWESOME) if isfile(
     join(DIR_AWESOME, f))and getsize(join(DIR_AWESOME, f)) > 3000]
+savant = [join(DIR_SAVANT, f) for f in listdir(DIR_SAVANT) if isfile(
+    join(DIR_SAVANT, f))and getsize(join(DIR_SAVANT, f)) > 3000]
 
 
 def remove_duplicates(arr, comb):
@@ -84,8 +87,21 @@ awesome = remove_duplicates(awesome, comb_awesome)
 print("Non duplicates", len(awesome))
 print()
 
+print("Remove duplicates from scriptsavant ", len(savant))
+comb_savant = list(itertools.combinations(savant, 2))
+savant = remove_duplicates(savant, comb_savant)
+print("Non duplicates", len(savant))
+print()
+
 print("Remove duplicates between sources")
 all_sources = ismdb + daily
+print(len(all_sources))
+comb_all = list(itertools.combinations(all_sources, 2))
+all_sources = remove_duplicates(all_sources, comb_all)
+# print(len(all_sources))
+print()
+
+all_sources += savant
 print(len(all_sources))
 comb_all = list(itertools.combinations(all_sources, 2))
 all_sources = remove_duplicates(all_sources, comb_all)
@@ -139,22 +155,25 @@ print(len(filtered))
 comb_filter = list(itertools.combinations(filtered, 2))
 
 for (x, y) in tqdm(comb_filter):
-    f1 = open(x, 'r', errors="ignore")
-    file_1 = f1.read(200)
-    f1.close()
-    f2 = open(y, 'r', errors="ignore")
-    file_2 = f2.read(200)
-    f2.close()
+    result = fuzz.partial_ratio("".join(x.split(sep)[-1].split('.txt')[0].split("-")).lower(),
+                        "".join(y.split(sep)[-1].split('.txt')[0].split("-")).lower())
+    if result > 60:
+        f1 = open(x, 'r', errors="ignore")
+        file_1 = f1.read().replace("\n", " ").replace("\t", " ")[:200]
+        f1.close()
+        f2 = open(y, 'r', errors="ignore")
+        file_2 = f2.read().replace("\n", " ").replace("\t", " ")[:200]
+        f2.close()
 
-    result = fuzz.ratio(file_1, file_2)
-    if result > 95:
-        try:
-            if len(file_2) > len(file_1):
-                filtered.remove(x)
-            else:
-                filtered.remove(y)
-        except:
-            pass
+        result = fuzz.ratio(file_1, file_2)
+        if result > 80:
+            try:
+                if len(file_2) > len(file_1):
+                    filtered.remove(x)
+                else:
+                    filtered.remove(y)
+            except:
+                pass
 
 print(sorted([x.split(sep)[-1] for x in filtered]))
 print(len(filtered))
