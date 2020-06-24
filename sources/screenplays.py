@@ -3,7 +3,7 @@ import urllib
 import os
 from tqdm import tqdm
 import string
-from utilities import format_filename, get_soup
+from .utilities import format_filename, get_soup
 
 
 def get_screenplays():

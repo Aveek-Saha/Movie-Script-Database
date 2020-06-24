@@ -3,7 +3,7 @@ import urllib
 import os
 from tqdm import tqdm
 import string
-from utilities import format_filename, get_soup, get_pdf_text, get_doc_text
+from .utilities import format_filename, get_soup, get_pdf_text, get_doc_text
 
 def get_awesomefilm():
     ALL_URL = "http://www.awesomefilm.com/"

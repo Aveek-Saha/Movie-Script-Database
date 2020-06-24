@@ -3,7 +3,7 @@ import urllib
 import os
 from tqdm import tqdm
 import string
-from utilities import format_filename, get_soup, get_pdf_text, get_doc_text
+from .utilities import format_filename, get_soup, get_pdf_text, get_doc_text
 
 def get_scriptsavant():
     ALL_URL_1 = "https://thescriptsavant.com/free-movie-screenplays-am/"

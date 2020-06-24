@@ -3,7 +3,7 @@ import urllib
 import os
 from tqdm import tqdm
 import string
-from utilities import format_filename, get_soup, get_pdf_text
+from .utilities import format_filename, get_soup, get_pdf_text
 
 
 def get_weeklyscript():
