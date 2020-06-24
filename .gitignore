@@ -1,4 +1,6 @@
 scripts/
+config.py
+metadata.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
