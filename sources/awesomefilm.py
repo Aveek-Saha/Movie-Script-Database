@@ -44,7 +44,6 @@ def get_awesomefilm():
                 if page:
                     text = page.get_text()
         except:
-            print(script_url)
             continue
 
         if text == "":

@@ -50,7 +50,7 @@ def get_imsdb():
         script_page_soup = get_soup(BASE_URL + urllib.parse.quote(script_page_url))
         paras = script_page_soup.find_all('p', align="center")
         if len(paras) < 1:
-            return ""
+            return "", ""
         script_url = paras[0].contents[0].get('href')
 
         return script_url, name
@@ -59,7 +59,7 @@ def get_imsdb():
     soup = get_soup(ALL_URL)
     movielist = soup.find_all('p')
 
-    for movie in tqdm(movielist[5:10]):
+    for movie in tqdm(movielist):
         script_url, name = get_script_url(movie)
         if script_url == "":
             continue
@@ -70,7 +70,7 @@ def get_imsdb():
 
         text = get_script_from_url(script_url)
 
-        if text == "":
+        if text == "" or name == "":
             continue
 
         name = format_filename(name)
