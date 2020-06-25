@@ -90,6 +90,10 @@ def search_name(name):
 with open(join("metadata", "metadata.json"), 'r') as f:
   mapping = json.load(f)
 
+def average_ratio(n, m):
+    return ((fuzz.token_sort_ratio(n,  m) + fuzz.token_sort_ratio(m,  n)) // 2)
+
+
 count = 0
 movie_info = {}
 
@@ -102,7 +106,7 @@ for key in mapping:
         movie_info[key] = {}
     elif len(mapping[key]) > 1:
         name = re.sub(r'\([^)]*\)', '',
-                    " ".join(key.split('.txt')[0].split("-"))).lower()
+                      " ".join(key.split('.txt')[0].replace("transcript", "").split("-"))).lower()
         m = mapping[key][0]['title'].replace(
             '\'', '').replace(",", '').replace(
             '.', '').replace('&', 'and').lower()
@@ -111,15 +115,23 @@ for key in mapping:
             '.', '').replace('&', 'and').lower()
         m = re.sub(r'\([^)]*\)', '', m)
         m2 = re.sub(r'\([^)]*\)', '', m2)
-        if (fuzz.token_sort_ratio(name,  m) + fuzz.token_sort_ratio(m,  name) // 2) < (fuzz.token_sort_ratio(name,  m2) + fuzz.token_sort_ratio(m2,  name) // 2) and abs((fuzz.token_sort_ratio(name,  m) + fuzz.token_sort_ratio(m,  name) // 2) - (fuzz.token_sort_ratio(name,  m2) + fuzz.token_sort_ratio(m2,  name) // 2)) > 35:
-            # print(key.split('.txt')[0], " : ", mapping[key]
-            #       [0]['title'], " | ", mapping[key][1]['title'])
-            movie_info[key] = mapping[key][1]
+        if average_ratio(name, m) < average_ratio(name, m2) and abs(average_ratio(name, m) - average_ratio(name, m2)) > 10:
+            m = m.split(":", 1)[0]
+            m2 = m2.split(":", 1)[0]
+            if average_ratio(name, m) < average_ratio(name, m2) and abs(average_ratio(name, m) - average_ratio(name, m2)) > 10:
+                # print(key.split('.txt')[0], " : ", mapping[key]
+                #     [0]['title'], " | ", mapping[key][1]['title'])
+                movie_info[key] = mapping[key][1]
+            else: 
+                movie_info[key] = mapping[key][0]
+
         else:
             movie_info[key] = mapping[key][0]
             
-    else:
+    elif len(mapping[key]) == 1:
         movie_info[key] = mapping[key][0]
+    else:
+        print("what???")
 
 print(count)
 
@@ -128,3 +140,35 @@ json_object = json.dumps(movie_info, indent=4)
 
 with open(join("metadata", "info.json"), "w") as outfile:
     outfile.write(json_object)
+
+with open(join("metadata", "info.json"), 'r') as f:
+  movie_info = json.load(f)
+
+count = 0
+for key in movie_info:
+    if movie_info[key]:
+        name = re.sub(r'\([^)]*\)', '',
+                      " ".join(key.split('.txt')[0].replace("transcript", "").split("-"))).lower().replace("the ", "").replace(" the", "")
+        m = movie_info[key]['title'].replace(
+            '\'', '').replace(",", '').replace(
+            '.', '').replace('&', 'and').lower().replace("the ", "").replace(" the", "")
+        m = re.sub(r'\([^)]*\)', '', m)
+        m_join = "".join(m.split())
+        name = re.sub(r'\([^)]*\)', '', name)
+        m_rem = m.replace(":", "")
+        m_split = m.split(":", 1)[0]
+        m_alt = m.split(":", 1)[1] if len(
+            m.split(":", 1)) != 1 else m_split
+        if average_ratio(name, m) < 80 and average_ratio(name, m_rem) < 80 and average_ratio(name, m_rem) < 80 and (average_ratio(name, m_split) < 80) and (average_ratio(name, m_alt) < 80) and (average_ratio(name, m_join) < 80) and fuzz.partial_ratio(name, m) < 80 and fuzz.partial_ratio(m, name) < 80:
+            m_original = movie_info[key]['original_title'].replace(
+                '\'', '').replace(",", '').replace(
+                '.', '').replace('&', 'and').lower().replace("the ", "").replace(" the", "")
+            m_original = re.sub(r'\([^)]*\)', '', m_original)
+            if average_ratio(name, m_original) < 80:
+
+                print(key.split('.txt')[0], " : ", movie_info[key]
+                      ['title'], ' , ', average_ratio(name, m))
+                count += 1
+
+print(count)
+        
