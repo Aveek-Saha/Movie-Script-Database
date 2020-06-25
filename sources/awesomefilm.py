@@ -3,6 +3,7 @@ import urllib
 import os
 from tqdm import tqdm
 import string
+import re
 from .utilities import format_filename, get_soup, get_pdf_text, get_doc_text
 
 def get_awesomefilm():
@@ -25,7 +26,7 @@ def get_awesomefilm():
         # print()
 
         text = ""
-        name = format_filename(script_ele.text)
+        name = re.sub(r'\([^)]*\)', '', format_filename(script_ele.text)).strip()
         try:
             if script_url.endswith('.pdf'):
                 text = get_pdf_text(BASE_URL + urllib.parse.quote(script_url))
@@ -53,4 +54,3 @@ def get_awesomefilm():
             out.write(text)
             
 
-# print(len(movielist))

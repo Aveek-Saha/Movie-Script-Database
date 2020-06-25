@@ -21,8 +21,6 @@ def get_sfy():
     unwanted.extract()
     movielist = movielist.find_all('a')
 
-    print(len(movielist))
-
     for movie in tqdm(movielist):
         script_url = movie.get('href')
         name = re.sub(r"(\d{4})", "", format_filename(
@@ -49,3 +47,4 @@ def get_sfy():
 
         with open(os.path.join(DIR, name + '.txt'), 'w', errors="ignore") as out:
             out.write(text)
+

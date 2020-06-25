@@ -44,6 +44,7 @@ def get_imsdb():
 
     def get_script_url(movie):
         script_page_url = movie.contents[0].get('href')
+        name = format_filename(movie.contents[0].text)
         movie_name = script_page_url.split("/")[-1].strip('Script.html')
 
         script_page_soup = get_soup(BASE_URL + urllib.parse.quote(script_page_url))
@@ -52,20 +53,20 @@ def get_imsdb():
             return ""
         script_url = paras[0].contents[0].get('href')
 
-        return script_url
+        return script_url, name
 
 
     soup = get_soup(ALL_URL)
     movielist = soup.find_all('p')
 
-    for movie in tqdm(movielist):
-        script_url = get_script_url(movie)
+    for movie in tqdm(movielist[5:10]):
+        script_url, name = get_script_url(movie)
         if script_url == "":
             continue
-        if script_url.endswith('.html'):
-            name = script_url.split("/")[-1].split('.html')[0]
-        elif script_url.endswith('.pdf'):
-            name = script_url.split("/")[-1].split('.pdf')[0]
+        # if script_url.endswith('.html'):
+        #     name = script_url.split("/")[-1].split('.html')[0]
+        # elif script_url.endswith('.pdf'):
+        #     name = script_url.split("/")[-1].split('.pdf')[0]
 
         text = get_script_from_url(script_url)
 

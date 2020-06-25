@@ -3,6 +3,7 @@ import urllib
 import os
 from tqdm import tqdm
 import string
+import re
 from .utilities import format_filename, get_soup, get_pdf_text
 
 
@@ -46,7 +47,7 @@ def get_weeklyscript():
         if text == "" or name == "":
             continue
 
-        name = format_filename(name)
+        name = re.sub(r'\([^)]*\)', '', format_filename(name)).strip()
 
         with open(os.path.join(DIR, name + '.txt'), 'w', errors="ignore") as out:
             out.write(text)

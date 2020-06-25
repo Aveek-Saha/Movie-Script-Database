@@ -3,6 +3,7 @@ import urllib
 import string
 import os
 import textract
+import re
 
 def format_filename(s):
     valid_chars = "-() %s%s%s" % (string.ascii_letters, string.digits, "%")
@@ -10,6 +11,7 @@ def format_filename(s):
     filename = filename.replace('%20', ' ')
     filename = filename.replace('%27', '')
     filename = filename.replace(' ', '-')
+    filename = re.sub(r'-+', '-', filename).strip()
     return filename
 
 

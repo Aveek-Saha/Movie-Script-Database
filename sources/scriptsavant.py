@@ -23,7 +23,7 @@ def get_scriptsavant():
 
 
     print(len(movielist))
-    for movie in tqdm(movielist[:20]):
+    for movie in tqdm(movielist):
         name = format_filename(movie.text.strip())
         script_url = movie.get('href')
 

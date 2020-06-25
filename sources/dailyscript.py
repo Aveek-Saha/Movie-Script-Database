@@ -31,11 +31,11 @@ def get_dailyscript():
         # print(script_url)
 
         text = ""
-        name = ""
+        name = movie.find('a').text
 
         if script_url.endswith('.pdf'):
             text = get_pdf_text(BASE_URL + urllib.parse.quote(script_url))
-            name = script_url.split("/")[-1].split('.pdf')[0]
+            # name = script_url.split("/")[-1].split('.pdf')[0]
 
         elif script_url.endswith('.html'):
             script_soup = get_soup(BASE_URL + urllib.parse.quote(script_url))
@@ -44,17 +44,17 @@ def get_dailyscript():
                 text = script_soup.pre.get_text()
             else:
                 text = script_soup.get_text()
-            name = script_url.split("/")[-1].split('.html')[0]
+            # name = script_url.split("/")[-1].split('.html')[0]
         
         elif script_url.endswith('.htm'):
             script_soup = get_soup(BASE_URL + urllib.parse.quote(script_url))
             text = script_soup.pre.get_text()
-            name = script_url.split("/")[-1].split('.htm')[0]
+            # name = script_url.split("/")[-1].split('.htm')[0]
         
         elif script_url.endswith('.txt'):
             script_soup = get_soup(BASE_URL + urllib.parse.quote(script_url))
             text = script_soup.get_text()
-            name = script_url.split("/")[-1].split('.txt')[0]
+            # name = script_url.split("/")[-1].split('.txt')[0]
 
         if text == "" or name == "":
             continue
