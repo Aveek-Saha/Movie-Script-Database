@@ -13,6 +13,7 @@ DIR_FINAL = join("scripts", "final")
 
 
 tmdb_api_key = config.tmdb_api_key
+omdb_api_key = config.omdb_api_key
 
 movielist = [join(DIR_FINAL, f) for f in listdir(DIR_FINAL) if isfile(
     join(DIR_FINAL, f)) and getsize(join(DIR_FINAL, f)) > 3000]
@@ -93,6 +94,7 @@ with open(join("metadata", "metadata.json"), 'r') as f:
 def average_ratio(n, m):
     return ((fuzz.token_sort_ratio(n,  m) + fuzz.token_sort_ratio(m,  n)) // 2)
 
+not_found = []
 
 count = 0
 movie_info = {}
@@ -102,6 +104,7 @@ for key in mapping:
     if len(mapping[key]) == 0:
         count += 1
         n = key.split('.txt')[0]
+        not_found.append(n)
         # print(search_name(key.split('.txt')[0])," : ", n)
         movie_info[key] = {}
     elif len(mapping[key]) > 1:
@@ -133,7 +136,7 @@ for key in mapping:
     else:
         print("what???")
 
-print(count)
+# print(count)
 
 
 json_object = json.dumps(movie_info, indent=4)
@@ -143,6 +146,8 @@ with open(join("metadata", "info.json"), "w") as outfile:
 
 with open(join("metadata", "info.json"), 'r') as f:
   movie_info = json.load(f)
+
+not_matched = []
 
 count = 0
 for key in movie_info:
@@ -166,9 +171,54 @@ for key in movie_info:
             m_original = re.sub(r'\([^)]*\)', '', m_original)
             if average_ratio(name, m_original) < 80:
 
-                print(key.split('.txt')[0], " : ", movie_info[key]
-                      ['title'], ' , ', average_ratio(name, m))
+                # print(key.split('.txt')[0], " : ", movie_info[key]
+                #       ['title'], ' , ', average_ratio(name, m))
+                not_matched.append(key)
                 count += 1
 
-print(count)
+print(len(not_matched) + len(not_found))
         
+
+omdb_info = {}
+
+for movie in tqdm(not_matched):
+    name = search_name(movie.split(sep)[-1].split('.txt')[0])
+    response = urllib.request.urlopen(
+        "http://www.omdbapi.com/?apikey=" +
+        omdb_api_key + "&t=" + urllib.parse.quote(name)
+        + "&plot=full")
+    html = response.read()
+    jres = json.loads(html)
+    if jres['Response'] != "False":
+        omdb_info[movie.split(sep)[-1].split('.txt')[0]] = jres
+    else:
+        name = movie.split(sep)[-1].split('.txt')[0]
+        response = urllib.request.urlopen(
+            "http://www.omdbapi.com/?apikey=" +
+            omdb_api_key + "&t=" + urllib.parse.quote(name)
+            + "&plot=full")
+        html = response.read()
+        jres = json.loads(html)
+        if jres['Response'] != "False":
+            omdb_info[movie.split(sep)[-1].split('.txt')[0]] = jres
+        else:
+            name = " ".join(movie.split(sep)[-1].split('.txt')[0].split("-"))
+            name = " ".join(camel_case_split(name))
+            response = urllib.request.urlopen(
+                "http://www.omdbapi.com/?apikey=" +
+                omdb_api_key + "&t=" + urllib.parse.quote(name)
+                + "&plot=full")
+            html = response.read()
+            jres = json.loads(html)
+            if jres['Response'] != "False":
+                omdb_info[movie.split(sep)[-1].split('.txt')[0]]=jres
+            else:
+                omdb_info[movie.split(sep)[-1].split('.txt')[0]]={}
+
+
+    # print(name)
+
+json_object = json.dumps(omdb_info, indent=4)
+
+with open(join("metadata", "omdb_unmatched_metadata.json"), "w") as outfile:
+    outfile.write(json_object)
