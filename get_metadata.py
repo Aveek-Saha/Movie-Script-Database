@@ -179,9 +179,53 @@ for key in movie_info:
 print(len(not_matched) + len(not_found))
         
 
+# omdb_info = {}
+
+# for movie in tqdm(not_matched):
+#     name = search_name(movie.split(sep)[-1].split('.txt')[0])
+#     response = urllib.request.urlopen(
+#         "http://www.omdbapi.com/?apikey=" +
+#         omdb_api_key + "&t=" + urllib.parse.quote(name)
+#         + "&plot=full")
+#     html = response.read()
+#     jres = json.loads(html)
+#     if jres['Response'] != "False":
+#         omdb_info[movie.split(sep)[-1].split('.txt')[0]] = jres
+#     else:
+#         name = movie.split(sep)[-1].split('.txt')[0]
+#         response = urllib.request.urlopen(
+#             "http://www.omdbapi.com/?apikey=" +
+#             omdb_api_key + "&t=" + urllib.parse.quote(name)
+#             + "&plot=full")
+#         html = response.read()
+#         jres = json.loads(html)
+#         if jres['Response'] != "False":
+#             omdb_info[movie.split(sep)[-1].split('.txt')[0]] = jres
+#         else:
+#             name = " ".join(movie.split(sep)[-1].split('.txt')[0].split("-"))
+#             name = " ".join(camel_case_split(name))
+#             response = urllib.request.urlopen(
+#                 "http://www.omdbapi.com/?apikey=" +
+#                 omdb_api_key + "&t=" + urllib.parse.quote(name)
+#                 + "&plot=full")
+#             html = response.read()
+#             jres = json.loads(html)
+#             if jres['Response'] != "False":
+#                 omdb_info[movie.split(sep)[-1].split('.txt')[0]]=jres
+#             else:
+#                 omdb_info[movie.split(sep)[-1].split('.txt')[0]]={}
+
+
+#     # print(name)
+
+# json_object = json.dumps(omdb_info, indent=4)
+
+# with open(join("metadata", "omdb_unmatched_metadata.json"), "w") as outfile:
+#     outfile.write(json_object)
+
 omdb_info = {}
 
-for movie in tqdm(not_matched):
+for movie in tqdm(not_found):
     name = search_name(movie.split(sep)[-1].split('.txt')[0])
     response = urllib.request.urlopen(
         "http://www.omdbapi.com/?apikey=" +
@@ -211,14 +255,13 @@ for movie in tqdm(not_matched):
             html = response.read()
             jres = json.loads(html)
             if jres['Response'] != "False":
-                omdb_info[movie.split(sep)[-1].split('.txt')[0]]=jres
+                omdb_info[movie.split(sep)[-1].split('.txt')[0]] = jres
             else:
-                omdb_info[movie.split(sep)[-1].split('.txt')[0]]={}
-
+                omdb_info[movie.split(sep)[-1].split('.txt')[0]] = {}
 
     # print(name)
 
 json_object = json.dumps(omdb_info, indent=4)
 
-with open(join("metadata", "omdb_unmatched_metadata.json"), "w") as outfile:
+with open(join("metadata", "omdb_not_found.json"), "w") as outfile:
     outfile.write(json_object)
