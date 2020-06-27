@@ -46,6 +46,11 @@ def search_name(name):
     name = ' '.join(name.split())
     return name
 
+def average_ratio(n, m):
+    return ((fuzz.token_sort_ratio(n,  m) + fuzz.token_sort_ratio(m,  n)) // 2)
+
+# Search TMDb for movies
+
 # for movie in tqdm(movielist):
 #     name = search_name(movie.split(sep)[-1].split('.txt')[0])
 #     response = urllib.request.urlopen(
@@ -91,14 +96,13 @@ def search_name(name):
 # with open(join("metadata", "metadata.json"), 'r') as f:
 #   mapping = json.load(f)
 
-# def average_ratio(n, m):
-#     return ((fuzz.token_sort_ratio(n,  m) + fuzz.token_sort_ratio(m,  n)) // 2)
 
 # not_found = []
 
 # count = 0
 # movie_info = {}
 
+# Get matching movie from list
 
 # for key in mapping:
 #     if len(mapping[key]) == 0:
@@ -150,6 +154,9 @@ def search_name(name):
 # not_matched = []
 
 # count = 0
+
+# Get all movies that dont match
+
 # for key in movie_info:
 #     if movie_info[key]:
 #         name = re.sub(r'\([^)]*\)', '',
@@ -180,6 +187,8 @@ def search_name(name):
         
 
 # omdb_info = {}
+
+# Search for them in OMDb
 
 # for movie in tqdm(not_matched):
 #     name = search_name(movie.split(sep)[-1].split('.txt')[0])
@@ -224,6 +233,8 @@ def search_name(name):
 #     outfile.write(json_object)
 
 # omdb_info = {}
+
+# Search for them in OMDb
 
 # for movie in tqdm(not_found):
 #     name = search_name(movie.split(sep)[-1].split('.txt')[0])
@@ -276,6 +287,8 @@ def search_name(name):
 
 # tmdb_re = {}
 
+# Find ones not found in OMDb in TMDb by using the first ine in the script
+
 # for key in tqdm(omdb_all):
 #     if not omdb_all[key]:
 #         f = open(join(DIR_FINAL, key + '.txt'), 'r', errors="ignore")
@@ -292,7 +305,8 @@ def search_name(name):
 #         jres = json.loads(html)
 #         if jres['total_results'] > 0:
 #             tmdb_re[key] = jres['results']
-#         # print(key, " : ", first_line)
+#         else:
+#             tmdb_re[key] = []
 
 # json_object = json.dumps(tmdb_re, indent=4)
 
@@ -301,3 +315,85 @@ def search_name(name):
 # print(count)
 
 
+# omdb_all = {}
+# movie_info = {}
+# count = 0
+# with open(join("metadata", "metadata_2.json"), 'r') as f:
+#     omdb_all = json.load(f)
+
+
+# for key in omdb_all:
+#     if len(omdb_all[key]) == 0:
+#         count += 1
+#         n = key.split('.txt')[0]
+#         # print(search_name(key.split('.txt')[0])," : ", n)
+#         movie_info[key] = {}
+#     elif len(omdb_all[key]) > 1:
+#         name = re.sub(r'\([^)]*\)', '',
+#                         " ".join(key.split('.txt')[0].replace("transcript", "").split("-"))).lower()
+#         m = omdb_all[key][0]['title'].replace(
+#             '\'', '').replace(",", '').replace(
+#             '.', '').replace('&', 'and').lower()
+#         m2 = omdb_all[key][1]['title'].replace(
+#             '\'', '').replace(",", '').replace(
+#             '.', '').replace('&', 'and').lower()
+#         m = re.sub(r'\([^)]*\)', '', m)
+#         m2 = re.sub(r'\([^)]*\)', '', m2)
+#         if average_ratio(name, m) < average_ratio(name, m2) and abs(average_ratio(name, m) - average_ratio(name, m2)) > 10:
+#             m = m.split(":", 1)[0]
+#             m2 = m2.split(":", 1)[0]
+#             if average_ratio(name, m) < average_ratio(name, m2) and abs(average_ratio(name, m) - average_ratio(name, m2)) > 10:
+#                 print(key.split('.txt')[0], " : ", omdb_all[key]
+#                       [0]['title'], " | ", omdb_all[key][1]['title'])
+#                 movie_info[key] = omdb_all[key][1]
+#             else:
+#                 movie_info[key] = omdb_all[key][0]
+
+#         else:
+#             movie_info[key] = omdb_all[key][0]
+
+#     elif len(omdb_all[key]) == 1:
+#         movie_info[key] = omdb_all[key][0]
+#     else:
+#         print("what???")
+
+# json_object = json.dumps(movie_info, indent=4)
+
+# with open(join("metadata", "info_2.json"), "w") as outfile:
+#     outfile.write(json_object)
+
+
+movie_info = {}
+
+with open(join("metadata", "info_2.json"), 'r') as f:
+  movie_info = json.load(f)
+
+
+count = 0
+for key in movie_info:
+    if movie_info[key]:
+        name = re.sub(r'\([^)]*\)', '',
+                      " ".join(key.split('.txt')[0].replace("transcript", "").split("-"))).lower().replace("the ", "").replace(" the", "")
+        m = movie_info[key]['title'].replace(
+            '\'', '').replace(",", '').replace(
+            '.', '').replace('&', 'and').lower().replace("the ", "").replace(" the", "")
+        m = re.sub(r'\([^)]*\)', '', m)
+        m_join = "".join(m.split())
+        name = re.sub(r'\([^)]*\)', '', name)
+        m_rem = m.replace(":", "")
+        m_split = m.split(":", 1)[0]
+        m_alt = m.split(":", 1)[1] if len(
+            m.split(":", 1)) != 1 else m_split
+        if average_ratio(name, m) < 80 and average_ratio(name, m_rem) < 80 and average_ratio(name, m_rem) < 80 and (average_ratio(name, m_split) < 80) and (average_ratio(name, m_alt) < 80) and (average_ratio(name, m_join) < 80) and fuzz.partial_ratio(name, m) < 80 and fuzz.partial_ratio(m, name) < 80:
+            m_original = movie_info[key]['original_title'].replace(
+                '\'', '').replace(",", '').replace(
+                '.', '').replace('&', 'and').lower().replace("the ", "").replace(" the", "")
+            m_original = re.sub(r'\([^)]*\)', '', m_original)
+            if average_ratio(name, m_original) < 55:
+
+                print(key.split('.txt')[0], " : ", movie_info[key]
+                      ['title'], ' , ', average_ratio(name, m_original))
+                count += 1
+
+
+print(count)
