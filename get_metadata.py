@@ -277,13 +277,13 @@ def average_ratio(n, m):
 # with open(join("metadata", "omdb_not_found.json"), "w") as outfile:
 #     outfile.write(json_object)
 
-# omdb_all = {}
-# count = 0
-# with open(join("metadata", "omdb_not_found.json"), 'r') as f:
-#   omdb_all = json.load(f)
+omdb_all = {}
+count = 0
+with open(join("metadata", "omdb_not_found.json"), 'r') as f:
+  omdb_all = json.load(f)
 
-# with open(join("metadata", "omdb_unmatched.json"), 'r') as f:
-#   omdb_all.update(json.load(f))
+with open(join("metadata", "omdb_unmatched.json"), 'r') as f:
+  omdb_all.update(json.load(f))
 
 # tmdb_re = {}
 
@@ -363,37 +363,39 @@ def average_ratio(n, m):
 #     outfile.write(json_object)
 
 
-movie_info = {}
+# movie_info = {}
 
-with open(join("metadata", "info_2.json"), 'r') as f:
-  movie_info = json.load(f)
-
-
-count = 0
-for key in movie_info:
-    if movie_info[key]:
-        name = re.sub(r'\([^)]*\)', '',
-                      " ".join(key.split('.txt')[0].replace("transcript", "").split("-"))).lower().replace("the ", "").replace(" the", "")
-        m = movie_info[key]['title'].replace(
-            '\'', '').replace(",", '').replace(
-            '.', '').replace('&', 'and').lower().replace("the ", "").replace(" the", "")
-        m = re.sub(r'\([^)]*\)', '', m)
-        m_join = "".join(m.split())
-        name = re.sub(r'\([^)]*\)', '', name)
-        m_rem = m.replace(":", "")
-        m_split = m.split(":", 1)[0]
-        m_alt = m.split(":", 1)[1] if len(
-            m.split(":", 1)) != 1 else m_split
-        if average_ratio(name, m) < 80 and average_ratio(name, m_rem) < 80 and average_ratio(name, m_rem) < 80 and (average_ratio(name, m_split) < 80) and (average_ratio(name, m_alt) < 80) and (average_ratio(name, m_join) < 80) and fuzz.partial_ratio(name, m) < 80 and fuzz.partial_ratio(m, name) < 80:
-            m_original = movie_info[key]['original_title'].replace(
-                '\'', '').replace(",", '').replace(
-                '.', '').replace('&', 'and').lower().replace("the ", "").replace(" the", "")
-            m_original = re.sub(r'\([^)]*\)', '', m_original)
-            if average_ratio(name, m_original) < 55:
-
-                print(key.split('.txt')[0], " : ", movie_info[key]
-                      ['title'], ' , ', average_ratio(name, m_original))
-                count += 1
+# with open(join("metadata", "info_2.json"), 'r') as f:
+#   movie_info = json.load(f)
 
 
-print(count)
+# count = 0
+# for key in movie_info:
+#     if movie_info[key]:
+#         name = re.sub(r'\([^)]*\)', '',
+#                       " ".join(key.split('.txt')[0].replace("transcript", "").split("-"))).lower().replace("the ", "").replace(" the", "")
+#         m = movie_info[key]['title'].replace(
+#             '\'', '').replace(",", '').replace(
+#             '.', '').replace('&', 'and').lower().replace("the ", "").replace(" the", "")
+#         m = re.sub(r'\([^)]*\)', '', m)
+#         m_join = "".join(m.split())
+#         name = re.sub(r'\([^)]*\)', '', name)
+#         m_rem = m.replace(":", "")
+#         m_split = m.split(":", 1)[0]
+#         m_alt = m.split(":", 1)[1] if len(
+#             m.split(":", 1)) != 1 else m_split
+#         if average_ratio(name, m) < 80 and average_ratio(name, m_rem) < 80 and average_ratio(name, m_rem) < 80 and (average_ratio(name, m_split) < 80) and (average_ratio(name, m_alt) < 80) and (average_ratio(name, m_join) < 80) and fuzz.partial_ratio(name, m) < 80 and fuzz.partial_ratio(m, name) < 80:
+#             m_original = movie_info[key]['original_title'].replace(
+#                 '\'', '').replace(",", '').replace(
+#                 '.', '').replace('&', 'and').lower().replace("the ", "").replace(" the", "")
+#             m_original = re.sub(r'\([^)]*\)', '', m_original)
+#             if average_ratio(name, m_original) < 55:
+
+#                 print(key.split('.txt')[0], " : ", movie_info[key]
+#                       ['title'], ' , ', average_ratio(name, m_original))
+#                 count += 1
+
+
+# print(count)
+
+

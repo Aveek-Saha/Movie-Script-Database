@@ -98,7 +98,13 @@ print("Write cleaned files to new dir")
 for source in tqdm(all_sources):
     f = open(source, 'r', errors="ignore")
     data = f.read().strip()
-    data = ''.join([i if ord(i) < 128 else '' for i in data])
+    out = data.replace(u'\u2018', u"'")
+    out = out.replace(u'\u2019', u"'")
+    out = out.replace(u'\u201c', '')
+    out = out.replace(u'\u201d', '')
+    out = out.replace('"', '')
+    out = out.replace("Script provided for educational purposes. More scripts can be found here: http://www.sellingyourscreenplay.com/library", "")
+    data = out.encode('ascii', 'ignore').decode('ascii').strip()
     f.close()
 
     with open(join(DIR_FILTER, source.split(sep)[-1]), 'w', errors="ignore") as out:
