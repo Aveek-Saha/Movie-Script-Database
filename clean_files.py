@@ -4,6 +4,7 @@ from os.path import isfile, join, sep, getsize, exists
 from tqdm import tqdm
 import re
 import itertools
+import string
 
 DIR_IMSDB = join("scripts", "imsdb")
 DIR_DAILY = join("scripts", "dailyscript")
@@ -69,46 +70,46 @@ def remove_duplicates(arr, comb):
 
     return arr
 
-for key in sources:
-    arr = sources[key]
-    print("Remove duplicates from", key, len(arr))
-    comb = list(itertools.combinations(arr, 2))
-    arr = remove_duplicates(arr, comb)
-    print("Non duplicates", len(arr))
-    print()
+# for key in sources:
+#     arr = sources[key]
+#     print("Remove duplicates from", key, len(arr))
+#     comb = list(itertools.combinations(arr, 2))
+#     arr = remove_duplicates(arr, comb)
+#     print("Non duplicates", len(arr))
+#     print()
 
-print("Remove duplicates between sources")
+# print("Remove duplicates between sources")
 
-all_sources = []
-for key in sources:
-    arr = sources[key]
-    all_sources += arr
-    print(len(all_sources))
-    comb_all = list(itertools.combinations(all_sources, 2))
-    all_sources = remove_duplicates(all_sources, comb_all)
-    print(len(all_sources))
-    print()
-
-
-if not exists(DIR_FILTER):
-    makedirs(DIR_FILTER)
+# all_sources = []
+# for key in sources:
+#     arr = sources[key]
+#     all_sources += arr
+#     print(len(all_sources))
+#     comb_all = list(itertools.combinations(all_sources, 2))
+#     all_sources = remove_duplicates(all_sources, comb_all)
+#     print(len(all_sources))
+#     print()
 
 
-print("Write cleaned files to new dir")
-for source in tqdm(all_sources):
-    f = open(source, 'r', errors="ignore")
-    data = f.read().strip()
-    out = data.replace(u'\u2018', u"'")
-    out = out.replace(u'\u2019', u"'")
-    out = out.replace(u'\u201c', '')
-    out = out.replace(u'\u201d', '')
-    out = out.replace('"', '')
-    out = out.replace("Script provided for educational purposes. More scripts can be found here: http://www.sellingyourscreenplay.com/library", "")
-    data = out.encode('ascii', 'ignore').decode('ascii').strip()
-    f.close()
+# if not exists(DIR_FILTER):
+#     makedirs(DIR_FILTER)
 
-    with open(join(DIR_FILTER, source.split(sep)[-1]), 'w', errors="ignore") as out:
-        out.write(data)
+
+# print("Write cleaned files to new dir")
+# for source in tqdm(all_sources):
+#     f = open(source, 'r', errors="ignore")
+#     data = f.read().strip()
+#     out = data.replace(u'\u2018', u"'")
+#     out = out.replace(u'\u2019', u"'")
+#     out = out.replace(u'\u201c', '')
+#     out = out.replace(u'\u201d', '')
+#     out = out.replace('"', '')
+#     out = out.replace("Script provided for educational purposes. More scripts can be found here: http://www.sellingyourscreenplay.com/library", "")
+#     data = out.encode('utf-8', 'ignore').decode('utf-8').strip()
+#     f.close()
+
+#     with open(join(DIR_FILTER, source.split(sep)[-1]), 'w', errors="ignore") as out:
+#         out.write(data)
 
 
 print("Remove different versions of scripts with same name")
@@ -152,6 +153,42 @@ for source in tqdm(filtered):
     f = open(source, 'r', errors="ignore")
     data = f.read().strip()
     f.close()
+
+    whitespace = re.compile(r'^[\s]+')
+    punctuation = re.compile(r'['+string.punctuation+']')
+    pagenumber = re.compile(r'^[(]?\d{1,3}[)]?[\.]?$')
+    pagenumber2 = re.compile(r'^[(]?\d{1,3}[)]?.?[(]?\d{1,3}[)]?[\.]?$')
+    pagenumber3 = re.compile(r'^.[(]?\d{1,3}[)]?[\.]?$')
+    cont = re.compile(r'^\(CONTINUED\)$')
+    cont2 = re.compile(r'^CONTINUED:$')
+    allspecialchars = re.compile(r'^[^\w\s ]*$')
+
+    lines = []
+
+    for line in data.split('\n'):
+        copy = line
+        line = line.lower().strip()
+
+        #skip lines with one char since they're likely typos
+        if len(line)==1:
+            if line.lower() != 'a' or line.lower() != 'i':
+                continue
+
+        #skip lines containing page numbers
+        if pagenumber.match(line) or pagenumber2.match(line) or pagenumber3.match(line):
+            continue
+        
+        if cont.match(line) or cont2.match(line):
+            continue
+
+        #skip lines containing just special characters
+        if line != '' and allspecialchars.match(line):
+            continue
+            
+
+        lines.append(copy)
+    
+    final_data = '\n'.join(lines)
 
     with open(join(DIR_FINAL, source.split(sep)[-1]), 'w', errors="ignore") as out:
         out.write(data)
