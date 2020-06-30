@@ -48,10 +48,13 @@ def remove_duplicates(arr, comb):
     for (x, y) in tqdm(comb):
         x = x.split('.txt')[0]
         y = y.split('.txt')[0]
-        # if x == y:
-        #     continue
-        result = fuzz.ratio("".join(x.split(sep)[-1].split("-")).lower(),
-                            "".join(y.split(sep)[-1].split("-")).lower())
+
+        name_x = "".join(" ".join(
+            x.split(sep)[-1].split("-")).lower().replace("the ", "").replace(" the", "").split())
+        name_y = "".join(" ".join(
+            y.split(sep)[-1].split("-")).lower().replace("the ", "").replace(" the", "").split())
+        
+        result = fuzz.ratio(name_x , name_y)
         if result > 98:
             f1 = open( x + '.txt', 'r', errors="ignore")
             file_1 = f1.read()
