@@ -1,9 +1,6 @@
 import subprocess
 import glob
 import os
-from os import listdir, makedirs
-from os.path import isfile, join, sep, getsize, exists
-from tqdm import tqdm
 import numpy as np
 import argparse
 import re
@@ -23,12 +20,16 @@ def read_args():
                         help="Print abridged version (on/off)", default='off')
     parser.add_argument(
         "-t", "--tags", help="Print class label tags (on/off)", default='off')
+    parser.add_argument(
+        "-c", "--char", help="Print char info file (on/off)", default='off')
     args = parser.parse_args()
     if args.abridged not in ['on', 'off']:
         raise AssertionError("Invalid value. Choose either off or on")
     if args.tags not in ['on', 'off']:
         raise AssertionError("Invalid value. Choose either off or on")
-    return os.path.abspath(args.input), os.path.abspath(args.output), args.abridged, args.tags
+    if args.char not in ['on', 'off']:
+        raise AssertionError("Invalid value. Choose either off or on")
+    return os.path.abspath(args.input), os.path.abspath(args.output), args.abridged, args.tags, args.char
 
 
 # READ FILE
@@ -45,6 +46,9 @@ def read_file(file_orig):
     fid = open(file_name, 'r')
     script_orig = fid.read().splitlines()
     fid.close()
+    if file_orig.endswith(".pdf"):
+        subprocess.call('rm ' + file_name, shell=True)
+
     return script_orig
 
 
@@ -82,14 +86,14 @@ def get_meta(script_noind, tag_vec, tag_set, meta_thresh, meta_set, sent_thresh,
     met_ind = [i for i, x in enumerate(script_noind) if tag_vec[i] not in tag_set
                and i != 0 and i != (len(script_noind) - 1)
                and len(x.split()) < meta_thresh
-               and re_func.sub('', script_noind[i - 1]) == ''
-               and re_func.sub('', script_noind[i + 1]) == ''
+               and len(re_func.sub('', script_noind[i - 1]).split()) == 0
+               and len(re_func.sub('', script_noind[i + 1]).split()) == 0
                and any([y in x for y in meta_set])]
     sent_ind = [i for i, x in enumerate(script_noind) if tag_vec[i] not in tag_set
                 and i != 0 and i != (len(script_noind) - 1)
                 and len(x.split()) > sent_thresh
-                and script_noind[i - 1] == ''
-                and script_noind[i + 1] != '']
+                and len(script_noind[i - 1].split()) == 0
+                and len(script_noind[i + 1].split()) > 0]
     meta_ind = sorted(met_ind + bound_ind + trans_ind + sent_ind)
     if len(meta_ind) > 0:
         for i, x in enumerate(script_noind[: meta_ind[0]]):
@@ -99,26 +103,43 @@ def get_meta(script_noind, tag_vec, tag_set, meta_thresh, meta_set, sent_thresh,
     return tag_vec
 
 
+# DECOMPOSE LINE WITH DIALOGUE AND DIALOGUE METADATA INTO INDIVIDUAL CLASSES
+def separate_dial_meta(line_str):
+    if '(' in line_str and ')' in line_str:
+        bef_par_str = ' '.join(line_str.split('(')[0].split())
+        in_par_str = ' '.join(line_str.split('(')[1].split(')')[0].split())
+        rem_str = ')'.join(line_str.split(')')[1:])
+    else:
+        bef_par_str = line_str
+        in_par_str = ''
+        rem_str = ''
+
+    return bef_par_str, in_par_str, rem_str
+
+
 # DETECT CHARACTER-DIALOGUE BLOCKS:
 # CHARACTER IS ALL-CAPS LINE PRECEDED BY NEWLINE AND NOT FOLLOWED BY A NEWLINE
 # DIALOGUE IS WHATEVER IMMEDIATELY FOLLOWS CHARACTER
 # EITHER CHARACTER OR DIALOGUE MIGHT CONTAIN DILAOGUE METADATA; WILL BE DETECTED LATER
 def get_char_dial(script_noind, tag_vec, tag_set, char_max_words):
     char_ind = [i for i, x in enumerate(script_noind) if tag_vec[i] not in tag_set and x.isupper()
-                and i != 0 and i != (len(script_noind) - 1)
-                and script_noind[i - 1] == ''
-                and script_noind[i + 1] != ''
-                and len(x.split()) < char_max_words]
+                and i != 0 and i != (len(script_noind) - 1)\
+                # and len(script_noind[i - 1].split()) == 0\
+                and len(script_noind[i + 1].split()) > 0\
+                and len(x.split()) < char_max_words\
+                and any([separate_dial_meta(x)[y] for y in [0, 2]])]
     for x in char_ind:
         tag_vec[x] = 'C'
         dial_flag = 1
         while dial_flag > 0:
             line_ind = x + dial_flag
-            if script_noind[line_ind] != '':
-                if '(' in script_noind[line_ind] and ')' in script_noind[line_ind].split('(')[1]:
-                    tag_vec[line_ind] = 'E'
-                else:
+            if len(script_noind[line_ind].split()) > 0:
+                dial_str, dial_meta_str, rem_str = separate_dial_meta(
+                    script_noind[line_ind])
+                if dial_str != '' or rem_str != '':
                     tag_vec[line_ind] = 'D'
+                else:
+                    tag_vec[line_ind] = 'E'
 
                 dial_flag += 1
             else:
@@ -130,8 +151,9 @@ def get_char_dial(script_noind, tag_vec, tag_set, char_max_words):
 # DETECT SCENE DESCRIPTION
 # LOOK FOR REMAINING LINES THAT ARE NOT PAGE BREAKS
 def get_scene_desc(script_noind, tag_vec, tag_set):
-    desc_ind = [i for i, x in enumerate(script_noind) if tag_vec[i] not in tag_set and x != ''
-                and not x.strip('.').isdigit()]
+    desc_ind = [i for i, x in enumerate(script_noind) if tag_vec[i] not in tag_set and
+                len(x.split()) > 0 and
+                not x.strip('.').isdigit()]
     for x in desc_ind:
         tag_vec[x] = 'N'
 
@@ -161,32 +183,34 @@ def combine_tag_lines(tag_valid, script_valid):
                     tag_final.append(x)
                     script_final.append(combined_str)
                 else:
-                    if '(' in combined_str and ')' in combined_str:
+                    _, in_par, _ = separate_dial_meta(combined_str)
+                    if in_par != '':
                         # IF DIALOGUE METADATA PRESENT, EXTRACT IT
-                        dial_met = ''
-                        rem_str = ''
+                        dial_meta_str = ''
+                        char_dial_str = ''
                         while '(' in combined_str and ')' in combined_str:
-                            split_1 = combined_str.split('(')
-                            rem_str += ' ' + split_1[0]
-                            dial_met += ' ' + split_1[1].split(')')[0]
-                            combined_str = ')'.join(
-                                combined_str.split(')')[1:])
+                            before_par, in_par, combined_str = separate_dial_meta(
+                                combined_str)
+                            char_dial_str += ' ' + before_par
+                            dial_meta_str += ' ' + in_par
 
-                        rem_str += ' ' + combined_str
-                        rem_str = ' '.join(rem_str.split())
-                        dial_met = ' '.join(dial_met.split())
+                        char_dial_str += ' ' + combined_str
+                        char_dial_str = ' '.join(char_dial_str.split())
+                        dial_meta_str = ' '.join(dial_meta_str.split())
                         if x == 'C':
                             # IF CHARACTER, APPEND DIALOGUE METADATA
                             tag_final.append(x)
-                            script_final.append(' '.join(rem_str.split()))
+                            script_final.append(
+                                ' '.join(char_dial_str.split()))
                             tag_final.append('E')
-                            script_final.append(dial_met)
+                            script_final.append(dial_meta_str)
                         elif x == 'D':
                             # IF DIALOGUE, PREPEND DIALOGUE METADATA
                             tag_final.append('E')
-                            script_final.append(dial_met)
+                            script_final.append(dial_meta_str)
                             tag_final.append(x)
-                            script_final.append(' '.join(rem_str.split()))
+                            script_final.append(
+                                ' '.join(char_dial_str.split()))
                     else:
                         # IF NO DIALOGUE METADATA, WRITE AS IT IS
                         tag_final.append(x)
@@ -271,7 +295,7 @@ def find_arrange(tag_valid):
 
 
 # PARSER FUNCTION
-def parse(file_orig, save_dir, abr_flag, tag_flag, save_name=None, abridged_name=None, tag_name=None):
+def parse(file_orig, save_dir, abr_flag, tag_flag, char_flag, save_name=None, abridged_name=None, tag_name=None):
     #------------------------------------------------------------------------------------
     # DEFINE
     tag_set = ['S', 'N', 'C', 'D', 'E', 'T', 'M']
@@ -285,9 +309,10 @@ def parse(file_orig, save_dir, abr_flag, tag_flag, save_name=None, abridged_name
     # READ PDF/TEXT FILE
     script_orig = read_file(file_orig)
     # REMOVE INDENTS
+    alnum_filter = re.compile('[\W_]+', re.UNICODE)
     script_noind = []
     for script_line in script_orig:
-        if len(script_line.split()) > 0:
+        if len(script_line.split()) > 0 and alnum_filter.sub('', script_line) != '':
             script_noind.append(' '.join(script_line.split()))
         else:
             script_noind.append('')
@@ -329,9 +354,14 @@ def parse(file_orig, save_dir, abr_flag, tag_flag, save_name=None, abridged_name
 
     # FORMAT TAGS, LINES
     tag_valid, script_valid = combine_tag_lines(tag_valid, script_valid)
+    max_rev = 0
     while find_same(tag_valid) > 0 or find_arrange(tag_valid) > 0:
         tag_valid, script_valid = merge_tag_lines(tag_valid, script_valid)
         tag_valid, script_valid = rearrange_tag_lines(tag_valid, script_valid)
+        max_rev += 1
+        if max_rev == 1000:
+            raise AssertionError(
+                "Too many revisions. Something must be wrong.")
 
     #------------------------------------------------------------------------------------
     # WRITE PARSED SCRIPT TO FILE
@@ -358,34 +388,53 @@ def parse(file_orig, save_dir, abr_flag, tag_flag, save_name=None, abridged_name
         else:
             abridged_name = os.path.join(save_dir, abridged_name)
 
-        abridged_script = [x for x in parsed_script if x.startswith(
-            'C') or x.startswith('D')]
+        abridged_ind = [i for i, x in enumerate(parsed_script) if x.startswith('C:') and
+                        parsed_script[i + 1].startswith('D:')]
         fid = open(abridged_name, 'w')
-        for i in range(0, len(abridged_script), 2):
-            try:
-                char_str = ' '.join(abridged_script[i].split('C:')[1].split())
-                dial_str = ' '.join(
-                    abridged_script[i + 1].split('D:')[1].split())
-                _ = fid.write(''.join([char_str, '=>', dial_str, '\n']))
-            except:
-                pass
+        for i in abridged_ind:
+            char_str = ' '.join(parsed_script[i].split('C:')[1].split())
+            dial_str = ' '.join(parsed_script[i + 1].split('D:')[1].split())
+            _ = fid.write(''.join([char_str, '=>', dial_str, '\n']))
 
         fid.close()
 
+    #------------------------------------------------------------------------------------
+    # CREATE CHAR INFO FILE
+    if char_flag == 'on':
+        tag_str_vec = np.array(tag_valid)
+        script_vec = np.array(script_valid)
+        char_ind = np.where(tag_str_vec == 'C')[0]
+        char_set = sorted(set(script_vec[char_ind]))
+        charinfo_vec = []
+        for char_id in char_set:
+            spk_ind = list(
+                set(np.where(script_vec == char_id)[0]) & set(char_ind))
+            if len(spk_ind) > 0:
+                num_lines = len([i for i in spk_ind if i != (len(tag_str_vec) - 1) and
+                                 tag_str_vec[i + 1] == 'D'])
+                charinfo_str = char_id + ': ' + \
+                    str(num_lines) + '|'.join([' ', ' ', ' ', ' '])
+                charinfo_vec.append(charinfo_str)
+
+        charinfo_name = os.path.join(save_dir, '.'.join(
+            file_orig.split('/')[-1].split('.')[: -1]) + '_charinfo.txt')
+        np.savetxt(charinfo_name, charinfo_vec, fmt='%s', delimiter='\n')
 
 # MAIN FUNCTION
 if __name__ == "__main__":
     DIR_FINAL = join("scripts", "final")
     DIR_OUT = join("scripts", "parsed")
+    if not os.path.exists(DIR_OUT):
+        os.makedirs(DIR_OUT)
 
     files = [join(DIR_FINAL, f) for f in listdir(DIR_FINAL)
              if isfile(join(DIR_FINAL, f)) and getsize(join(DIR_FINAL, f)) > 3000]
     for f in tqdm(files):
 
-        file_orig, save_dir, abr_flag, tag_flag, save_name, abridged_name = f, DIR_OUT, 'on', 'off', f.split(
+        file_orig, save_dir, abr_flag, tag_flag, char_flag, save_name, abridged_name = f, DIR_OUT, 'on', 'off', 'off', f.split(
             sep)[-1], f.split(sep)[-1].split('.txt')[0] + '_abridged.txt'
         try:
             parse(file_orig, save_dir, abr_flag,
-                  tag_flag, save_name, abridged_name)
+                  tag_flag, char_flag, save_name, abridged_name)
         except:
             pass
