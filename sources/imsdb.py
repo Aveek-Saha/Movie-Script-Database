@@ -12,7 +12,7 @@ from .utilities import format_filename, get_soup, get_pdf_text
 def get_imsdb():
     ALL_URL = "https://www.imsdb.com/all%20scripts"
     BASE_URL = "https://www.imsdb.com"
-    DIR = os.path.join("scripts", "imsdb")
+    DIR = os.path.join("scripts", "unprocessed", "imsdb")
 
     if not os.path.exists(DIR):
         os.makedirs(DIR)

@@ -10,7 +10,7 @@ from .utilities import format_filename, get_soup, get_pdf_text
 def get_sfy():
     ALL_URL = "https://sfy.ru/scripts"
     BASE_URL = "https://sfy.ru"
-    DIR = os.path.join("scripts", "sfy")
+    DIR = os.path.join("scripts", "unprocessed", "sfy")
 
     if not os.path.exists(DIR):
         os.makedirs(DIR)

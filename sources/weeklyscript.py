@@ -10,7 +10,7 @@ from .utilities import format_filename, get_soup, get_pdf_text
 def get_weeklyscript():
     ALL_URL = "https://www.weeklyscript.com/movies_full_list.htm"
     BASE_URL = "https://www.weeklyscript.com/"
-    DIR = os.path.join("scripts", "weeklyscript")
+    DIR = os.path.join("scripts", "unprocessed", "weeklyscript")
 
     if not os.path.exists(DIR):
         os.makedirs(DIR)

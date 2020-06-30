@@ -9,7 +9,7 @@ from .utilities import format_filename, get_soup
 def get_screenplays():
     ALL_URL = "https://www.screenplays-online.de/"
     BASE_URL = "https://www.screenplays-online.de/"
-    DIR = os.path.join("scripts", "screenplays")
+    DIR = os.path.join("scripts", "unprocessed", "screenplays")
 
     if not os.path.exists(DIR):
         os.makedirs(DIR)

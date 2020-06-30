@@ -9,7 +9,7 @@ from .utilities import format_filename, get_soup, get_pdf_text, get_doc_text
 def get_awesomefilm():
     ALL_URL = "http://www.awesomefilm.com/"
     BASE_URL = "http://www.awesomefilm.com/"
-    DIR = os.path.join("scripts", "awesomefilm")
+    DIR = os.path.join("scripts", "unprocessed", "awesomefilm")
 
     if not os.path.exists(DIR):
         os.makedirs(DIR)

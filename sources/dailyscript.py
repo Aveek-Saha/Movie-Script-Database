@@ -9,7 +9,7 @@ def get_dailyscript():
     ALL_URL_1 = "https://www.dailyscript.com/movie.html"
     ALL_URL_2 = "https://www.dailyscript.com/movie_n-z.html"
     BASE_URL = "https://www.dailyscript.com/"
-    DIR = os.path.join("scripts", "dailyscript")
+    DIR = os.path.join("scripts", "unprocessed", "dailyscript")
 
     if not os.path.exists(DIR):
         os.makedirs(DIR)

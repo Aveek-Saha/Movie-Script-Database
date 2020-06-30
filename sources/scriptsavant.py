@@ -9,7 +9,7 @@ def get_scriptsavant():
     ALL_URL_1 = "https://thescriptsavant.com/free-movie-screenplays-am/"
     ALL_URL_2 = "https://thescriptsavant.com/free-movie-screenplays-nz/"
     BASE_URL = "http://www.awesomefilm.com/"
-    DIR = os.path.join("scripts", "scriptsavant")
+    DIR = os.path.join("scripts", "unprocessed", "scriptsavant")
 
     if not os.path.exists(DIR):
         os.makedirs(DIR)

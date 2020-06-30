@@ -6,13 +6,13 @@ import re
 import itertools
 import string
 
-DIR_IMSDB = join("scripts", "imsdb")
-DIR_DAILY = join("scripts", "dailyscript")
-DIR_WEEKLY = join("scripts", "weeklyscript")
-DIR_SCREEN = join("scripts", "screenplays")
-DIR_AWESOME = join("scripts", "awesomefilm")
-DIR_SAVANT = join("scripts", "scriptsavant")
-DIR_SFY = join("scripts", "sfy")
+DIR_IMSDB = join("scripts", "unprocessed", "imsdb")
+DIR_DAILY = join("scripts", "unprocessed", "dailyscript")
+DIR_WEEKLY = join("scripts", "unprocessed", "weeklyscript")
+DIR_SCREEN = join("scripts", "unprocessed", "screenplays")
+DIR_AWESOME = join("scripts", "unprocessed", "awesomefilm")
+DIR_SAVANT = join("scripts", "unprocessed", "scriptsavant")
+DIR_SFY = join("scripts", "unprocessed", "sfy")
 
 DIR_FILTER = join("scripts", "filtered")
 DIR_FINAL = join("scripts", "final")
