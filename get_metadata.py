@@ -88,7 +88,7 @@ def average_ratio(n, m):
     
 #     # print(name)
 
-# json_object = json.dumps(mapping)
+# json_object = json.dumps(mapping, indent=4)
 
 # with open(join("metadata", "metadata.json"), "w") as outfile:
 #     outfile.write(json_object)
@@ -277,13 +277,13 @@ def average_ratio(n, m):
 # with open(join("metadata", "omdb_not_found.json"), "w") as outfile:
 #     outfile.write(json_object)
 
-omdb_all = {}
-count = 0
-with open(join("metadata", "omdb_not_found.json"), 'r') as f:
-  omdb_all = json.load(f)
+# omdb_all = {}
+# count = 0
+# with open(join("metadata", "omdb_not_found.json"), 'r') as f:
+#   omdb_all = json.load(f)
 
-with open(join("metadata", "omdb_unmatched.json"), 'r') as f:
-  omdb_all.update(json.load(f))
+# with open(join("metadata", "omdb_unmatched.json"), 'r') as f:
+#   omdb_all.update(json.load(f))
 
 # tmdb_re = {}
 
@@ -397,5 +397,20 @@ with open(join("metadata", "omdb_unmatched.json"), 'r') as f:
 
 
 # print(count)
+
+
+meta = {}
+count = 0
+with open(join("metadata", "info.json"), 'r') as f:
+  meta = json.load(f)
+
+titles = []
+
+for key in meta:
+    if meta[key]:
+        if meta[key]['title'] not in titles:
+            titles.append(meta[key]['title'])
+        else:
+            print(key, meta[key]['title'])
 
 
