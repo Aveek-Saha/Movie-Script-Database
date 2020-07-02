@@ -49,10 +49,20 @@ def remove_duplicates(arr, comb):
         x = x.split('.txt')[0]
         y = y.split('.txt')[0]
 
-        name_x = "".join(" ".join(
-            x.split(sep)[-1].split("-")).lower().replace("the ", "").replace(" the", "").split())
-        name_y = "".join(" ".join(
-            y.split(sep)[-1].split("-")).lower().replace("the ", "").replace(" the", "").split())
+        name_x = x.split(sep)[-1].lower().split("-")
+        name_y = y.split(sep)[-1].lower().split("-")
+
+        if "the" in name_x:
+            name_x.remove("the")
+        if "a" in name_x:
+            name_x.remove("a")
+        if "the" in name_y:
+            name_y.remove("the")
+        if "a" in name_y:
+            name_y.remove("a")
+
+        name_x = "".join(name_x)
+        name_y = "".join(name_y)
         
         result = fuzz.ratio(name_x , name_y)
         if result > 98:
