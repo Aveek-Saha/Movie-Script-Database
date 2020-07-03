@@ -18,10 +18,9 @@ omdb_api_key = config.omdb_api_key
 movielist = [join(DIR_FINAL, f) for f in listdir(DIR_FINAL) if isfile(
     join(DIR_FINAL, f)) and getsize(join(DIR_FINAL, f)) > 3000]
 
-if not os.path.exists("metadata"):
-    os.makedirs("metadata")
+if not exists("metadata"):
+    makedirs("metadata")
 
-mapping = {}
 
 def camel_case_split(str):
     return re.findall(r'([A-Z0-9]+|[A-Z0-9]?[a-z]+)(?=[A-Z0-9]|\b)', str)
@@ -52,7 +51,9 @@ def search_name(name):
 def average_ratio(n, m):
     return ((fuzz.token_sort_ratio(n,  m) + fuzz.token_sort_ratio(m,  n)) // 2)
 
+
 # Search TMDb for movies
+mapping = {}
 
 for movie in tqdm(movielist):
     name = search_name(movie.split(sep)[-1].split('.txt')[0])
@@ -152,7 +153,7 @@ with open(join("metadata", "info.json"), "w") as outfile:
     outfile.write(json_object)
 
 with open(join("metadata", "info.json"), 'r') as f:
-  movie_info = json.load(f)
+    movie_info = json.load(f)
 
 not_matched = []
 
