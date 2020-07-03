@@ -208,6 +208,9 @@ for source in tqdm(filtered):
     
     final_data = '\n'.join(lines)
 
+    if final_data.strip() == "":
+        continue
+
     with open(join(DIR_FINAL, source.split(sep)[-1]), 'w', errors="ignore") as out:
         out.write(final_data)
 
