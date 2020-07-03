@@ -64,8 +64,8 @@ def remove_duplicates(arr, comb):
         name_x = "".join(name_x)
         name_y = "".join(name_y)
         
-        result = fuzz.ratio(name_x , name_y)
-        if result > 98:
+        # result = fuzz.ratio(name_x , name_y)
+        if name_x == name_y:
             f1 = open( x + '.txt', 'r', errors="ignore")
             file_1 = f1.read()
             f1.close()
