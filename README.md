@@ -1,5 +1,7 @@
 # The Movie Script Database
-This is an utility that allows you to collect movie scripts from several sources and create a database of ~2.5k movie scripts as `.txt` files. The metadata for the movies is also collected automatically.
+This is an utility that allows you to collect movie scripts from several sources and create a database of ~2.3k movie scripts as `.txt` files along with the metadata for the movies.
+
+This is still a work in progress so stay tuned for updates.
 
 There are three steps to the whole process:
 1. Collect data from various sources
