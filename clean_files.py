@@ -141,15 +141,19 @@ for (x, y) in tqdm(comb_filter):
     if result > 50:
         f1 = open(x, 'r', errors="ignore")
         file_1 = f1.read().replace("\n", " ").replace(
-            "\t", " ").replace(" ", "")[:300]
+            "\t", " ").replace(" ", "")
+        comp_1 = file_1[:300]
         f1.close()
         f2 = open(y, 'r', errors="ignore")
         file_2 = f2.read().replace("\n", " ").replace(
-            "\t", " ").replace(" ", "")[:300]
+            "\t", " ").replace(" ", "")
+        comp_2 = file_2[:300]
         f2.close()
 
-        result = fuzz.ratio(file_1, file_2)
+        result = fuzz.ratio(comp_1, comp_2)
         if result > 80:
+            # print("".join(x.split(sep)[-1].split('.txt')[0].split("-")),
+            #       "".join(y.split(sep)[-1].split('.txt')[0].split("-")))
             try:
                 if len(file_2) > len(file_1):
                     filtered.remove(x)
