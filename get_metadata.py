@@ -53,7 +53,7 @@ def average_ratio(n, m):
 
 
 # Search TMDb for movies
-# mapping = {}
+mapping = {}
 
 # for movie in tqdm(movielist):
 #     name = search_name(movie.split(sep)[-1].split('.txt')[0])
@@ -97,60 +97,83 @@ def average_ratio(n, m):
 # with open(join("metadata", "metadata.json"), "w") as outfile:
 #     outfile.write(json_object)
 
-# with open(join("metadata", "metadata.json"), 'r') as f:
-#   mapping = json.load(f)
+with open(join("metadata", "metadata.json"), 'r') as f:
+  mapping = json.load(f)
 
 
-# not_found = []
+not_found = []
 
-# count = 0
-# movie_info = {}
+count = 0
+movie_info = {}
 
-# # Get matching movie from list
+# Get matching movie from list
 
-# for key in mapping:
-#     if len(mapping[key]) == 0:
-#         count += 1
-#         n = key.split('.txt')[0]
-#         not_found.append(n)
-#         # print(search_name(key.split('.txt')[0])," : ", n)
-#         movie_info[key] = {}
-#     elif len(mapping[key]) > 1:
-#         name = re.sub(r'\([^)]*\)', '',
-#                       " ".join(key.split('.txt')[0].replace("transcript", "").split("-"))).lower()
-#         m = mapping[key][0]['title'].replace(
-#             '\'', '').replace(",", '').replace(
-#             '.', '').replace('&', 'and').lower()
-#         m2 = mapping[key][1]['title'].replace(
-#             '\'', '').replace(",", '').replace(
-#             '.', '').replace('&', 'and').lower()
-#         m = re.sub(r'\([^)]*\)', '', m)
-#         m2 = re.sub(r'\([^)]*\)', '', m2)
-#         if average_ratio(name, m) < average_ratio(name, m2) and abs(average_ratio(name, m) - average_ratio(name, m2)) > 10:
-#             m = m.split(":", 1)[0]
-#             m2 = m2.split(":", 1)[0]
-#             if average_ratio(name, m) < average_ratio(name, m2) and abs(average_ratio(name, m) - average_ratio(name, m2)) > 10:
-#                 # print(key.split('.txt')[0], " : ", mapping[key]
-#                 #     [0]['title'], " | ", mapping[key][1]['title'])
-#                 movie_info[key] = mapping[key][1]
-#             else: 
-#                 movie_info[key] = mapping[key][0]
+for key in mapping:
+    if len(mapping[key]) == 0:
+        count += 1
+        n = key.split('.txt')[0]
+        not_found.append(n)
+        # print(search_name(key.split('.txt')[0])," : ", n)
+        movie_info[key] = {}
+    elif len(mapping[key]) > 1:
+        n = " ".join(key.split('.txt')[0].replace("transcript", "").split("-"))
+        name = re.sub(r'\([^)]*\)', '', n).lower()
+        num = re.findall(r'\b\d\b', name)
+        date = re.findall(r'\d{4}', n)
 
-#         else:
-#             movie_info[key] = mapping[key][0]
+        all_titles = [(x['title'], ind) for ind, x in enumerate(mapping[key])]
+        all_dates = [(x['release_date'], ind)
+                     for ind, x in enumerate(mapping[key]) if 'release_date' in x]
+
+        second = mapping[key][1]
+
+        for title, ind in all_titles:
+            n_title = re.findall(r'\b\d\b', title)
+            if len(num) > 0 and len(n_title) > 0:
+                if num[0] == n_title[0]:
+                    second = mapping[key][ind]
+                    break
+
+        for title, ind in all_dates:
+            n_title = re.findall(r'\d{4}', title)
+            if len(date) > 0 and len(n_title) > 0:
+                if date[0] == n_title[0]:
+                    second = mapping[key][ind]
+                    break
+
+        m = mapping[key][0]['title'].replace(
+            '\'', '').replace(",", '').replace(
+            '.', '').replace('&', 'and').lower()
+        m2 = second['title'].replace(
+            '\'', '').replace(",", '').replace(
+            '.', '').replace('&', 'and').lower()
+        m = re.sub(r'\([^)]*\)', '', m)
+        m2 = re.sub(r'\([^)]*\)', '', m2)
+        if average_ratio(name, m) < average_ratio(name, m2) and abs(average_ratio(name, m) - average_ratio(name, m2)) > 10:
+            m = m.split(":", 1)[0]
+            m2 = m2.split(":", 1)[0]
+            if average_ratio(name, m) < average_ratio(name, m2) and abs(average_ratio(name, m) - average_ratio(name, m2)) > 10:
+                # print(key.split('.txt')[0], " : ", mapping[key]
+                #     [0]['title'], " | ", mapping[key][1]['title'])
+                movie_info[key] = mapping[key][1]
+            else: 
+                movie_info[key] = mapping[key][0]
+
+        else:
+            movie_info[key] = mapping[key][0]
             
-#     elif len(mapping[key]) == 1:
-#         movie_info[key] = mapping[key][0]
-#     else:
-#         print("what???")
+    elif len(mapping[key]) == 1:
+        movie_info[key] = mapping[key][0]
+    else:
+        print("what???")
 
-# # print(count)
+# print(count)
 
 
-# json_object = json.dumps(movie_info, indent=4)
+json_object = json.dumps(movie_info, indent=4)
 
-# with open(join("metadata", "info.json"), "w") as outfile:
-#     outfile.write(json_object)
+with open(join("metadata", "info.json"), "w") as outfile:
+    outfile.write(json_object)
 
 # with open(join("metadata", "info.json"), 'r') as f:
 #     movie_info = json.load(f)
@@ -418,4 +441,6 @@ for key in meta:
 
 for key in titles:
     if len(titles[key]) > 1:
-        print(titles[key])
+        count += 1
+        print(key, titles[key])
+print(count)
