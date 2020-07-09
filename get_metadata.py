@@ -425,11 +425,27 @@ with open(join("metadata", "info.json"), "w") as outfile:
 
 # print(count)
 
+def clean_name(name):
+    name = " ".join(name.lower().split("-"))
+    name = re.sub(r'\([^)]*\)', '', name)
+    name = re.sub(r"(\d{4})", "", name)
+    name = name.replace(":", "")
+    name = name.replace("\'", "")
+    name = name.split()
+    if "the" in name:
+        name.remove("the")
+    if "a" in name:
+        name.remove("a")
+    if "an" in name:
+        name.remove("an")
+    name = " ".join(name).strip()
+
+    return name
 
 meta = {}
 count = 0
 with open(join("metadata", "info.json"), 'r') as f:
-  meta = json.load(f)
+    meta = json.load(f)
 
 titles = {}
 
@@ -441,6 +457,12 @@ for key in meta:
 
 for key in titles:
     if len(titles[key]) > 1:
-        count += 1
-        print(key, titles[key])
+        # print(key, titles[key])
+        for title in titles[key]:
+            if clean_name(title) == clean_name(key):
+                count += 1
+                print(key, title)
+                break
+
+
 print(count)
