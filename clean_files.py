@@ -42,6 +42,7 @@ sources = {
     'sfy': sfy
 }
 
+forbidden = ["the", "a", "an", "transcript"]
 
 def remove_duplicates(arr, comb):
 
@@ -52,10 +53,8 @@ def remove_duplicates(arr, comb):
         name_x = x.split(sep)[-1].lower().split("-")
         name_y = y.split(sep)[-1].lower().split("-")
 
-        name_x = list(filter(lambda a: a != "the" and a !=
-                             "a" and a != "an" and a != "", name_x))
-        name_y = list(filter(lambda a: a != "the" and a !=
-                             "a" and a != "an" and a != "", name_y))
+        name_x = list(filter(lambda a: a not in forbidden, name_x))
+        name_y = list(filter(lambda a: a not in forbidden, name_y))
 
         name_x = "".join(name_x).strip()
         name_y = "".join(name_y).strip()
