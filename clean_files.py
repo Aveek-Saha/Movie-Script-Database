@@ -52,17 +52,13 @@ def remove_duplicates(arr, comb):
         name_x = x.split(sep)[-1].lower().split("-")
         name_y = y.split(sep)[-1].lower().split("-")
 
-        if "the" in name_x:
-            name_x.remove("the")
-        if "a" in name_x:
-            name_x.remove("a")
-        if "the" in name_y:
-            name_y.remove("the")
-        if "a" in name_y:
-            name_y.remove("a")
+        name_x = list(filter(lambda a: a != "the" and a !=
+                             "a" and a != "an" and a != "", name_x))
+        name_y = list(filter(lambda a: a != "the" and a !=
+                             "a" and a != "an" and a != "", name_y))
 
-        name_x = "".join(name_x)
-        name_y = "".join(name_y)
+        name_x = "".join(name_x).strip()
+        name_y = "".join(name_y).strip()
         
         # result = fuzz.ratio(name_x , name_y)
         if name_x == name_y:
@@ -168,6 +164,15 @@ for (x, y) in tqdm(comb_filter):
 if not exists(DIR_FINAL):
     makedirs(DIR_FINAL)
 
+counts = {
+    'scriptsavant': 0,
+    'imsdb': 0,
+    'dailyscript': 0,
+    'weeklyscript': 0,
+    'screenplays': 0,
+    'awesomefilm': 0,
+    'sfy': 0
+}
 
 print("Write cleaned files to new dir")
 for source in tqdm(filtered):
@@ -214,7 +219,8 @@ for source in tqdm(filtered):
 
     if final_data.strip() == "":
         continue
-
+    counts[source.split(sep)[-2]] += 1
     with open(join(DIR_FINAL, source.split(sep)[-1]), 'w', errors="ignore") as out:
         out.write(final_data)
 
+print(counts)
