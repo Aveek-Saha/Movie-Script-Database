@@ -316,24 +316,29 @@ with open(join("metadata", "info.json"), "w") as outfile:
 
 # # Find ones not found in OMDb in TMDb by using the first ine in the script
 
-# for key in tqdm(omdb_all):
-#     if not omdb_all[key]:
-#         f = open(join(DIR_FINAL, key + '.txt'), 'r', errors="ignore")
-#         first_line = f.readline().strip().lower()
-#         f.close()
-#         count += 1
-#         first_line = first_line.replace("\"" , "")
-#         response = urllib.request.urlopen(
-#             "https://api.themoviedb.org/3/search/movie?api_key=" +
-#             tmdb_api_key + "&language=en-US&query=" +
-#             urllib.parse.quote(first_line)
-#             + "&page=1")
-#         html = response.read()
-#         jres = json.loads(html)
-#         if jres['total_results'] > 0:
-#             tmdb_re[key] = jres['results']
-#         else:
-#             tmdb_re[key] = []
+# all_missing = not_matched + not_found
+
+# for key in tqdm(all_missing):
+#     # if not omdb_all[key]:
+#     f = open(join(DIR_FINAL, key + '.txt'), 'r', errors="ignore")
+#     first_line = f.readline().strip().lower()
+#     f.close()
+#     count += 1
+#     first_line = first_line.replace(
+#         "\"", "").replace(".", "").replace(":", "")
+#     if first_line == "fade in":
+#         continue
+#     response = urllib.request.urlopen(
+#         "https://api.themoviedb.org/3/search/movie?api_key=" +
+#         tmdb_api_key + "&language=en-US&query=" +
+#         urllib.parse.quote(first_line)
+#         + "&page=1")
+#     html = response.read()
+#     jres = json.loads(html)
+#     if jres['total_results'] > 0:
+#         tmdb_re[key] = jres['results']
+#     else:
+#         tmdb_re[key] = []
 
 # json_object = json.dumps(tmdb_re, indent=4)
 
