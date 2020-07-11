@@ -476,6 +476,31 @@ count = 0
 with open(join("metadata", "info.json"), 'r') as f:
     meta = json.load(f)
 
+# titles = {}
+
+# for key in meta:
+#     if meta[key]:
+#         if not meta[key]['title'] in titles:
+#             titles[meta[key]['title']] = []
+#         titles[meta[key]['title']].append(key)
+
+# for key in titles:
+#     if len(titles[key]) > 1:
+#         # print(key, titles[key])
+#         for title in titles[key]:
+#             if clean_name(title) == clean_name(key):
+#                 count += 1
+#                 print(key, title)
+#                 for t in titles[key]:
+#                     if t not title:
+#                         meta[t] = {}
+#                 break
+
+# meta = {}
+# count = 0
+with open(join("metadata", "info_2.json"), 'r') as f:
+    meta.update(json.load(f))
+
 titles = {}
 
 for key in meta:
@@ -491,7 +516,14 @@ for key in titles:
             if clean_name(title) == clean_name(key):
                 count += 1
                 print(key, title)
+                for t in titles[key]:
+                    if t != title:
+                        meta[t] = {}
                 break
 
+json_object = json.dumps(meta, indent=4)
+
+with open(join("metadata", "tmdb.json"), "w") as outfile:
+    outfile.write(json_object)
 
 print(count)
