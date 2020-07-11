@@ -347,52 +347,76 @@ with open(join("metadata", "info.json"), "w") as outfile:
 # print(count)
 
 
-# omdb_all = {}
-# movie_info = {}
-# count = 0
-# with open(join("metadata", "metadata_2.json"), 'r') as f:
-#     omdb_all = json.load(f)
+omdb_all = {}
+movie_info = {}
+count = 0
+with open(join("metadata", "metadata_2.json"), 'r') as f:
+    omdb_all = json.load(f)
 
 
-# for key in omdb_all:
-#     if len(omdb_all[key]) == 0:
-#         count += 1
-#         n = key.split('.txt')[0]
-#         # print(search_name(key.split('.txt')[0])," : ", n)
-#         movie_info[key] = {}
-#     elif len(omdb_all[key]) > 1:
-#         name = re.sub(r'\([^)]*\)', '',
-#                         " ".join(key.split('.txt')[0].replace("transcript", "").split("-"))).lower()
-#         m = omdb_all[key][0]['title'].replace(
-#             '\'', '').replace(",", '').replace(
-#             '.', '').replace('&', 'and').lower()
-#         m2 = omdb_all[key][1]['title'].replace(
-#             '\'', '').replace(",", '').replace(
-#             '.', '').replace('&', 'and').lower()
-#         m = re.sub(r'\([^)]*\)', '', m)
-#         m2 = re.sub(r'\([^)]*\)', '', m2)
-#         if average_ratio(name, m) < average_ratio(name, m2) and abs(average_ratio(name, m) - average_ratio(name, m2)) > 10:
-#             m = m.split(":", 1)[0]
-#             m2 = m2.split(":", 1)[0]
-#             if average_ratio(name, m) < average_ratio(name, m2) and abs(average_ratio(name, m) - average_ratio(name, m2)) > 10:
-#                 print(key.split('.txt')[0], " : ", omdb_all[key]
-#                       [0]['title'], " | ", omdb_all[key][1]['title'])
-#                 movie_info[key] = omdb_all[key][1]
-#             else:
-#                 movie_info[key] = omdb_all[key][0]
+for key in omdb_all:
+    if len(omdb_all[key]) == 0:
+        count += 1
+        n = key.split('.txt')[0]
+        # print(search_name(key.split('.txt')[0])," : ", n)
+        movie_info[key] = {}
+    elif len(omdb_all[key]) > 1:
+        n = " ".join(key.split('.txt')[0].replace("transcript", "").split("-"))
+        name = re.sub(r'\([^)]*\)', '', n).lower()
+        num = re.findall(r'\b\d\b', name)
+        date = re.findall(r'\d{4}', n)
 
-#         else:
-#             movie_info[key] = omdb_all[key][0]
+        all_titles = [(x['title'], ind) for ind, x in enumerate(omdb_all[key])]
+        all_dates = [(x['release_date'], ind)
+                     for ind, x in enumerate(omdb_all[key]) if 'release_date' in x]
 
-#     elif len(omdb_all[key]) == 1:
-#         movie_info[key] = omdb_all[key][0]
-#     else:
-#         print("what???")
+        second = omdb_all[key][1]
 
-# json_object = json.dumps(movie_info, indent=4)
+        for title, ind in all_titles:
+            n_title = re.findall(r'\b\d\b', title)
+            if len(num) > 0 and len(n_title) > 0:
+                if num[0] == n_title[0]:
+                    second = omdb_all[key][ind]
+                    break
 
-# with open(join("metadata", "info_2.json"), "w") as outfile:
-#     outfile.write(json_object)
+        for title, ind in all_dates:
+            n_title = re.findall(r'\d{4}', title)
+            if len(date) > 0 and len(n_title) > 0:
+                if date[0] == n_title[0]:
+                    second = omdb_all[key][ind]
+                    break
+
+        m = omdb_all[key][0]['title'].replace(
+            '\'', '').replace(",", '').replace(
+            '.', '').replace('&', 'and').lower()
+        m2 = second['title'].replace(
+            '\'', '').replace(",", '').replace(
+            '.', '').replace('&', 'and').lower()
+            
+        m = re.sub(r'\([^)]*\)', '', m)
+        m2 = re.sub(r'\([^)]*\)', '', m2)
+        if average_ratio(name, m) < average_ratio(name, m2) and abs(average_ratio(name, m) - average_ratio(name, m2)) > 10:
+            m = m.split(":", 1)[0]
+            m2 = m2.split(":", 1)[0]
+            if average_ratio(name, m) < average_ratio(name, m2) and abs(average_ratio(name, m) - average_ratio(name, m2)) > 10:
+                print(key.split('.txt')[0], " : ", omdb_all[key]
+                      [0]['title'], " | ", omdb_all[key][1]['title'])
+                movie_info[key] = omdb_all[key][1]
+            else:
+                movie_info[key] = omdb_all[key][0]
+
+        else:
+            movie_info[key] = omdb_all[key][0]
+
+    elif len(omdb_all[key]) == 1:
+        movie_info[key] = omdb_all[key][0]
+    else:
+        print("what???")
+
+json_object = json.dumps(movie_info, indent=4)
+
+with open(join("metadata", "info_2.json"), "w") as outfile:
+    outfile.write(json_object)
 
 
 # movie_info = {}
