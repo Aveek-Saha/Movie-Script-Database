@@ -399,8 +399,8 @@ for key in omdb_all:
             m = m.split(":", 1)[0]
             m2 = m2.split(":", 1)[0]
             if average_ratio(name, m) < average_ratio(name, m2) and abs(average_ratio(name, m) - average_ratio(name, m2)) > 10:
-                print(key.split('.txt')[0], " : ", omdb_all[key]
-                      [0]['title'], " | ", omdb_all[key][1]['title'])
+                # print(key.split('.txt')[0], " : ", omdb_all[key]
+                #       [0]['title'], " | ", omdb_all[key][1]['title'])
                 movie_info[key] = omdb_all[key][1]
             else:
                 movie_info[key] = omdb_all[key][0]
@@ -476,28 +476,6 @@ count = 0
 with open(join("metadata", "info.json"), 'r') as f:
     meta = json.load(f)
 
-# titles = {}
-
-# for key in meta:
-#     if meta[key]:
-#         if not meta[key]['title'] in titles:
-#             titles[meta[key]['title']] = []
-#         titles[meta[key]['title']].append(key)
-
-# for key in titles:
-#     if len(titles[key]) > 1:
-#         # print(key, titles[key])
-#         for title in titles[key]:
-#             if clean_name(title) == clean_name(key):
-#                 count += 1
-#                 print(key, title)
-#                 for t in titles[key]:
-#                     if t not title:
-#                         meta[t] = {}
-#                 break
-
-# meta = {}
-# count = 0
 with open(join("metadata", "info_2.json"), 'r') as f:
     meta.update(json.load(f))
 
@@ -514,8 +492,8 @@ for key in titles:
         # print(key, titles[key])
         for title in titles[key]:
             if clean_name(title) == clean_name(key):
-                count += 1
-                print(key, title)
+                # count += 1
+                # print(key, title)
                 for t in titles[key]:
                     if t != title:
                         meta[t] = {}
@@ -526,4 +504,24 @@ json_object = json.dumps(meta, indent=4)
 with open(join("metadata", "tmdb.json"), "w") as outfile:
     outfile.write(json_object)
 
+meta_2 = {}
+with open(join("metadata", "omdb_not_found.json"), 'r') as f:
+    meta_2 = json.load(f)
+
+with open(join("metadata", "omdb_unmatched.json"), 'r') as f:
+    meta_2.update(json.load(f))
+
+json_object = json.dumps(meta_2, indent=4)
+
+with open(join("metadata", "omdb.json"), "w") as outfile:
+    outfile.write(json_object)
+
+for key in meta_2:
+    if meta_2[key]:
+        if not meta[key]:
+            meta[key] = meta_2[key]
+
+for key in meta:
+    if meta[key]:
+        count += 1
 print(count)
