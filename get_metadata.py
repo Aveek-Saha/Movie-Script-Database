@@ -454,20 +454,48 @@ with open(join("metadata", "info_2.json"), "w") as outfile:
 
 # print(count)
 
+def roman_to_int(num):
+    string = num.split()
+    res = []
+    for s in string:
+        if s == "ii":
+            res.append("2")
+        elif s == "iii":
+            res.append("3")
+        elif s == "iv":
+            res.append("4")
+        elif s == "v":
+            res.append("5")
+        elif s == "vi":
+            res.append("6")
+        elif s == "vii":
+            res.append("7")
+        elif s == "viii":
+            res.append("8")
+        elif s == "ix":
+            res.append("9")
+        else:
+            res.append(s)
+    return " ".join(res)
+
+forbidden = ["the", "a", "an", "and", "part", "transcript", "vol"]
 def clean_name(name):
     name = " ".join(name.lower().split("-"))
     name = re.sub(r'\([^)]*\)', '', name)
     name = re.sub(r"(\d{4})", "", name)
     name = name.replace(":", "")
+    name = name.replace("&", "")
+    name = name.replace(".", "")
+    name = name.replace(",", "")
+    name = name.replace("/", "")
+    name = name.replace("!", "")
+    name = name.replace("+", "")
+    name = name.replace("?", "")
     name = name.replace("\'", "")
     name = name.split()
-    if "the" in name:
-        name.remove("the")
-    if "a" in name:
-        name.remove("a")
-    if "an" in name:
-        name.remove("an")
+    name = list(filter(lambda a: a not in forbidden, name))
     name = " ".join(name).strip()
+    name = roman_to_int(name)
 
     return name
 
@@ -491,7 +519,7 @@ for key in titles:
     if len(titles[key]) > 1:
         # print(key, titles[key])
         for title in titles[key]:
-            if clean_name(title) == clean_name(key):
+            if clean_name(title) == clean_name(key) or "".join(clean_name(title).split()) == "".join(clean_name(key).split()):
                 # count += 1
                 # print(key, title)
                 for t in titles[key]:
@@ -516,12 +544,17 @@ json_object = json.dumps(meta_2, indent=4)
 with open(join("metadata", "omdb.json"), "w") as outfile:
     outfile.write(json_object)
 
-for key in meta_2:
-    if meta_2[key]:
-        if not meta[key]:
-            meta[key] = meta_2[key]
+# for key in meta_2:
+#     if meta_2[key]:
+#         if not meta[key]:
+#             meta[key] = meta_2[key]
+#     if not meta[key]:
+#         print(key)
 
 for key in meta:
     if meta[key]:
-        count += 1
+        if clean_name(meta[key]['title']) == clean_name(key) or "".join(clean_name(meta[key]['title']).split()) == "".join(clean_name(key).split()):
+            count += 1
+        else:
+            print(clean_name(meta[key]['title']), " | ", clean_name(key))
 print(count)
