@@ -205,7 +205,7 @@ for key in mapping:
                 movie_info[key] = match
                 break
         if key not in movie_info:
-            n = " ".join(key.split('.txt')[0].replace("transcript", "").split("-"))
+            n = " ".join(key.replace("transcript", "").split("-"))
             name = re.sub(r'\([^)]*\)', '', n).lower()
             num = re.findall(r'\b\d\b', name)
             date = re.findall(r'\d{4}', n)
@@ -455,7 +455,7 @@ for key in omdb_all:
                 movie_info[key] = match
                 break
         if key not in omdb_all:
-            n = " ".join(key.split('.txt')[0].replace("transcript", "").split("-"))
+            n = " ".join(key.replace("transcript", "").split("-"))
             name = re.sub(r'\([^)]*\)', '', n).lower()
             num = re.findall(r'\b\d\b', name)
             date = re.findall(r'\d{4}', n)
