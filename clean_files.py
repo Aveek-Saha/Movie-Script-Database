@@ -43,7 +43,7 @@ sources = {
 }
 
 forbidden = ["the", "a", "an", "and", "or", "part",
-             "transcript", "vol", "chapter", "movie"]
+             "vol", "chapter", "movie"]
 symbols = ["!", "@", "#", "$", "%", "^", "&", "*",
            "_", "-", "+", ":", ".", ",", "?", "\'", "/"]
 
