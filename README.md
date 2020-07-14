@@ -4,9 +4,9 @@ This is an utility that allows you to collect movie scripts from several sources
 This is still a work in progress so stay tuned for updates.
 
 There are three steps to the whole process:
-1. Collect data from various sources
-2. Remove duplicates from different sources
-3. Get correct metadata about the movies
+1. Collect data from various sources - Scrape websites for scripts in HTML, txt, doc or pdf format
+2. Remove duplicates from different sources - Automatically remove as many deplicates from different sources as possible
+3. Collect metadata - Get metadata about the scripts for additional processing
 
 The sources that scripts are collected from are:
 - [IMSDb](https://www.imsdb.com/)

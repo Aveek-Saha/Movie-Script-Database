@@ -372,7 +372,7 @@ def parse(file_orig, save_dir, abr_flag, tag_flag, char_flag, save_name=None, ab
         save_name = os.path.join(save_dir, '.'.join(
             file_orig.split('/')[-1].split('.')[: -1]) + '_parsed.txt')
     else:
-        save_name = os.path.join(save_dir, save_name)
+        save_name = os.path.join(save_dir, "full", save_name)
 
     fid = open(save_name, 'w')
     for tag_ind in range(len(tag_valid)):
@@ -389,7 +389,7 @@ def parse(file_orig, save_dir, abr_flag, tag_flag, char_flag, save_name=None, ab
             abridged_name = os.path.join(save_dir, '.'.join(
                 file_orig.split('/')[-1].split('.')[: -1]) + '_abridged.txt')
         else:
-            abridged_name = os.path.join(save_dir, abridged_name)
+            abridged_name = os.path.join(save_dir, "abridged", abridged_name)
 
         abridged_ind = [i for i, x in enumerate(parsed_script) if x.startswith('C:') and
                         parsed_script[i + 1].startswith('D:')]
@@ -427,8 +427,15 @@ def parse(file_orig, save_dir, abr_flag, tag_flag, char_flag, save_name=None, ab
 if __name__ == "__main__":
     DIR_FINAL = join("scripts", "final")
     DIR_OUT = join("scripts", "parsed")
+    DIR_OUT_FULL = join(DIR_OUT, "full")
+    DIR_OUT_ABRIDGED = join(DIR_OUT, "abridged")
+
     if not os.path.exists(DIR_OUT):
         os.makedirs(DIR_OUT)
+    if not os.path.exists(DIR_OUT_FULL):
+        os.makedirs(DIR_OUT_FULL)
+    if not os.path.exists(DIR_OUT_ABRIDGED):
+        os.makedirs(DIR_OUT_ABRIDGED)
 
     files = [join(DIR_FINAL, f) for f in listdir(DIR_FINAL)
              if isfile(join(DIR_FINAL, f)) and getsize(join(DIR_FINAL, f)) > 3000]
