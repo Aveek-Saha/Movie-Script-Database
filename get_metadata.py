@@ -6,6 +6,7 @@ from os.path import isfile, join, sep, getsize, exists
 from os import listdir, makedirs
 import re
 from fuzzywuzzy import fuzz
+import unidecode
 
 import config
 
@@ -478,26 +479,51 @@ def roman_to_int(num):
             res.append(s)
     return " ".join(res)
 
-forbidden = ["the", "a", "an", "and", "part", "transcript", "vol"]
+forbidden = ["the", "a", "an", "and", "or", "part", "transcript", "vol", "chapter", "movie"]
+symbols = ["!", "@", "#", "$", "%", "^", "&", "*", "_", "-", "+", ":", ".", ",", "?", "\'", "/"]
 def clean_name(name):
     name = " ".join(name.lower().split("-"))
     name = re.sub(r'\([^)]*\)', '', name)
     name = re.sub(r"(\d{4})", "", name)
-    name = name.replace(":", "")
-    name = name.replace("&", "")
-    name = name.replace(".", "")
-    name = name.replace(",", "")
-    name = name.replace("/", "")
-    name = name.replace("!", "")
-    name = name.replace("+", "")
-    name = name.replace("?", "")
-    name = name.replace("\'", "")
+    name = "".join([x for x in name if x not in symbols])
     name = name.split()
     name = list(filter(lambda a: a not in forbidden, name))
     name = " ".join(name).strip()
     name = roman_to_int(name)
+    name = unidecode.unidecode(name)
 
     return name
+
+def check_series(name1, name2):
+    name1 = "".join(name1.split())
+    name2 = "".join(name2.split())
+    
+    series_num1 = re.findall(r'\d{1,3}', name1)
+    series_num2 = re.findall(r'\d{1,3}', name2)
+    series_title1 = re.findall(r'.+?(?=\d)', name1)
+    series_title2 = re.findall(r'.+?(?=\d)', name2)
+    if len(series_num1) > 0 and len(series_num2) > 0 and len(series_title1) > 0 and len(series_title2) > 0:
+        if series_num1[0] == series_num2[0] and series_title1[0] == series_title2[0]:
+            return True
+    
+    return False
+
+
+def check_series_number(name1, name2):
+    name1 = "".join(name1.split())
+    name2 = "".join(name2.split())
+
+    series_num1 = re.findall(r'\d{1,3}', name1)
+    series_num2 = re.findall(r'\d{1,3}', name2)
+
+    if len(series_num1) > 0 and len(series_num2) > 0 :
+        if series_num1[0] == series_num2[0]:
+            return True
+    elif len(series_num1) == 0 and len(series_num2) == 0:
+        return True
+    return False
+
+
 
 meta = {}
 count = 0
@@ -553,8 +579,16 @@ with open(join("metadata", "omdb.json"), "w") as outfile:
 
 for key in meta:
     if meta[key]:
-        if clean_name(meta[key]['title']) == clean_name(key) or "".join(clean_name(meta[key]['title']).split()) == "".join(clean_name(key).split()):
+        title = meta[key]['title']
+        if clean_name(title) == clean_name(key) or "".join(clean_name(title).split()) == "".join(clean_name(key).split()) or check_series(clean_name(title), clean_name(key)):
             count += 1
+        elif fuzz.ratio("".join(clean_name(title).split()), "".join(clean_name(key).split())) > 89 and check_series_number(clean_name(title), clean_name(key)):
+            # print(clean_name(title), " | ",
+            #       clean_name(key))
+            count+=1
         else:
-            print(clean_name(meta[key]['title']), " | ", clean_name(key))
+            # pass
+            print(clean_name(title), " | ",
+                  clean_name(key), " | ", fuzz.ratio(
+                      "".join(clean_name(title).split()), "".join(clean_name(key).split())))
 print(count)
