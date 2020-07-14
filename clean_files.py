@@ -42,7 +42,10 @@ sources = {
     'sfy': sfy
 }
 
-forbidden = ["the", "a", "an", "transcript"]
+forbidden = ["the", "a", "an", "and", "or", "part",
+             "transcript", "vol", "chapter", "movie"]
+symbols = ["!", "@", "#", "$", "%", "^", "&", "*",
+           "_", "-", "+", ":", ".", ",", "?", "\'", "/"]
 
 def remove_duplicates(arr, comb):
 
@@ -58,8 +61,10 @@ def remove_duplicates(arr, comb):
 
         name_x = "".join(name_x).strip()
         name_y = "".join(name_y).strip()
+
+        name_x = "".join([x for x in name_x if x not in symbols])
+        name_y = "".join([x for x in name_y if x not in symbols])
         
-        # result = fuzz.ratio(name_x , name_y)
         if name_x == name_y:
             f1 = open( x + '.txt', 'r', errors="ignore")
             file_1 = f1.read()

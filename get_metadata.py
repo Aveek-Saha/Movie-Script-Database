@@ -565,6 +565,9 @@ for key in meta:
             titles[meta[key]['title']] = []
         titles[meta[key]['title']].append(key)
 
+forbidden = ["the", "a", "an", "and", "or",
+            "part", "vol", "chapter", "movie"]
+
 for key in titles:
     if len(titles[key]) > 1:
         # print(key, titles[key])
@@ -632,10 +635,10 @@ for key in meta_2:
 
 # print(count)
 
-for key in meta:
-    if meta[key]:
-        count += 1
-    else: 
-        print(key)
+# for key in meta:
+#     if meta[key]:
+#         count += 1
+#     else: 
+#         print(key)
 
-print(count)
+# print(count)
