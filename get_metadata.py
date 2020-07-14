@@ -53,6 +53,89 @@ def average_ratio(n, m):
     return ((fuzz.token_sort_ratio(n,  m) + fuzz.token_sort_ratio(m,  n)) // 2)
 
 
+def roman_to_int(num):
+    string = num.split()
+    res = []
+    for s in string:
+        if s == "ii":
+            res.append("2")
+        elif s == "iii":
+            res.append("3")
+        elif s == "iv":
+            res.append("4")
+        elif s == "v":
+            res.append("5")
+        elif s == "vi":
+            res.append("6")
+        elif s == "vii":
+            res.append("7")
+        elif s == "viii":
+            res.append("8")
+        elif s == "ix":
+            res.append("9")
+        else:
+            res.append(s)
+    return " ".join(res)
+
+
+forbidden = ["the", "a", "an", "and", "or", "part",
+             "transcript", "vol", "chapter", "movie"]
+symbols = ["!", "@", "#", "$", "%", "^", "&", "*",
+           "_", "-", "+", ":", ".", ",", "?", "\'", "/"]
+
+
+def clean_name(name):
+    name = " ".join(name.lower().split("-"))
+    name = re.sub(r'\([^)]*\)', '', name)
+    name = re.sub(r"(\d{4})", "", name)
+    name = "".join([x for x in name if x not in symbols])
+    name = name.split()
+    name = list(filter(lambda a: a not in forbidden, name))
+    name = " ".join(name).strip()
+    name = roman_to_int(name)
+    name = unidecode.unidecode(name)
+
+    return name
+
+
+def check_series(name1, name2):
+    name1 = "".join(name1.split())
+    name2 = "".join(name2.split())
+
+    series_num1 = re.findall(r'\d{1,3}', name1)
+    series_num2 = re.findall(r'\d{1,3}', name2)
+    series_title1 = re.findall(r'.+?(?=\d)', name1)
+    series_title2 = re.findall(r'.+?(?=\d)', name2)
+    if len(series_num1) > 0 and len(series_num2) > 0 and len(series_title1) > 0 and len(series_title2) > 0:
+        if series_num1[0] == series_num2[0] and series_title1[0] == series_title2[0]:
+            return True
+
+    return False
+
+
+def check_series_number(name1, name2):
+    name1 = "".join(name1.split())
+    name2 = "".join(name2.split())
+
+    series_num1 = re.findall(r'\d{1,3}', name1)
+    series_num2 = re.findall(r'\d{1,3}', name2)
+
+    if len(series_num1) > 0 and len(series_num2) > 0:
+        if series_num1[0] == series_num2[0]:
+            return True
+    elif len(series_num1) == 0 and len(series_num2) == 0:
+        return True
+    return False
+
+
+def title_match(title, key):
+    if clean_name(title) == clean_name(key) or "".join(clean_name(title).split()) == "".join(clean_name(key).split()) or check_series(clean_name(title), clean_name(key)):
+        return True
+    elif fuzz.ratio("".join(clean_name(title).split()), "".join(clean_name(key).split())) > 89 and check_series_number(clean_name(title), clean_name(key)):
+        return True
+    else:
+        return False
+
 # Search TMDb for movies
 mapping = {}
 
@@ -117,52 +200,57 @@ for key in mapping:
         # print(search_name(key.split('.txt')[0])," : ", n)
         movie_info[key] = {}
     elif len(mapping[key]) > 1:
-        n = " ".join(key.split('.txt')[0].replace("transcript", "").split("-"))
-        name = re.sub(r'\([^)]*\)', '', n).lower()
-        num = re.findall(r'\b\d\b', name)
-        date = re.findall(r'\d{4}', n)
+        for match in mapping[key]:
+            if title_match(match['title'], key):
+                movie_info[key] = match
+                break
+        if key not in movie_info:
+            n = " ".join(key.split('.txt')[0].replace("transcript", "").split("-"))
+            name = re.sub(r'\([^)]*\)', '', n).lower()
+            num = re.findall(r'\b\d\b', name)
+            date = re.findall(r'\d{4}', n)
 
-        all_titles = [(x['title'], ind) for ind, x in enumerate(mapping[key])]
-        all_dates = [(x['release_date'], ind)
-                     for ind, x in enumerate(mapping[key]) if 'release_date' in x]
+            all_titles = [(x['title'], ind) for ind, x in enumerate(mapping[key])]
+            all_dates = [(x['release_date'], ind)
+                        for ind, x in enumerate(mapping[key]) if 'release_date' in x]
 
-        second = mapping[key][1]
+            second = mapping[key][1]
 
-        for title, ind in all_titles:
-            n_title = re.findall(r'\b\d\b', title)
-            if len(num) > 0 and len(n_title) > 0:
-                if num[0] == n_title[0]:
-                    second = mapping[key][ind]
-                    break
+            for title, ind in all_titles:
+                n_title = re.findall(r'\b\d\b', title)
+                if len(num) > 0 and len(n_title) > 0:
+                    if num[0] == n_title[0]:
+                        second = mapping[key][ind]
+                        break
 
-        for title, ind in all_dates:
-            n_title = re.findall(r'\d{4}', title)
-            if len(date) > 0 and len(n_title) > 0:
-                if date[0] == n_title[0]:
-                    second = mapping[key][ind]
-                    break
+            for title, ind in all_dates:
+                n_title = re.findall(r'\d{4}', title)
+                if len(date) > 0 and len(n_title) > 0:
+                    if date[0] == n_title[0]:
+                        second = mapping[key][ind]
+                        break
 
-        m = mapping[key][0]['title'].replace(
-            '\'', '').replace(",", '').replace(
-            '.', '').replace('&', 'and').lower()
-        m2 = second['title'].replace(
-            '\'', '').replace(",", '').replace(
-            '.', '').replace('&', 'and').lower()
-        m = re.sub(r'\([^)]*\)', '', m)
-        m2 = re.sub(r'\([^)]*\)', '', m2)
-        if average_ratio(name, m) < average_ratio(name, m2) and abs(average_ratio(name, m) - average_ratio(name, m2)) > 10:
-            m = m.split(":", 1)[0]
-            m2 = m2.split(":", 1)[0]
+            m = mapping[key][0]['title'].replace(
+                '\'', '').replace(",", '').replace(
+                '.', '').replace('&', 'and').lower()
+            m2 = second['title'].replace(
+                '\'', '').replace(",", '').replace(
+                '.', '').replace('&', 'and').lower()
+            m = re.sub(r'\([^)]*\)', '', m)
+            m2 = re.sub(r'\([^)]*\)', '', m2)
             if average_ratio(name, m) < average_ratio(name, m2) and abs(average_ratio(name, m) - average_ratio(name, m2)) > 10:
-                # print(key.split('.txt')[0], " : ", mapping[key]
-                #     [0]['title'], " | ", mapping[key][1]['title'])
-                movie_info[key] = mapping[key][1]
-            else: 
-                movie_info[key] = mapping[key][0]
+                m = m.split(":", 1)[0]
+                m2 = m2.split(":", 1)[0]
+                if average_ratio(name, m) < average_ratio(name, m2) and abs(average_ratio(name, m) - average_ratio(name, m2)) > 10:
+                    # print(key.split('.txt')[0], " : ", mapping[key]
+                    #     [0]['title'], " | ", mapping[key][1]['title'])
+                    movie_info[key] = mapping[key][1]
+                else: 
+                    movie_info[key] = mapping[key][0]
 
-        else:
-            movie_info[key] = mapping[key][0]
-            
+            else:
+                movie_info[key] = mapping[key][0]
+                
     elif len(mapping[key]) == 1:
         movie_info[key] = mapping[key][0]
     else:
@@ -362,52 +450,57 @@ for key in omdb_all:
         # print(search_name(key.split('.txt')[0])," : ", n)
         movie_info[key] = {}
     elif len(omdb_all[key]) > 1:
-        n = " ".join(key.split('.txt')[0].replace("transcript", "").split("-"))
-        name = re.sub(r'\([^)]*\)', '', n).lower()
-        num = re.findall(r'\b\d\b', name)
-        date = re.findall(r'\d{4}', n)
+        for match in omdb_all[key]:
+            if title_match(match['title'], key):
+                movie_info[key] = match
+                break
+        if key not in omdb_all:
+            n = " ".join(key.split('.txt')[0].replace("transcript", "").split("-"))
+            name = re.sub(r'\([^)]*\)', '', n).lower()
+            num = re.findall(r'\b\d\b', name)
+            date = re.findall(r'\d{4}', n)
 
-        all_titles = [(x['title'], ind) for ind, x in enumerate(omdb_all[key])]
-        all_dates = [(x['release_date'], ind)
-                     for ind, x in enumerate(omdb_all[key]) if 'release_date' in x]
+            all_titles = [(x['title'], ind) for ind, x in enumerate(omdb_all[key])]
+            all_dates = [(x['release_date'], ind)
+                        for ind, x in enumerate(omdb_all[key]) if 'release_date' in x]
 
-        second = omdb_all[key][1]
+            second = omdb_all[key][1]
 
-        for title, ind in all_titles:
-            n_title = re.findall(r'\b\d\b', title)
-            if len(num) > 0 and len(n_title) > 0:
-                if num[0] == n_title[0]:
-                    second = omdb_all[key][ind]
-                    break
+            for title, ind in all_titles:
+                n_title = re.findall(r'\b\d\b', title)
+                if len(num) > 0 and len(n_title) > 0:
+                    if num[0] == n_title[0]:
+                        second = omdb_all[key][ind]
+                        break
 
-        for title, ind in all_dates:
-            n_title = re.findall(r'\d{4}', title)
-            if len(date) > 0 and len(n_title) > 0:
-                if date[0] == n_title[0]:
-                    second = omdb_all[key][ind]
-                    break
+            for title, ind in all_dates:
+                n_title = re.findall(r'\d{4}', title)
+                if len(date) > 0 and len(n_title) > 0:
+                    if date[0] == n_title[0]:
+                        second = omdb_all[key][ind]
+                        break
 
-        m = omdb_all[key][0]['title'].replace(
-            '\'', '').replace(",", '').replace(
-            '.', '').replace('&', 'and').lower()
-        m2 = second['title'].replace(
-            '\'', '').replace(",", '').replace(
-            '.', '').replace('&', 'and').lower()
-            
-        m = re.sub(r'\([^)]*\)', '', m)
-        m2 = re.sub(r'\([^)]*\)', '', m2)
-        if average_ratio(name, m) < average_ratio(name, m2) and abs(average_ratio(name, m) - average_ratio(name, m2)) > 10:
-            m = m.split(":", 1)[0]
-            m2 = m2.split(":", 1)[0]
+            m = omdb_all[key][0]['title'].replace(
+                '\'', '').replace(",", '').replace(
+                '.', '').replace('&', 'and').lower()
+            m2 = second['title'].replace(
+                '\'', '').replace(",", '').replace(
+                '.', '').replace('&', 'and').lower()
+                
+            m = re.sub(r'\([^)]*\)', '', m)
+            m2 = re.sub(r'\([^)]*\)', '', m2)
             if average_ratio(name, m) < average_ratio(name, m2) and abs(average_ratio(name, m) - average_ratio(name, m2)) > 10:
-                # print(key.split('.txt')[0], " : ", omdb_all[key]
-                #       [0]['title'], " | ", omdb_all[key][1]['title'])
-                movie_info[key] = omdb_all[key][1]
+                m = m.split(":", 1)[0]
+                m2 = m2.split(":", 1)[0]
+                if average_ratio(name, m) < average_ratio(name, m2) and abs(average_ratio(name, m) - average_ratio(name, m2)) > 10:
+                    # print(key.split('.txt')[0], " : ", omdb_all[key]
+                    #       [0]['title'], " | ", omdb_all[key][1]['title'])
+                    movie_info[key] = omdb_all[key][1]
+                else:
+                    movie_info[key] = omdb_all[key][0]
+
             else:
                 movie_info[key] = omdb_all[key][0]
-
-        else:
-            movie_info[key] = omdb_all[key][0]
 
     elif len(omdb_all[key]) == 1:
         movie_info[key] = omdb_all[key][0]
@@ -455,75 +548,6 @@ with open(join("metadata", "info_2.json"), "w") as outfile:
 
 # print(count)
 
-def roman_to_int(num):
-    string = num.split()
-    res = []
-    for s in string:
-        if s == "ii":
-            res.append("2")
-        elif s == "iii":
-            res.append("3")
-        elif s == "iv":
-            res.append("4")
-        elif s == "v":
-            res.append("5")
-        elif s == "vi":
-            res.append("6")
-        elif s == "vii":
-            res.append("7")
-        elif s == "viii":
-            res.append("8")
-        elif s == "ix":
-            res.append("9")
-        else:
-            res.append(s)
-    return " ".join(res)
-
-forbidden = ["the", "a", "an", "and", "or", "part", "transcript", "vol", "chapter", "movie"]
-symbols = ["!", "@", "#", "$", "%", "^", "&", "*", "_", "-", "+", ":", ".", ",", "?", "\'", "/"]
-def clean_name(name):
-    name = " ".join(name.lower().split("-"))
-    name = re.sub(r'\([^)]*\)', '', name)
-    name = re.sub(r"(\d{4})", "", name)
-    name = "".join([x for x in name if x not in symbols])
-    name = name.split()
-    name = list(filter(lambda a: a not in forbidden, name))
-    name = " ".join(name).strip()
-    name = roman_to_int(name)
-    name = unidecode.unidecode(name)
-
-    return name
-
-def check_series(name1, name2):
-    name1 = "".join(name1.split())
-    name2 = "".join(name2.split())
-    
-    series_num1 = re.findall(r'\d{1,3}', name1)
-    series_num2 = re.findall(r'\d{1,3}', name2)
-    series_title1 = re.findall(r'.+?(?=\d)', name1)
-    series_title2 = re.findall(r'.+?(?=\d)', name2)
-    if len(series_num1) > 0 and len(series_num2) > 0 and len(series_title1) > 0 and len(series_title2) > 0:
-        if series_num1[0] == series_num2[0] and series_title1[0] == series_title2[0]:
-            return True
-    
-    return False
-
-
-def check_series_number(name1, name2):
-    name1 = "".join(name1.split())
-    name2 = "".join(name2.split())
-
-    series_num1 = re.findall(r'\d{1,3}', name1)
-    series_num2 = re.findall(r'\d{1,3}', name2)
-
-    if len(series_num1) > 0 and len(series_num2) > 0 :
-        if series_num1[0] == series_num2[0]:
-            return True
-    elif len(series_num1) == 0 and len(series_num2) == 0:
-        return True
-    return False
-
-
 
 meta = {}
 count = 0
@@ -570,25 +594,48 @@ json_object = json.dumps(meta_2, indent=4)
 with open(join("metadata", "omdb.json"), "w") as outfile:
     outfile.write(json_object)
 
-# for key in meta_2:
-#     if meta_2[key]:
-#         if not meta[key]:
-#             meta[key] = meta_2[key]
-#     if not meta[key]:
-#         print(key)
+for key in meta_2:
+    if meta_2[key]:
+        if not meta[key]:
+            meta[key] = meta_2[key]
+    # if not meta[key]:
+    #     print(key)
+
+# for key in meta:
+#     if meta[key]:
+#         title = meta[key]['title']
+#         title_match(title, key)
+
+
+# with open(join("metadata", "metadata.json"), 'r') as f:
+#     mapping = json.load(f)
+
+# with open(join("metadata", "metadata_2.json"), 'r') as f:
+#     mapping.update(json.load(f))
+
+# movie_info = {}
+
+# for key in mapping:
+#     if len(mapping[key]) == 0:
+#         movie_info[key] = {}
+#     elif len(mapping[key]) > 1:
+#         for match in mapping[key]:
+#             if title_match(match['title'], key):
+#                 movie_info[key] = match
+#                 break
+#         if key not in movie_info:
+#             movie_info[key] = {}
+#     elif len(mapping[key]) == 1:
+#         movie_info[key] = mapping[key][0]
+#     else:
+#         print("what???")
+
+# print(count)
 
 for key in meta:
     if meta[key]:
-        title = meta[key]['title']
-        if clean_name(title) == clean_name(key) or "".join(clean_name(title).split()) == "".join(clean_name(key).split()) or check_series(clean_name(title), clean_name(key)):
-            count += 1
-        elif fuzz.ratio("".join(clean_name(title).split()), "".join(clean_name(key).split())) > 89 and check_series_number(clean_name(title), clean_name(key)):
-            # print(clean_name(title), " | ",
-            #       clean_name(key))
-            count+=1
-        else:
-            # pass
-            print(clean_name(title), " | ",
-                  clean_name(key), " | ", fuzz.ratio(
-                      "".join(clean_name(title).split()), "".join(clean_name(key).split())))
+        count += 1
+    else: 
+        print(key)
+
 print(count)
