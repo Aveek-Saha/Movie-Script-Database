@@ -7,6 +7,14 @@ There are three steps to the whole process:
 1. Collect data from various sources - Scrape websites for scripts in HTML, txt, doc or pdf format
 2. Remove duplicates from different sources - Automatically remove as many deplicates from different sources as possible
 3. Collect metadata - Get metadata about the scripts for additional processing
+4. Parse Scripts - Convert scripts into lines with just Character => dialouge
+
+## Instructions for use
+1. Install all dependencies using `pip install -r requirements.txt`.
+2. Collect all the scripts: `python get_scripts.py`. This might take a while(2+ hrs).
+3. Remove duplicates and empty files: `python clean_files.py`.
+4. Collect metadata from TMDb and OMDb: `python get_metadata.py`.
+5. Parse scripts: `python parse_files.py`.
 
 The sources that scripts are collected from are:
 - [IMSDb](https://www.imsdb.com/)
