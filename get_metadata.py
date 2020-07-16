@@ -139,47 +139,47 @@ def title_match(title, key):
 # Search TMDb for movies
 mapping = {}
 
-# for movie in tqdm(movielist):
-#     name = search_name(movie.split(sep)[-1].split('.txt')[0])
-#     response = urllib.request.urlopen(
-#         "https://api.themoviedb.org/3/search/movie?api_key=" + 
-#         tmdb_api_key + "&language=en-US&query=" + urllib.parse.quote(name)
-#         +"&page=1")
-#     html = response.read()
-#     jres = json.loads(html)
-#     if jres['total_results'] > 0:
-#         mapping[movie.split(sep)[-1].split('.txt')[0]] = jres['results']
-#     else:
-#         name = movie.split(sep)[-1].split('.txt')[0]
-#         response = urllib.request.urlopen(
-#             "https://api.themoviedb.org/3/search/movie?api_key=" +
-#             tmdb_api_key + "&language=en-US&query=" + urllib.parse.quote(name)
-#             + "&page=1")
-#         html = response.read()
-#         jres = json.loads(html)
-#         if jres['total_results'] > 0:
-#             mapping[movie.split(sep)[-1].split('.txt')[0]] = jres['results']
-#         else:
-#             name = " ".join(movie.split(sep)[-1].split('.txt')[0].split("-"))
-#             name = " ".join(camel_case_split(name))
-#             response = urllib.request.urlopen(
-#                 "https://api.themoviedb.org/3/search/movie?api_key=" +
-#                 tmdb_api_key + "&language=en-US&query=" + urllib.parse.quote(name)
-#                 + "&page=1")
-#             html = response.read()
-#             jres = json.loads(html)
-#             if jres['total_results'] > 0:
-#                 mapping[movie.split(sep)[-1].split('.txt')[0]] = jres['results']
-#             else:
-#                 mapping[movie.split(sep)[-1].split('.txt')[0]] = []
+for movie in tqdm(movielist):
+    name = search_name(movie.split(sep)[-1].split('.txt')[0])
+    response = urllib.request.urlopen(
+        "https://api.themoviedb.org/3/search/movie?api_key=" + 
+        tmdb_api_key + "&language=en-US&query=" + urllib.parse.quote(name)
+        +"&page=1")
+    html = response.read()
+    jres = json.loads(html)
+    if jres['total_results'] > 0:
+        mapping[movie.split(sep)[-1].split('.txt')[0]] = jres['results']
+    else:
+        name = movie.split(sep)[-1].split('.txt')[0]
+        response = urllib.request.urlopen(
+            "https://api.themoviedb.org/3/search/movie?api_key=" +
+            tmdb_api_key + "&language=en-US&query=" + urllib.parse.quote(name)
+            + "&page=1")
+        html = response.read()
+        jres = json.loads(html)
+        if jres['total_results'] > 0:
+            mapping[movie.split(sep)[-1].split('.txt')[0]] = jres['results']
+        else:
+            name = " ".join(movie.split(sep)[-1].split('.txt')[0].split("-"))
+            name = " ".join(camel_case_split(name))
+            response = urllib.request.urlopen(
+                "https://api.themoviedb.org/3/search/movie?api_key=" +
+                tmdb_api_key + "&language=en-US&query=" + urllib.parse.quote(name)
+                + "&page=1")
+            html = response.read()
+            jres = json.loads(html)
+            if jres['total_results'] > 0:
+                mapping[movie.split(sep)[-1].split('.txt')[0]] = jres['results']
+            else:
+                mapping[movie.split(sep)[-1].split('.txt')[0]] = []
 
     
-#     # print(name)
+    # print(name)
 
-# json_object = json.dumps(mapping, indent=4)
+json_object = json.dumps(mapping, indent=4)
 
-# with open(join("metadata", "metadata.json"), "w") as outfile:
-#     outfile.write(json_object)
+with open(join("metadata", "metadata.json"), "w") as outfile:
+    outfile.write(json_object)
 
 with open(join("metadata", "metadata.json"), 'r') as f:
   mapping = json.load(f)
@@ -264,176 +264,176 @@ json_object = json.dumps(movie_info, indent=4)
 with open(join("metadata", "info.json"), "w") as outfile:
     outfile.write(json_object)
 
-# with open(join("metadata", "info.json"), 'r') as f:
-#     movie_info = json.load(f)
+with open(join("metadata", "info.json"), 'r') as f:
+    movie_info = json.load(f)
 
-# not_matched = []
+not_matched = []
 
-# count = 0
+count = 0
 
-# # Get all movies that dont match
+# Get all movies that dont match
 
-# for key in movie_info:
-#     if movie_info[key]:
-#         name = re.sub(r'\([^)]*\)', '',
-#                       " ".join(key.split('.txt')[0].replace("transcript", "").split("-"))).lower().replace("the ", "").replace(" the", "")
-#         m = movie_info[key]['title'].replace(
-#             '\'', '').replace(",", '').replace(
-#             '.', '').replace('&', 'and').lower().replace("the ", "").replace(" the", "")
-#         m = re.sub(r'\([^)]*\)', '', m)
-#         m_join = "".join(m.split())
-#         name = re.sub(r'\([^)]*\)', '', name)
-#         m_rem = m.replace(":", "")
-#         m_split = m.split(":", 1)[0]
-#         m_alt = m.split(":", 1)[1] if len(
-#             m.split(":", 1)) != 1 else m_split
-#         if average_ratio(name, m) < 80 and average_ratio(name, m_rem) < 80 and average_ratio(name, m_rem) < 80 and (average_ratio(name, m_split) < 80) and (average_ratio(name, m_alt) < 80) and (average_ratio(name, m_join) < 80) and fuzz.partial_ratio(name, m) < 80 and fuzz.partial_ratio(m, name) < 80:
-#             m_original = movie_info[key]['original_title'].replace(
-#                 '\'', '').replace(",", '').replace(
-#                 '.', '').replace('&', 'and').lower().replace("the ", "").replace(" the", "")
-#             m_original = re.sub(r'\([^)]*\)', '', m_original)
-#             if average_ratio(name, m_original) < 80:
+for key in movie_info:
+    if movie_info[key]:
+        name = re.sub(r'\([^)]*\)', '',
+                      " ".join(key.split('.txt')[0].replace("transcript", "").split("-"))).lower().replace("the ", "").replace(" the", "")
+        m = movie_info[key]['title'].replace(
+            '\'', '').replace(",", '').replace(
+            '.', '').replace('&', 'and').lower().replace("the ", "").replace(" the", "")
+        m = re.sub(r'\([^)]*\)', '', m)
+        m_join = "".join(m.split())
+        name = re.sub(r'\([^)]*\)', '', name)
+        m_rem = m.replace(":", "")
+        m_split = m.split(":", 1)[0]
+        m_alt = m.split(":", 1)[1] if len(
+            m.split(":", 1)) != 1 else m_split
+        if average_ratio(name, m) < 80 and average_ratio(name, m_rem) < 80 and average_ratio(name, m_rem) < 80 and (average_ratio(name, m_split) < 80) and (average_ratio(name, m_alt) < 80) and (average_ratio(name, m_join) < 80) and fuzz.partial_ratio(name, m) < 80 and fuzz.partial_ratio(m, name) < 80:
+            m_original = movie_info[key]['original_title'].replace(
+                '\'', '').replace(",", '').replace(
+                '.', '').replace('&', 'and').lower().replace("the ", "").replace(" the", "")
+            m_original = re.sub(r'\([^)]*\)', '', m_original)
+            if average_ratio(name, m_original) < 80:
 
-#                 # print(key.split('.txt')[0], " : ", movie_info[key]
-#                 #       ['title'], ' , ', average_ratio(name, m))
-#                 not_matched.append(key)
-#                 count += 1
+                # print(key.split('.txt')[0], " : ", movie_info[key]
+                #       ['title'], ' , ', average_ratio(name, m))
+                not_matched.append(key)
+                count += 1
 
-# print(len(not_matched) + len(not_found))
+print(len(not_matched) + len(not_found))
         
 
-# omdb_info = {}
+omdb_info = {}
 
-# # Search for them in OMDb
+# Search for them in OMDb
 
-# for movie in tqdm(not_matched):
-#     name = search_name(movie.split(sep)[-1].split('.txt')[0])
-#     response = urllib.request.urlopen(
-#         "http://www.omdbapi.com/?apikey=" +
-#         omdb_api_key + "&t=" + urllib.parse.quote(name)
-#         + "&plot=full")
-#     html = response.read()
-#     jres = json.loads(html)
-#     if jres['Response'] != "False":
-#         omdb_info[movie.split(sep)[-1].split('.txt')[0]] = jres
-#     else:
-#         name = movie.split(sep)[-1].split('.txt')[0]
-#         response = urllib.request.urlopen(
-#             "http://www.omdbapi.com/?apikey=" +
-#             omdb_api_key + "&t=" + urllib.parse.quote(name)
-#             + "&plot=full")
-#         html = response.read()
-#         jres = json.loads(html)
-#         if jres['Response'] != "False":
-#             omdb_info[movie.split(sep)[-1].split('.txt')[0]] = jres
-#         else:
-#             name = " ".join(movie.split(sep)[-1].split('.txt')[0].split("-"))
-#             name = " ".join(camel_case_split(name))
-#             response = urllib.request.urlopen(
-#                 "http://www.omdbapi.com/?apikey=" +
-#                 omdb_api_key + "&t=" + urllib.parse.quote(name)
-#                 + "&plot=full")
-#             html = response.read()
-#             jres = json.loads(html)
-#             if jres['Response'] != "False":
-#                 omdb_info[movie.split(sep)[-1].split('.txt')[0]]=jres
-#             else:
-#                 omdb_info[movie.split(sep)[-1].split('.txt')[0]]={}
+for movie in tqdm(not_matched):
+    name = search_name(movie.split(sep)[-1].split('.txt')[0])
+    response = urllib.request.urlopen(
+        "http://www.omdbapi.com/?apikey=" +
+        omdb_api_key + "&t=" + urllib.parse.quote(name)
+        + "&plot=full")
+    html = response.read()
+    jres = json.loads(html)
+    if jres['Response'] != "False":
+        omdb_info[movie.split(sep)[-1].split('.txt')[0]] = jres
+    else:
+        name = movie.split(sep)[-1].split('.txt')[0]
+        response = urllib.request.urlopen(
+            "http://www.omdbapi.com/?apikey=" +
+            omdb_api_key + "&t=" + urllib.parse.quote(name)
+            + "&plot=full")
+        html = response.read()
+        jres = json.loads(html)
+        if jres['Response'] != "False":
+            omdb_info[movie.split(sep)[-1].split('.txt')[0]] = jres
+        else:
+            name = " ".join(movie.split(sep)[-1].split('.txt')[0].split("-"))
+            name = " ".join(camel_case_split(name))
+            response = urllib.request.urlopen(
+                "http://www.omdbapi.com/?apikey=" +
+                omdb_api_key + "&t=" + urllib.parse.quote(name)
+                + "&plot=full")
+            html = response.read()
+            jres = json.loads(html)
+            if jres['Response'] != "False":
+                omdb_info[movie.split(sep)[-1].split('.txt')[0]]=jres
+            else:
+                omdb_info[movie.split(sep)[-1].split('.txt')[0]]={}
 
 
-#     # print(name)
+    # print(name)
 
-# json_object = json.dumps(omdb_info, indent=4)
+json_object = json.dumps(omdb_info, indent=4)
 
-# with open(join("metadata", "omdb_unmatched.json"), "w") as outfile:
-#     outfile.write(json_object)
+with open(join("metadata", "omdb_unmatched.json"), "w") as outfile:
+    outfile.write(json_object)
 
-# omdb_info = {}
+omdb_info = {}
 
-# # Search for them in OMDb
+# Search for them in OMDb
 
-# for movie in tqdm(not_found):
-#     name = search_name(movie.split(sep)[-1].split('.txt')[0])
-#     response = urllib.request.urlopen(
-#         "http://www.omdbapi.com/?apikey=" +
-#         omdb_api_key + "&t=" + urllib.parse.quote(name)
-#         + "&plot=full")
-#     html = response.read()
-#     jres = json.loads(html)
-#     if jres['Response'] != "False":
-#         omdb_info[movie.split(sep)[-1].split('.txt')[0]] = jres
-#     else:
-#         name = movie.split(sep)[-1].split('.txt')[0]
-#         response = urllib.request.urlopen(
-#             "http://www.omdbapi.com/?apikey=" +
-#             omdb_api_key + "&t=" + urllib.parse.quote(name)
-#             + "&plot=full")
-#         html = response.read()
-#         jres = json.loads(html)
-#         if jres['Response'] != "False":
-#             omdb_info[movie.split(sep)[-1].split('.txt')[0]] = jres
-#         else:
-#             name = " ".join(movie.split(sep)[-1].split('.txt')[0].split("-"))
-#             name = " ".join(camel_case_split(name))
-#             response = urllib.request.urlopen(
-#                 "http://www.omdbapi.com/?apikey=" +
-#                 omdb_api_key + "&t=" + urllib.parse.quote(name)
-#                 + "&plot=full")
-#             html = response.read()
-#             jres = json.loads(html)
-#             if jres['Response'] != "False":
-#                 omdb_info[movie.split(sep)[-1].split('.txt')[0]] = jres
-#             else:
-#                 omdb_info[movie.split(sep)[-1].split('.txt')[0]] = {}
+for movie in tqdm(not_found):
+    name = search_name(movie.split(sep)[-1].split('.txt')[0])
+    response = urllib.request.urlopen(
+        "http://www.omdbapi.com/?apikey=" +
+        omdb_api_key + "&t=" + urllib.parse.quote(name)
+        + "&plot=full")
+    html = response.read()
+    jres = json.loads(html)
+    if jres['Response'] != "False":
+        omdb_info[movie.split(sep)[-1].split('.txt')[0]] = jres
+    else:
+        name = movie.split(sep)[-1].split('.txt')[0]
+        response = urllib.request.urlopen(
+            "http://www.omdbapi.com/?apikey=" +
+            omdb_api_key + "&t=" + urllib.parse.quote(name)
+            + "&plot=full")
+        html = response.read()
+        jres = json.loads(html)
+        if jres['Response'] != "False":
+            omdb_info[movie.split(sep)[-1].split('.txt')[0]] = jres
+        else:
+            name = " ".join(movie.split(sep)[-1].split('.txt')[0].split("-"))
+            name = " ".join(camel_case_split(name))
+            response = urllib.request.urlopen(
+                "http://www.omdbapi.com/?apikey=" +
+                omdb_api_key + "&t=" + urllib.parse.quote(name)
+                + "&plot=full")
+            html = response.read()
+            jres = json.loads(html)
+            if jres['Response'] != "False":
+                omdb_info[movie.split(sep)[-1].split('.txt')[0]] = jres
+            else:
+                omdb_info[movie.split(sep)[-1].split('.txt')[0]] = {}
 
-#     # print(name)
+    # print(name)
 
-# json_object = json.dumps(omdb_info, indent=4)
+json_object = json.dumps(omdb_info, indent=4)
 
-# with open(join("metadata", "omdb_not_found.json"), "w") as outfile:
-#     outfile.write(json_object)
+with open(join("metadata", "omdb_not_found.json"), "w") as outfile:
+    outfile.write(json_object)
 
-# omdb_all = {}
-# count = 0
-# with open(join("metadata", "omdb_not_found.json"), 'r') as f:
-#   omdb_all = json.load(f)
+omdb_all = {}
+count = 0
+with open(join("metadata", "omdb_not_found.json"), 'r') as f:
+  omdb_all = json.load(f)
 
-# with open(join("metadata", "omdb_unmatched.json"), 'r') as f:
-#   omdb_all.update(json.load(f))
+with open(join("metadata", "omdb_unmatched.json"), 'r') as f:
+  omdb_all.update(json.load(f))
 
-# tmdb_re = {}
+tmdb_re = {}
 
-# # Find ones not found in OMDb in TMDb by using the first ine in the script
+# Find ones not found in OMDb in TMDb by using the first ine in the script
 
-# all_missing = not_matched + not_found
+all_missing = not_matched + not_found
 
-# for key in tqdm(all_missing):
-#     # if not omdb_all[key]:
-#     f = open(join(DIR_FINAL, key + '.txt'), 'r', errors="ignore")
-#     first_line = f.readline().strip().lower()
-#     f.close()
-#     count += 1
-#     first_line = first_line.replace(
-#         "\"", "").replace(".", "").replace(":", "")
-#     if first_line == "fade in":
-#         continue
-#     response = urllib.request.urlopen(
-#         "https://api.themoviedb.org/3/search/movie?api_key=" +
-#         tmdb_api_key + "&language=en-US&query=" +
-#         urllib.parse.quote(first_line)
-#         + "&page=1")
-#     html = response.read()
-#     jres = json.loads(html)
-#     if jres['total_results'] > 0:
-#         tmdb_re[key] = jres['results']
-#     else:
-#         tmdb_re[key] = []
+for key in tqdm(all_missing):
+    # if not omdb_all[key]:
+    f = open(join(DIR_FINAL, key + '.txt'), 'r', errors="ignore")
+    first_line = f.readline().strip().lower()
+    f.close()
+    count += 1
+    first_line = first_line.replace(
+        "\"", "").replace(".", "").replace(":", "")
+    if first_line == "fade in":
+        continue
+    response = urllib.request.urlopen(
+        "https://api.themoviedb.org/3/search/movie?api_key=" +
+        tmdb_api_key + "&language=en-US&query=" +
+        urllib.parse.quote(first_line)
+        + "&page=1")
+    html = response.read()
+    jres = json.loads(html)
+    if jres['total_results'] > 0:
+        tmdb_re[key] = jres['results']
+    else:
+        tmdb_re[key] = []
 
-# json_object = json.dumps(tmdb_re, indent=4)
+json_object = json.dumps(tmdb_re, indent=4)
 
-# with open(join("metadata", "metadata_2.json"), "w") as outfile:
-#     outfile.write(json_object)
-# print(count)
+with open(join("metadata", "metadata_2.json"), "w") as outfile:
+    outfile.write(json_object)
+print(count)
 
 
 omdb_all = {}
@@ -513,37 +513,37 @@ with open(join("metadata", "info_2.json"), "w") as outfile:
     outfile.write(json_object)
 
 
-# movie_info = {}
+movie_info = {}
 
-# with open(join("metadata", "info_2.json"), 'r') as f:
-#   movie_info = json.load(f)
+with open(join("metadata", "info_2.json"), 'r') as f:
+  movie_info = json.load(f)
 
 
-# count = 0
-# for key in movie_info:
-#     if movie_info[key]:
-#         name = re.sub(r'\([^)]*\)', '',
-#                       " ".join(key.split('.txt')[0].replace("transcript", "").split("-"))).lower().replace("the ", "").replace(" the", "")
-#         m = movie_info[key]['title'].replace(
-#             '\'', '').replace(",", '').replace(
-#             '.', '').replace('&', 'and').lower().replace("the ", "").replace(" the", "")
-#         m = re.sub(r'\([^)]*\)', '', m)
-#         m_join = "".join(m.split())
-#         name = re.sub(r'\([^)]*\)', '', name)
-#         m_rem = m.replace(":", "")
-#         m_split = m.split(":", 1)[0]
-#         m_alt = m.split(":", 1)[1] if len(
-#             m.split(":", 1)) != 1 else m_split
-#         if average_ratio(name, m) < 80 and average_ratio(name, m_rem) < 80 and average_ratio(name, m_rem) < 80 and (average_ratio(name, m_split) < 80) and (average_ratio(name, m_alt) < 80) and (average_ratio(name, m_join) < 80) and fuzz.partial_ratio(name, m) < 80 and fuzz.partial_ratio(m, name) < 80:
-#             m_original = movie_info[key]['original_title'].replace(
-#                 '\'', '').replace(",", '').replace(
-#                 '.', '').replace('&', 'and').lower().replace("the ", "").replace(" the", "")
-#             m_original = re.sub(r'\([^)]*\)', '', m_original)
-#             if average_ratio(name, m_original) < 55:
+count = 0
+for key in movie_info:
+    if movie_info[key]:
+        name = re.sub(r'\([^)]*\)', '',
+                      " ".join(key.split('.txt')[0].replace("transcript", "").split("-"))).lower().replace("the ", "").replace(" the", "")
+        m = movie_info[key]['title'].replace(
+            '\'', '').replace(",", '').replace(
+            '.', '').replace('&', 'and').lower().replace("the ", "").replace(" the", "")
+        m = re.sub(r'\([^)]*\)', '', m)
+        m_join = "".join(m.split())
+        name = re.sub(r'\([^)]*\)', '', name)
+        m_rem = m.replace(":", "")
+        m_split = m.split(":", 1)[0]
+        m_alt = m.split(":", 1)[1] if len(
+            m.split(":", 1)) != 1 else m_split
+        if average_ratio(name, m) < 80 and average_ratio(name, m_rem) < 80 and average_ratio(name, m_rem) < 80 and (average_ratio(name, m_split) < 80) and (average_ratio(name, m_alt) < 80) and (average_ratio(name, m_join) < 80) and fuzz.partial_ratio(name, m) < 80 and fuzz.partial_ratio(m, name) < 80:
+            m_original = movie_info[key]['original_title'].replace(
+                '\'', '').replace(",", '').replace(
+                '.', '').replace('&', 'and').lower().replace("the ", "").replace(" the", "")
+            m_original = re.sub(r'\([^)]*\)', '', m_original)
+            if average_ratio(name, m_original) < 55:
 
-#                 print(key.split('.txt')[0], " : ", movie_info[key]
-#                       ['title'], ' , ', average_ratio(name, m_original))
-#                 count += 1
+                print(key.split('.txt')[0], " : ", movie_info[key]
+                      ['title'], ' , ', average_ratio(name, m_original))
+                count += 1
 
 
 # print(count)
