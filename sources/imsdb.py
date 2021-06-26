@@ -10,8 +10,8 @@ from .utilities import format_filename, get_soup, get_pdf_text
 
 
 def get_imsdb():
-    ALL_URL = "https://www.imsdb.com/all%20scripts"
-    BASE_URL = "https://www.imsdb.com"
+    ALL_URL = "https://imsdb.com/all-scripts.html"
+    BASE_URL = "https://imsdb.com"
     DIR = os.path.join("scripts", "unprocessed", "imsdb")
 
     if not os.path.exists(DIR):
@@ -20,25 +20,29 @@ def get_imsdb():
 
     def get_script_from_url(script_url):
         text = ""
+        
+        try:
 
-        if script_url.endswith('.pdf'):
-            text = get_pdf_text(BASE_URL + urllib.parse.quote(script_url))
-            return text
+            if script_url.endswith('.pdf'):
+                text = get_pdf_text(BASE_URL + urllib.parse.quote(script_url))
+                return text
 
-        if script_url.endswith('.html'):
-            script_soup = get_soup(BASE_URL + urllib.parse.quote(script_url))
-            if len(script_soup.find_all('td', class_="scrtext")) < 1:
-                return ""
-            script_text = script_soup.find_all('td', class_="scrtext")[0].pre
+            if script_url.endswith('.html'):
+                script_soup = get_soup(BASE_URL + urllib.parse.quote(script_url))
+                if len(script_soup.find_all('td', class_="scrtext")) < 1:
+                    return ""
+                script_text = script_soup.find_all('td', class_="scrtext")[0].pre
 
-            if script_text:
-                script_text = script_soup.find_all('td', class_="scrtext")[0].pre.pre
                 if script_text:
-                    text = script_text.get_text()
+                    script_text = script_soup.find_all('td', class_="scrtext")[0].pre.pre
+                    if script_text:
+                        text = script_text.get_text()
 
-                else:
-                    script_text = script_soup.find_all('td', class_="scrtext")[0].pre
-                    text = script_text.get_text()
+                    else:
+                        script_text = script_soup.find_all('td', class_="scrtext")[0].pre
+                        text = script_text.get_text()
+        except:
+            text = ""
 
         return text
 
