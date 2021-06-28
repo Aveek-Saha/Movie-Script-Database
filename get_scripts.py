@@ -1,28 +1,27 @@
 import sources
 
-print("Fetching from imsdb")
-sources.get_imsdb()
-print()
+import json
 
-print("Fetching from screenplays")
-sources.get_screenplays()
-print()
+f = open('sources.json','r')
+data = json.load(f)
 
-print("Fetching from scriptsavant")
-sources.get_scriptsavant()
-print()
+for source in data:
+    print("Fetching scripts from %s" % (source))
+    included = data[source]
+    if source == "imsdb" and included == "true":
+        sources.get_imsdb()
+    elif source == "screenplays" and included == "true":
+        sources.get_screenplays()
+    elif source == "scriptsavant" and included == "true":
+        sources.get_scriptsavant()
+    elif source == "weeklyscript" and included == "true":
+        sources.get_weeklyscript()
+    elif source == "dailyscript" and included == "true":
+        sources.get_dailyscript()
+    elif source == "awesomefilm" and included == "true":
+        sources.get_awesomefilm()
+    elif source == "sfy" and included == "true":
+        sources.get_sfy()
+    
+    print()
 
-print("Fetching from weeklyscript")
-sources.get_weeklyscript()
-print()
-
-print("Fetching from dailyscript")
-sources.get_dailyscript()
-print()
-
-print("Fetching from awesomefilm")
-sources.get_awesomefilm()
-print()
-
-print("Fetching from sfy")
-sources.get_sfy()
