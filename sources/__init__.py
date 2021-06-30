@@ -5,4 +5,5 @@ from .weeklyscript import get_weeklyscript
 from .dailyscript import get_dailyscript
 from .awesomefilm import get_awesomefilm
 from .sfy import get_sfy
+from .scriptslug import get_scriptslug
 from .utilities import *

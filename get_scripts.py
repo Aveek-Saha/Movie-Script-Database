@@ -22,6 +22,8 @@ for source in data:
         sources.get_awesomefilm()
     elif source == "sfy" and included == "true":
         sources.get_sfy()
+    elif source == "scriptslug" and included == "true":
+        sources.get_scriptslug()
     
     print()
 
