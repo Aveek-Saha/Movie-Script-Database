@@ -18,9 +18,12 @@ The sources that scripts are collected from are:
 - [IMSDb](https://www.imsdb.com/)
 - [Dailyscript](https://www.dailyscript.com/)
 - [Awesomefilm](http://www.awesomefilm.com/)
-- [Weeklyscript](https://www.weeklyscript.com/)
 - [Scriptsavanat](https://thescriptsavant.com/)
 - [Screenplays online](https://www.screenplays-online.de/)
 - [Scripts for you](https://sfy.ru/)
+- [Script Slug](https://www.scriptslug.com/)
+
+**Note:**
+- [~~Weeklyscript~~](https://www.weeklyscript.com/) (Site no longer active)
  
 The script for parsing the movie scripts come from this paper: `Linguistic analysis of differences in portrayal of movie characters, in: Proceedings of Association for Computational Linguistics, Vancouver, Canada, 2017` and the code can be found here: https://github.com/usc-sail/mica-text-script-parser
