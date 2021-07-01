@@ -8,7 +8,7 @@ from .utilities import format_filename, get_soup, get_pdf_text, get_doc_text
 def get_scriptsavant():
     ALL_URL_1 = "https://thescriptsavant.com/free-movie-screenplays-am/"
     ALL_URL_2 = "https://thescriptsavant.com/free-movie-screenplays-nz/"
-    BASE_URL = "http://www.awesomefilm.com/"
+    BASE_URL = "http://www.thescriptsavant.com/"
     DIR = os.path.join("scripts", "unprocessed", "scriptsavant")
 
     if not os.path.exists(DIR):
