@@ -13,6 +13,7 @@ DIR_SCREEN = join("scripts", "unprocessed", "screenplays")
 DIR_AWESOME = join("scripts", "unprocessed", "awesomefilm")
 DIR_SAVANT = join("scripts", "unprocessed", "scriptsavant")
 DIR_SFY = join("scripts", "unprocessed", "sfy")
+DIR_SLUG = join("scripts", "unprocessed", "scriptslug")
 
 DIR_FILTER = join("scripts", "filtered")
 DIR_FINAL = join("scripts", "final")
@@ -31,6 +32,8 @@ savant = [join(DIR_SAVANT, f) for f in listdir(DIR_SAVANT) if isfile(
     join(DIR_SAVANT, f))and getsize(join(DIR_SAVANT, f)) > 3000]
 sfy = [join(DIR_SFY, f) for f in listdir(DIR_SFY) if isfile(
     join(DIR_SFY, f))and getsize(join(DIR_SFY, f)) > 3000]
+slug = [join(DIR_SLUG, f) for f in listdir(DIR_SLUG) if isfile(
+    join(DIR_SLUG, f))and getsize(join(DIR_SLUG, f)) > 3000]
 
 sources = {
     'savant': savant,
@@ -39,7 +42,8 @@ sources = {
     'weekly': weekly,
     'screen': screen,
     'awesome': awesome,
-    'sfy': sfy
+    'sfy': sfy,
+    'slug': slug
 }
 
 forbidden = ["the", "a", "an", "and", "or", "part",
@@ -175,7 +179,8 @@ counts = {
     'weeklyscript': 0,
     'screenplays': 0,
     'awesomefilm': 0,
-    'sfy': 0
+    'sfy': 0,
+    'scriptslug': 0
 }
 
 print("Write cleaned files to new dir")

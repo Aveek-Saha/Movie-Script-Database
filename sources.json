@@ -2,7 +2,7 @@
     "imsdb": "true",
     "screenplays": "true",
     "scriptsavant": "true",
-    "weeklyscript": "true",
+    "weeklyscript": "false",
     "dailyscript": "true",
     "awesomefilm": "true",
     "sfy": "true",
