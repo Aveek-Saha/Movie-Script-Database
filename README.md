@@ -11,7 +11,7 @@ There are three steps to the whole process:
 1. Install all dependencies using `pip install -r requirements.txt`.
 2. Collect all the scripts: `python get_scripts.py`. This might take a while(2+ hrs).
 3. Remove duplicates and empty files: `python clean_files.py`.
-4. Collect metadata from TMDb and OMDb: `python get_metadata.py`.
+4. Collect metadata from TMDb and OMDb: `python get_metadata.py`. (You'll need an API key for this)
 5. Parse scripts: `python parse_files.py`.
  
 The sources that scripts are collected from are:
@@ -22,6 +22,7 @@ The sources that scripts are collected from are:
 - [Screenplays online](https://www.screenplays-online.de/)
 - [Scripts for you](https://sfy.ru/)
 - [Script Slug](https://www.scriptslug.com/)
+- [Actor Point](https://www.actorpoint.com/)
 
 **Note:**
 - [~~Weeklyscript~~](https://www.weeklyscript.com/) (Site no longer active)
