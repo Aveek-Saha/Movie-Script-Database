@@ -12,11 +12,13 @@ f = open('sources.json','r')
 data = json.load(f)
 
 for source in data:
-    DIR = join("scripts", "unprocessed", source)
-    data[source] = {}
-    data[source]['files'] = [join(DIR, f) for f in listdir(DIR) if isfile(
-                    join(DIR, f)) and getsize(join(DIR, f)) > 3000]
-    data[source]['counts'] = 0
+    included = data[source]
+    if included == "true":
+        DIR = join("scripts", "unprocessed", source)
+        data[source] = {}
+        data[source]['files'] = [join(DIR, f) for f in listdir(DIR) if isfile(
+                        join(DIR, f)) and getsize(join(DIR, f)) > 3000]
+        data[source]['counts'] = 0
 
 # DIR_IMSDB = join("scripts", "unprocessed", "imsdb")
 # DIR_DAILY = join("scripts", "unprocessed", "dailyscript")
@@ -100,24 +102,26 @@ def remove_duplicates(arr, comb):
     return arr
 
 for key in data:
-    arr = data[key]['files']
-    print("Remove duplicates from", key, len(arr))
-    comb = list(itertools.combinations(arr, 2))
-    arr = remove_duplicates(arr, comb)
-    print("Non duplicates", len(arr))
-    print()
+    if data[key] != "false":
+        arr = data[key]['files']
+        print("Remove duplicates from", key, len(arr))
+        comb = list(itertools.combinations(arr, 2))
+        arr = remove_duplicates(arr, comb)
+        print("Non duplicates", len(arr))
+        print()
 
 print("Remove duplicates between sources")
 
 all_sources = []
 for key in data:
-    arr = data[key]['files']
-    all_sources += arr
-    print(len(all_sources))
-    comb_all = list(itertools.combinations(all_sources, 2))
-    all_sources = remove_duplicates(all_sources, comb_all)
-    print(len(all_sources))
-    print()
+    if data[key] != "false":
+        arr = data[key]['files']
+        all_sources += arr
+        print(len(all_sources))
+        comb_all = list(itertools.combinations(all_sources, 2))
+        all_sources = remove_duplicates(all_sources, comb_all)
+        print(len(all_sources))
+        print()
 
 
 # if not exists(DIR_FILTER):
@@ -198,10 +202,10 @@ if not exists(DIR_FINAL):
 print("Write cleaned files to new dir")
 for source in tqdm(filtered):
     f = open(source, 'r', errors="ignore")
-    data = f.read().strip()
-    data = data.replace(
+    text = f.read().strip()
+    text = text.replace(
         "Script provided for educational purposes. More scripts can be found here: http://www.sellingyourscreenplay.com/library", "")
-    data = data.encode('utf-8', 'ignore').decode('utf-8').strip()
+    text = text.encode('utf-8', 'ignore').decode('utf-8').strip()
     f.close()
 
     whitespace = re.compile(r'^[\s]+')
@@ -213,7 +217,7 @@ for source in tqdm(filtered):
 
     lines = []
 
-    for line in data.split('\n'):
+    for line in text.split('\n'):
         copy = line
         line = line.lower().strip()
 
@@ -240,9 +244,12 @@ for source in tqdm(filtered):
 
     if final_data.strip() == "":
         continue
-    data[source.split(sep)[-2]]['counts'] += 1
+    
+    if data[source.split(sep)[-2]] != "false":
+        data[source.split(sep)[-2]]['counts'] += 1
     with open(join(DIR_FINAL, source.split(sep)[-1]), 'w', errors="ignore") as out:
         out.write(final_data)
 
 for source in data:
-    print(source, ":" , data[source]['counts'])
+    if data[source] != "false":
+        print(source, ":" , data[source]['counts'])
