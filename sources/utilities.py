@@ -16,7 +16,7 @@ def format_filename(s):
 
 
 def get_soup(url):
-    page = urllib.request.Request(url)
+    page = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
     result = urllib.request.urlopen(page)
     resulttext = result.read()
 
