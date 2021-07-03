@@ -6,6 +6,7 @@ from .dailyscript import get_dailyscript
 from .awesomefilm import get_awesomefilm
 from .sfy import get_sfy
 from .scriptslug import get_scriptslug
+from .actorpoint import get_actorpoint
 from .utilities import *
 
 def get_scripts(source):
@@ -25,5 +26,7 @@ def get_scripts(source):
         get_sfy()
     elif source == "scriptslug":
         get_scriptslug()
+    elif source == "actorpoint":
+        get_actorpoint()
     else:
         print("Invalid source.")

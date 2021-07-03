@@ -41,9 +41,11 @@ def get_actorpoint():
     alphabet = string.ascii_lowercase
 
     movielist = []
-    for letter in alphabet[:2]:
+    for letter in alphabet:
         soup = get_soup(ALL_URL % (letter))
         movielist.extend(soup.find_all(attrs={"data-th" : "Script name"}))
+    soup = get_soup(ALL_URL % "num")
+    movielist.extend(soup.find_all(attrs={"data-th" : "Script name"}))
 
     for movie in tqdm(movielist):
         script_url, name = get_script_url(movie)
