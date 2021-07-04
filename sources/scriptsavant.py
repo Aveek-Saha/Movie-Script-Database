@@ -23,7 +23,7 @@ def get_scriptsavant():
 
 
     for movie in tqdm(movielist):
-        name = format_filename(movie.text.strip())
+        name = format_filename(movie.text.replace("script", "").strip())
         script_url = movie.get('href')
 
         if not script_url.endswith('.pdf'):
