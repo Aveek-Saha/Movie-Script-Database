@@ -32,14 +32,16 @@ def get_sfy():
         if script_url.endswith('.pdf'):
             try:
                 text = get_pdf_text(script_url)
-            except:
+            except Exception as err:
+                print(err)
                 continue
         else:
             try:
                 script_soup = get_soup(script_url).pre
                 if script_soup:
                     text = script_soup.get_text()
-            except:
+            except Exception as err:
+                print(err)
                 continue
 
         if text == "" or name == "":

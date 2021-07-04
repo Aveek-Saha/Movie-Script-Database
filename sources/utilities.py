@@ -47,7 +47,8 @@ def get_doc_text(url):
     f.close()
     try:
         text = textract.process(doc, encoding='utf-8').decode('utf-8')
-    except:
+    except Exception as err:
+        print(err)
         text = ""
     if os.path.isfile(doc):
         os.remove(doc)

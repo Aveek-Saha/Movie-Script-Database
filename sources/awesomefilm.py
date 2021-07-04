@@ -43,7 +43,8 @@ def get_awesomefilm():
                 page = script_soup.pre
                 if page:
                     text = page.get_text()
-        except:
+        except Exception as err:
+            print(err)
             continue
 
         if text == "":

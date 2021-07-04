@@ -24,7 +24,8 @@ def get_actorpoint():
             else:
                 print("No script at " + script_url)
 
-        except:
+        except Exception as err:
+            print(err)
             text = ""
 
         return text

@@ -41,7 +41,8 @@ def get_imsdb():
                     else:
                         script_text = script_soup.find_all('td', class_="scrtext")[0].pre
                         text = script_text.get_text()
-        except:
+        except Exception as err:
+            print(err)
             text = ""
 
         return text
