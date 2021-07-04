@@ -45,7 +45,7 @@ def get_scriptslug():
 
     movielist = []
 
-    for num in range(2):
+    for num in range(25):
         pg = num + 1
         soup = get_soup(ALL_URL + str(pg))
         linklist = soup.find_all(class_="script__wrap")
