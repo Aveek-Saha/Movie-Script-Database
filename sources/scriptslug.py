@@ -1,12 +1,8 @@
 from bs4 import BeautifulSoup
-import textract
 
 import urllib
 import os
 import re
-
-import time
-import string
 
 from tqdm import tqdm
 from .utilities import format_filename, get_soup, get_pdf_text
@@ -28,7 +24,8 @@ def get_scriptslug():
             text = get_pdf_text(BASE_URL + urllib.parse.quote(script_url) + ".pdf")
             return text
 
-        except:
+        except Exception as err:
+            print(err)
             text = ""
 
         return text

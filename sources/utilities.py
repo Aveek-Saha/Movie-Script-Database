@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-import urllib
+import urllib.request
 import string
 import os
 import textract
@@ -31,7 +31,8 @@ def get_pdf_text(url):
     f.close()
     try:
         text = textract.process("scripts/document.pdf", encoding='utf-8').decode('utf-8')
-    except:
+    except Exception as err:
+        print(err)
         text = ""
     if os.path.isfile(doc):
         os.remove(doc)
