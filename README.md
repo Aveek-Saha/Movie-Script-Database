@@ -1,5 +1,5 @@
 # The Movie Script Database
-This is an utility that allows you to collect movie scripts from several sources and create a database of ~2.3k movie scripts as `.txt` files along with the metadata for the movies.
+This is an utility that allows you to collect movie scripts from several sources and create a database of ~2.5k movie scripts as `.txt` files along with the metadata for the movies.
  
 There are three steps to the whole process:
 1. Collect data from various sources - Scrape websites for scripts in HTML, txt, doc or pdf format
@@ -27,6 +27,7 @@ The sources that scripts are collected from are:
 - [Scripts for you](https://sfy.ru/)
 - [Script Slug](https://www.scriptslug.com/)
 - [Actor Point](https://www.actorpoint.com/)
+- [Script PDF](https://scriptpdf.com/)
 
 **Note:**
 - [~~Weeklyscript~~](https://www.weeklyscript.com/) (Site no longer active)
