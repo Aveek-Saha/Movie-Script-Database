@@ -1,6 +1,6 @@
-tqdm==4.36.1
-Unidecode==1.1.1
-fuzzywuzzy==0.18.0
-numpy==1.16.5
+tqdm==4.61.1
 textract==1.6.3
-beautifulsoup4==4.9.1
+beautifulsoup4==4.9.3
+fuzzywuzzy==0.18.0
+numpy==1.21.0
+Unidecode==1.2.0
