@@ -7,9 +7,13 @@ There are three steps to the whole process:
 3. Collect metadata - Get metadata about the scripts for additional processing
 4. Parse Scripts - Convert scripts into lines with just Character => dialogue
  
-## Instructions for use
+## Usage
+
+### Dependencies
+Read the instructions for installing `textract` first [here](https://textract.readthedocs.io/en/stable/installation.html).
+
 1. Install all dependencies using `pip install -r requirements.txt`.
-2. Collect all the scripts: `python get_scripts.py`. This might take a while(2+ hrs).
+2. Collect all the scripts: `python get_scripts.py`. This might take a while(4+ hrs).
 3. Remove duplicates and empty files: `python clean_files.py`.
 4. Collect metadata from TMDb and OMDb: `python get_metadata.py`. (You'll need an API key for this)
 5. Parse scripts: `python parse_files.py`.
