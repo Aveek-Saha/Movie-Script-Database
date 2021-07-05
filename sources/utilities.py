@@ -30,7 +30,7 @@ def get_pdf_text(url):
     f.write(result.read())
     f.close()
     try:
-        text = textract.process("scripts/document.pdf", encoding='utf-8').decode('utf-8')
+        text = textract.process(doc, encoding='utf-8').decode('utf-8')
     except Exception as err:
         print(err)
         text = ""
