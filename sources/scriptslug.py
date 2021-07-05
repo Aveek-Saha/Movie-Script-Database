@@ -16,12 +16,12 @@ def get_scriptslug():
     if not os.path.exists(DIR):
         os.makedirs(DIR)
 
-
     def get_script_from_url(script_url):
         text = ""
-        
+
         try:
-            text = get_pdf_text(BASE_URL + urllib.parse.quote(script_url) + ".pdf")
+            text = get_pdf_text(
+                BASE_URL + urllib.parse.quote(script_url) + ".pdf")
             return text
 
         except Exception as err:
@@ -31,12 +31,12 @@ def get_scriptslug():
         return text
 
     def get_script_url(movie):
-        
+
         script_url = movie['href'].split("/")[-1]
 
-        name = movie.find_all(class_="script__title")[0].find(text=True, recursive=False)
+        name = movie.find_all(class_="script__title")[
+            0].find(text=True, recursive=False)
         file_name = re.sub(r'\([^)]*\)', '', format_filename(name.strip()))
-        
 
         return script_url, file_name
 

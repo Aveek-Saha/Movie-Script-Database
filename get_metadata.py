@@ -26,6 +26,7 @@ if not exists("metadata"):
 def camel_case_split(str):
     return re.findall(r'([A-Z0-9]+|[A-Z0-9]?[a-z]+)(?=[A-Z0-9]|\b)', str)
 
+
 def search_name(name):
     name = " ".join(name.split("-"))
     if re.sub(r"(\d{4})", "", name).strip() != "":
@@ -48,6 +49,7 @@ def search_name(name):
         name = name.replace('shooting', "").strip()
     name = ' '.join(name.split())
     return name
+
 
 def average_ratio(n, m):
     return ((fuzz.token_sort_ratio(n,  m) + fuzz.token_sort_ratio(m,  n)) // 2)
@@ -136,15 +138,16 @@ def title_match(title, key):
     else:
         return False
 
+
 # Search TMDb for movies
 mapping = {}
 
 for movie in tqdm(movielist):
     name = search_name(movie.split(sep)[-1].split('.txt')[0])
     response = urllib.request.urlopen(
-        "https://api.themoviedb.org/3/search/movie?api_key=" + 
+        "https://api.themoviedb.org/3/search/movie?api_key=" +
         tmdb_api_key + "&language=en-US&query=" + urllib.parse.quote(name)
-        +"&page=1")
+        + "&page=1")
     html = response.read()
     jres = json.loads(html)
     if jres['total_results'] > 0:
@@ -164,16 +167,17 @@ for movie in tqdm(movielist):
             name = " ".join(camel_case_split(name))
             response = urllib.request.urlopen(
                 "https://api.themoviedb.org/3/search/movie?api_key=" +
-                tmdb_api_key + "&language=en-US&query=" + urllib.parse.quote(name)
+                tmdb_api_key + "&language=en-US&query=" +
+                urllib.parse.quote(name)
                 + "&page=1")
             html = response.read()
             jres = json.loads(html)
             if jres['total_results'] > 0:
-                mapping[movie.split(sep)[-1].split('.txt')[0]] = jres['results']
+                mapping[movie.split(sep)[-1].split('.txt')
+                        [0]] = jres['results']
             else:
                 mapping[movie.split(sep)[-1].split('.txt')[0]] = []
 
-    
     # print(name)
 
 json_object = json.dumps(mapping, indent=4)
@@ -182,7 +186,7 @@ with open(join("metadata", "metadata.json"), "w") as outfile:
     outfile.write(json_object)
 
 with open(join("metadata", "metadata.json"), 'r') as f:
-  mapping = json.load(f)
+    mapping = json.load(f)
 
 
 not_found = []
@@ -210,9 +214,10 @@ for key in mapping:
             num = re.findall(r'\b\d\b', name)
             date = re.findall(r'\d{4}', n)
 
-            all_titles = [(x['title'], ind) for ind, x in enumerate(mapping[key])]
+            all_titles = [(x['title'], ind)
+                          for ind, x in enumerate(mapping[key])]
             all_dates = [(x['release_date'], ind)
-                        for ind, x in enumerate(mapping[key]) if 'release_date' in x]
+                         for ind, x in enumerate(mapping[key]) if 'release_date' in x]
 
             second = mapping[key][1]
 
@@ -245,12 +250,12 @@ for key in mapping:
                     # print(key.split('.txt')[0], " : ", mapping[key]
                     #     [0]['title'], " | ", mapping[key][1]['title'])
                     movie_info[key] = mapping[key][1]
-                else: 
+                else:
                     movie_info[key] = mapping[key][0]
 
             else:
                 movie_info[key] = mapping[key][0]
-                
+
     elif len(mapping[key]) == 1:
         movie_info[key] = mapping[key][0]
     else:
@@ -300,7 +305,7 @@ for key in movie_info:
                 count += 1
 
 print(len(not_matched) + len(not_found))
-        
+
 
 omdb_info = {}
 
@@ -336,10 +341,9 @@ for movie in tqdm(not_matched):
             html = response.read()
             jres = json.loads(html)
             if jres['Response'] != "False":
-                omdb_info[movie.split(sep)[-1].split('.txt')[0]]=jres
+                omdb_info[movie.split(sep)[-1].split('.txt')[0]] = jres
             else:
-                omdb_info[movie.split(sep)[-1].split('.txt')[0]]={}
-
+                omdb_info[movie.split(sep)[-1].split('.txt')[0]] = {}
 
     # print(name)
 
@@ -396,10 +400,10 @@ with open(join("metadata", "omdb_not_found.json"), "w") as outfile:
 omdb_all = {}
 count = 0
 with open(join("metadata", "omdb_not_found.json"), 'r') as f:
-  omdb_all = json.load(f)
+    omdb_all = json.load(f)
 
 with open(join("metadata", "omdb_unmatched.json"), 'r') as f:
-  omdb_all.update(json.load(f))
+    omdb_all.update(json.load(f))
 
 tmdb_re = {}
 
@@ -460,9 +464,10 @@ for key in omdb_all:
             num = re.findall(r'\b\d\b', name)
             date = re.findall(r'\d{4}', n)
 
-            all_titles = [(x['title'], ind) for ind, x in enumerate(omdb_all[key])]
+            all_titles = [(x['title'], ind)
+                          for ind, x in enumerate(omdb_all[key])]
             all_dates = [(x['release_date'], ind)
-                        for ind, x in enumerate(omdb_all[key]) if 'release_date' in x]
+                         for ind, x in enumerate(omdb_all[key]) if 'release_date' in x]
 
             second = omdb_all[key][1]
 
@@ -486,7 +491,7 @@ for key in omdb_all:
             m2 = second['title'].replace(
                 '\'', '').replace(",", '').replace(
                 '.', '').replace('&', 'and').lower()
-                
+
             m = re.sub(r'\([^)]*\)', '', m)
             m2 = re.sub(r'\([^)]*\)', '', m2)
             if average_ratio(name, m) < average_ratio(name, m2) and abs(average_ratio(name, m) - average_ratio(name, m2)) > 10:
@@ -516,7 +521,7 @@ with open(join("metadata", "info_2.json"), "w") as outfile:
 movie_info = {}
 
 with open(join("metadata", "info_2.json"), 'r') as f:
-  movie_info = json.load(f)
+    movie_info = json.load(f)
 
 
 count = 0
@@ -566,7 +571,7 @@ for key in meta:
         titles[meta[key]['title']].append(key)
 
 forbidden = ["the", "a", "an", "and", "or",
-            "part", "vol", "chapter", "movie"]
+             "part", "vol", "chapter", "movie"]
 
 for key in titles:
     if len(titles[key]) > 1:
@@ -638,7 +643,7 @@ for key in meta_2:
 # for key in meta:
 #     if meta[key]:
 #         count += 1
-#     else: 
+#     else:
 #         print(key)
 
 # print(count)

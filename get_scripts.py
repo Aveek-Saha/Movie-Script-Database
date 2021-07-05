@@ -2,7 +2,7 @@ import sources
 
 import json
 
-f = open('sources.json','r')
+f = open('sources.json', 'r')
 data = json.load(f)
 
 for source in data:
@@ -11,4 +11,3 @@ for source in data:
         print("Fetching scripts from %s" % (source))
         sources.get_scripts(source=source)
         print()
-

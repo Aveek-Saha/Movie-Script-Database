@@ -2,7 +2,6 @@ from bs4 import BeautifulSoup
 import urllib
 import os
 from tqdm import tqdm
-import string
 import re
 from .utilities import format_filename, get_soup, get_pdf_text
 

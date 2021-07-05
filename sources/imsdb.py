@@ -2,9 +2,6 @@ from bs4 import BeautifulSoup
 import urllib
 import os
 
-import time
-import string
-
 from tqdm import tqdm
 from .utilities import format_filename, get_soup, get_pdf_text
 
@@ -17,10 +14,9 @@ def get_imsdb():
     if not os.path.exists(DIR):
         os.makedirs(DIR)
 
-
     def get_script_from_url(script_url):
         text = ""
-        
+
         try:
 
             if script_url.endswith('.pdf'):
@@ -28,18 +24,22 @@ def get_imsdb():
                 return text
 
             if script_url.endswith('.html'):
-                script_soup = get_soup(BASE_URL + urllib.parse.quote(script_url))
+                script_soup = get_soup(
+                    BASE_URL + urllib.parse.quote(script_url))
                 if len(script_soup.find_all('td', class_="scrtext")) < 1:
                     return ""
-                script_text = script_soup.find_all('td', class_="scrtext")[0].pre
+                script_text = script_soup.find_all(
+                    'td', class_="scrtext")[0].pre
 
                 if script_text:
-                    script_text = script_soup.find_all('td', class_="scrtext")[0].pre.pre
+                    script_text = script_soup.find_all(
+                        'td', class_="scrtext")[0].pre.pre
                     if script_text:
                         text = script_text.get_text()
 
                     else:
-                        script_text = script_soup.find_all('td', class_="scrtext")[0].pre
+                        script_text = script_soup.find_all(
+                            'td', class_="scrtext")[0].pre
                         text = script_text.get_text()
         except Exception as err:
             print(err)
@@ -52,14 +52,14 @@ def get_imsdb():
         name = format_filename(movie.contents[0].text)
         movie_name = script_page_url.split("/")[-1].strip('Script.html')
 
-        script_page_soup = get_soup(BASE_URL + urllib.parse.quote(script_page_url))
+        script_page_soup = get_soup(
+            BASE_URL + urllib.parse.quote(script_page_url))
         paras = script_page_soup.find_all('p', align="center")
         if len(paras) < 1:
             return "", ""
         script_url = paras[0].contents[0].get('href')
 
         return script_url, name
-
 
     soup = get_soup(ALL_URL)
     movielist = soup.find_all('p')
@@ -82,7 +82,3 @@ def get_imsdb():
 
         with open(os.path.join(DIR, name + '.txt'), 'w', errors="ignore") as out:
             out.write(text)
-
-
-
-

@@ -5,6 +5,7 @@ import os
 import textract
 import re
 
+
 def format_filename(s):
     valid_chars = "-() %s%s%s" % (string.ascii_letters, string.digits, "%")
     filename = ''.join(c for c in s if c in valid_chars)
@@ -22,6 +23,7 @@ def get_soup(url):
 
     soup = BeautifulSoup(resulttext, 'html.parser')
     return soup
+
 
 def get_pdf_text(url):
     doc = os.path.join("scripts", "document.pdf")

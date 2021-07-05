@@ -2,7 +2,6 @@ from bs4 import BeautifulSoup
 import urllib
 import os
 from tqdm import tqdm
-import string
 from .utilities import format_filename, get_soup
 
 
@@ -13,9 +12,10 @@ def get_screenplays():
 
     if not os.path.exists(DIR):
         os.makedirs(DIR)
-        
+
     soup = get_soup(ALL_URL)
-    mlist = soup.find_all('table', class_="screenplay-listing")[0].find_all("a")
+    mlist = soup.find_all(
+        'table', class_="screenplay-listing")[0].find_all("a")
     movielist = [x for x in mlist if x.get('href').startswith("screenplay")]
 
     for movie in tqdm(movielist):
@@ -31,7 +31,3 @@ def get_screenplays():
 
         with open(os.path.join(DIR, name + '.txt'), 'w', errors="ignore") as out:
             out.write(text)
-
-
-
-

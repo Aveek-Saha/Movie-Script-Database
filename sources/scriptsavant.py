@@ -1,9 +1,8 @@
 from bs4 import BeautifulSoup
-import urllib
 import os
 from tqdm import tqdm
-import string
 from .utilities import format_filename, get_soup, get_pdf_text, get_doc_text
+
 
 def get_scriptsavant():
     ALL_URL_1 = "https://thescriptsavant.com/free-movie-screenplays-am/"
@@ -21,7 +20,6 @@ def get_scriptsavant():
     movielist_2 = soup_2.find_all('div', class_='fusion-text')[0].find_all('a')
     movielist += movielist_2
 
-
     for movie in tqdm(movielist):
         name = format_filename(movie.text.replace("script", "").strip())
         script_url = movie.get('href')
@@ -37,6 +35,6 @@ def get_scriptsavant():
 
         if text == "" or name == "":
             continue
-        
+
         with open(os.path.join(DIR, name + '.txt'), 'w', errors="ignore") as out:
             out.write(text)

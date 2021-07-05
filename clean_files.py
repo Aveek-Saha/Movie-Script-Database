@@ -8,7 +8,7 @@ import string
 
 import json
 
-f = open('sources.json','r')
+f = open('sources.json', 'r')
 data = json.load(f)
 
 for source in data:
@@ -17,53 +17,17 @@ for source in data:
         DIR = join("scripts", "unprocessed", source)
         data[source] = {}
         data[source]['files'] = [join(DIR, f) for f in listdir(DIR) if isfile(
-                        join(DIR, f)) and getsize(join(DIR, f)) > 3000]
+            join(DIR, f)) and getsize(join(DIR, f)) > 3000]
         data[source]['counts'] = 0
-
-# DIR_IMSDB = join("scripts", "unprocessed", "imsdb")
-# DIR_DAILY = join("scripts", "unprocessed", "dailyscript")
-# DIR_WEEKLY = join("scripts", "unprocessed", "weeklyscript")
-# DIR_SCREEN = join("scripts", "unprocessed", "screenplays")
-# DIR_AWESOME = join("scripts", "unprocessed", "awesomefilm")
-# DIR_SAVANT = join("scripts", "unprocessed", "scriptsavant")
-# DIR_SFY = join("scripts", "unprocessed", "sfy")
-# DIR_SLUG = join("scripts", "unprocessed", "scriptslug")
 
 DIR_FILTER = join("scripts", "filtered")
 DIR_FINAL = join("scripts", "final")
-
-# imsdb = [join(DIR_IMSDB, f) for f in listdir(DIR_IMSDB) if isfile(
-#     join(DIR_IMSDB, f)) and getsize(join(DIR_IMSDB, f)) > 3000]
-# daily = [join(DIR_DAILY, f) for f in listdir(DIR_DAILY) if isfile(
-#     join(DIR_DAILY, f))and getsize(join(DIR_DAILY, f)) > 3000]
-# weekly = [join(DIR_WEEKLY, f) for f in listdir(DIR_WEEKLY) if isfile(
-#     join(DIR_WEEKLY, f))and getsize(join(DIR_WEEKLY, f)) > 3000]
-# screen = [join(DIR_SCREEN, f) for f in listdir(DIR_SCREEN) if isfile(
-#     join(DIR_SCREEN, f))and getsize(join(DIR_SCREEN, f)) > 3000]
-# awesome = [join(DIR_AWESOME, f) for f in listdir(DIR_AWESOME) if isfile(
-#     join(DIR_AWESOME, f))and getsize(join(DIR_AWESOME, f)) > 3000]
-# savant = [join(DIR_SAVANT, f) for f in listdir(DIR_SAVANT) if isfile(
-#     join(DIR_SAVANT, f))and getsize(join(DIR_SAVANT, f)) > 3000]
-# sfy = [join(DIR_SFY, f) for f in listdir(DIR_SFY) if isfile(
-#     join(DIR_SFY, f))and getsize(join(DIR_SFY, f)) > 3000]
-# slug = [join(DIR_SLUG, f) for f in listdir(DIR_SLUG) if isfile(
-#     join(DIR_SLUG, f))and getsize(join(DIR_SLUG, f)) > 3000]
-
-# sources = {
-#     'savant': savant,
-#     'imsdb': imsdb,
-#     'daily': daily,
-#     'weekly': weekly,
-#     'screen': screen,
-#     'awesome': awesome,
-#     'sfy': sfy,
-#     'slug': slug
-# }
 
 forbidden = ["the", "a", "an", "and", "or", "part",
              "vol", "chapter", "movie"]
 symbols = ["!", "@", "#", "$", "%", "^", "&", "*",
            "_", "-", "+", ":", ".", ",", "?", "\'", "/"]
+
 
 def remove_duplicates(arr, comb):
 
@@ -82,16 +46,16 @@ def remove_duplicates(arr, comb):
 
         name_x = "".join([x for x in name_x if x not in symbols])
         name_y = "".join([x for x in name_y if x not in symbols])
-        
+
         if name_x == name_y:
-            f1 = open( x + '.txt', 'r', errors="ignore")
+            f1 = open(x + '.txt', 'r', errors="ignore")
             file_1 = f1.read()
             f1.close()
-            f2 = open( y + '.txt', 'r', errors="ignore")
+            f2 = open(y + '.txt', 'r', errors="ignore")
             file_2 = f2.read()
             f2.close()
 
-            try: 
+            try:
                 if len(file_2.strip()) > len(file_1.strip()):
                     arr.remove(x + '.txt')
                 else:
@@ -100,6 +64,7 @@ def remove_duplicates(arr, comb):
                 pass
 
     return arr
+
 
 for key in data:
     if data[key] != "false":
@@ -188,17 +153,6 @@ for (x, y) in tqdm(comb_filter):
 if not exists(DIR_FINAL):
     makedirs(DIR_FINAL)
 
-# counts = {
-#     'scriptsavant': 0,
-#     'imsdb': 0,
-#     'dailyscript': 0,
-#     'weeklyscript': 0,
-#     'screenplays': 0,
-#     'awesomefilm': 0,
-#     'sfy': 0,
-#     'scriptslug': 0
-# }
-
 print("Write cleaned files to new dir")
 for source in tqdm(filtered):
     f = open(source, 'r', errors="ignore")
@@ -221,30 +175,29 @@ for source in tqdm(filtered):
         copy = line
         line = line.lower().strip()
 
-        #skip lines with one char since they're likely typos
-        if len(line)==1:
+        # skip lines with one char since they're likely typos
+        if len(line) == 1:
             if line.lower() != 'a' or line.lower() != 'i':
                 continue
 
-        #skip lines containing page numbers
+        # skip lines containing page numbers
         if pagenumber.match(line):
             continue
-        
+
         if cont.match(line):
             continue
 
-        #skip lines containing just special characters
+        # skip lines containing just special characters
         if line != '' and allspecialchars.match(line):
             continue
-            
 
         lines.append(copy)
-    
+
     final_data = '\n'.join(lines)
 
     if final_data.strip() == "":
         continue
-    
+
     if data[source.split(sep)[-2]] != "false":
         data[source.split(sep)[-2]]['counts'] += 1
     with open(join(DIR_FINAL, source.split(sep)[-1]), 'w', errors="ignore") as out:
@@ -252,4 +205,4 @@ for source in tqdm(filtered):
 
 for source in data:
     if data[source] != "false":
-        print(source, ":" , data[source]['counts'])
+        print(source, ":", data[source]['counts'])

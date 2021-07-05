@@ -2,8 +2,8 @@ from bs4 import BeautifulSoup
 import urllib
 import os
 from tqdm import tqdm
-import string
 from .utilities import format_filename, get_soup, get_pdf_text
+
 
 def get_dailyscript():
     ALL_URL_1 = "https://www.dailyscript.com/movie.html"
@@ -45,12 +45,12 @@ def get_dailyscript():
             else:
                 text = script_soup.get_text()
             # name = script_url.split("/")[-1].split('.html')[0]
-        
+
         elif script_url.endswith('.htm'):
             script_soup = get_soup(BASE_URL + urllib.parse.quote(script_url))
             text = script_soup.pre.get_text()
             # name = script_url.split("/")[-1].split('.htm')[0]
-        
+
         elif script_url.endswith('.txt'):
             script_soup = get_soup(BASE_URL + urllib.parse.quote(script_url))
             text = script_soup.get_text()
@@ -60,6 +60,6 @@ def get_dailyscript():
             continue
 
         name = format_filename(name)
-        
+
         with open(os.path.join(DIR, name + '.txt'), 'w', errors="ignore") as out:
             out.write(text)

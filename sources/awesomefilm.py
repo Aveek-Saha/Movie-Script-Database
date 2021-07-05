@@ -2,9 +2,9 @@ from bs4 import BeautifulSoup
 import urllib
 import os
 from tqdm import tqdm
-import string
 import re
 from .utilities import format_filename, get_soup, get_pdf_text, get_doc_text
+
 
 def get_awesomefilm():
     ALL_URL = "http://www.awesomefilm.com/"
@@ -21,25 +21,27 @@ def get_awesomefilm():
         script_ele = movie.a
         if not script_ele:
             continue
-        
+
         script_url = script_ele.get('href')
         # print()
 
         text = ""
-        name = re.sub(r'\([^)]*\)', '', format_filename(script_ele.text)).strip()
+        name = re.sub(r'\([^)]*\)', '',
+                      format_filename(script_ele.text)).strip()
         try:
             if script_url.endswith('.pdf'):
                 text = get_pdf_text(BASE_URL + urllib.parse.quote(script_url))
 
             elif script_url.endswith('.doc'):
                 text = get_doc_text(BASE_URL + urllib.parse.quote(script_url))
-            
+
             elif script_url.endswith('.txt'):
                 f = urllib.request.urlopen(BASE_URL + script_url)
                 text = f.read().decode("utf-8", errors="ignore")
 
             else:
-                script_soup = get_soup(BASE_URL + urllib.parse.quote(script_url))
+                script_soup = get_soup(
+                    BASE_URL + urllib.parse.quote(script_url))
                 page = script_soup.pre
                 if page:
                     text = page.get_text()
@@ -52,5 +54,3 @@ def get_awesomefilm():
 
         with open(os.path.join(DIR, name + '.txt'), 'w', errors="ignore") as out:
             out.write(text)
-            
-
