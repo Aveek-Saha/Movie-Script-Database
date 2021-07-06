@@ -17,12 +17,17 @@ def format_filename(s):
 
 
 def get_soup(url):
-    page = urllib.request.Request(
-        url, headers={'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64)'})
-    result = urllib.request.urlopen(page)
-    resulttext = result.read()
+    try:
+        page = urllib.request.Request(
+            url, headers={'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64)'})
+        result = urllib.request.urlopen(page)
+        resulttext = result.read()
 
-    soup = BeautifulSoup(resulttext, 'html.parser')
+        soup = BeautifulSoup(resulttext, 'html.parser')
+    
+    except Exception as err:
+        print(err)
+        soup = None
     return soup
 
 

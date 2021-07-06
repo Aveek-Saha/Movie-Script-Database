@@ -53,7 +53,7 @@ def get_imsdb():
 
     def get_script_url(movie):
         script_page_url = movie.contents[0].get('href')
-        name = format_filename(movie.contents[0].text)
+        name = movie.contents[0].text
         movie_name = script_page_url.split("/")[-1].strip('Script.html')
 
         script_page_soup = get_soup(
@@ -78,19 +78,19 @@ def get_imsdb():
         # elif script_url.endswith('.pdf'):
         #     name = script_url.split("/")[-1].split('.pdf')[0]
 
-        text = get_script_from_url(script_url)
+        # text = get_script_from_url(script_url)
 
-        if text == "" or name == "":
-            continue
+        # if text == "" or name == "":
+        #     continue
 
         file_name = format_filename(name)
         metadata[name] = {
-            file_name: file_name,
-            script_url: script_url
+            "file_name": file_name,
+            "script_url": script_url
         }
 
-        with open(os.path.join(DIR, file_name + '.txt'), 'w', errors="ignore") as out:
-            out.write(text)
+        # with open(os.path.join(DIR, file_name + '.txt'), 'w', errors="ignore") as out:
+        #     out.write(text)
 
     with open(os.path.join(META_DIR, "imsdb.json"), "w") as outfile: 
         json.dump(metadata, outfile)
