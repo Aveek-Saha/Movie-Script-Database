@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import urllib
 import os
+import json
 
 from tqdm import tqdm
 from .utilities import format_filename, get_soup, get_pdf_text
@@ -10,9 +11,12 @@ def get_imsdb():
     ALL_URL = "https://imsdb.com/all-scripts.html"
     BASE_URL = "https://imsdb.com"
     DIR = os.path.join("scripts", "unprocessed", "imsdb")
+    META_DIR = os.path.join("scripts", "metadata")
 
     if not os.path.exists(DIR):
         os.makedirs(DIR)
+    if not os.path.exists(META_DIR):
+        os.makedirs(META_DIR)
 
     def get_script_from_url(script_url):
         text = ""
@@ -61,6 +65,7 @@ def get_imsdb():
 
         return script_url, name
 
+    metadata = {}
     soup = get_soup(ALL_URL)
     movielist = soup.find_all('p')
 
@@ -78,7 +83,14 @@ def get_imsdb():
         if text == "" or name == "":
             continue
 
-        name = format_filename(name)
+        file_name = format_filename(name)
+        metadata[name] = {
+            file_name: file_name,
+            script_url: script_url
+        }
 
-        with open(os.path.join(DIR, name + '.txt'), 'w', errors="ignore") as out:
+        with open(os.path.join(DIR, file_name + '.txt'), 'w', errors="ignore") as out:
             out.write(text)
+
+    with open(os.path.join(META_DIR, "imsdb.json"), "w") as outfile: 
+        json.dump(metadata, outfile)

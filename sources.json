@@ -1,11 +1,11 @@
 {
     "imsdb": "true",
-    "screenplays": "true",
-    "scriptsavant": "true",
-    "dailyscript": "true",
-    "awesomefilm": "true",
-    "sfy": "true",
+    "screenplays": "false",
+    "scriptsavant": "false",
+    "dailyscript": "false",
+    "awesomefilm": "false",
+    "sfy": "false",
     "scriptslug": "true",
-    "actorpoint": "true",
-    "scriptpdf": "true"
+    "actorpoint": "false",
+    "scriptpdf": "false"
 }
