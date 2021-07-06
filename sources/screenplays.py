@@ -19,8 +19,6 @@ def get_screenplays():
 
     metadata = {}
     soup = get_soup(ALL_URL)
-    if soup == None:
-        return
     mlist = soup.find_all(
         'table', class_="screenplay-listing")[0].find_all("a")
     movielist = [x for x in mlist if x.get('href').startswith("screenplay")]
