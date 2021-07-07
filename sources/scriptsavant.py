@@ -1,7 +1,9 @@
 from bs4 import BeautifulSoup
 import os
+import json
 from tqdm import tqdm
-from .utilities import format_filename, get_soup, get_pdf_text, get_doc_text
+from unidecode import unidecode
+from .utilities import format_filename, get_soup, get_pdf_text
 
 
 def get_scriptsavant():
@@ -9,10 +11,14 @@ def get_scriptsavant():
     ALL_URL_2 = "https://thescriptsavant.com/free-movie-screenplays-nz/"
     BASE_URL = "http://www.thescriptsavant.com/"
     DIR = os.path.join("scripts", "unprocessed", "scriptsavant")
+    META_DIR = os.path.join("scripts", "metadata")
 
     if not os.path.exists(DIR):
         os.makedirs(DIR)
+    if not os.path.exists(META_DIR):
+        os.makedirs(META_DIR)
 
+    metadata = {}
     soup_1 = get_soup(ALL_URL_1)
     soup_2 = get_soup(ALL_URL_2)
 
@@ -21,7 +27,8 @@ def get_scriptsavant():
     movielist += movielist_2
 
     for movie in tqdm(movielist):
-        name = format_filename(movie.text.replace("script", "").strip())
+        name = movie.text.replace("script", "").strip()
+        file_name = format_filename(name)
         script_url = movie.get('href')
 
         if not script_url.endswith('.pdf'):
@@ -30,11 +37,20 @@ def get_scriptsavant():
         try:
             text = get_pdf_text(script_url)
 
-        except:
+        except Exception as err:
+            print(err)
             continue
 
-        if text == "" or name == "":
+        if text == "" or file_name == "":
             continue
+        
+        metadata[unidecode(name)] = {
+            "file_name": file_name,
+            "script_url": script_url
+        }
 
-        with open(os.path.join(DIR, name + '.txt'), 'w', errors="ignore") as out:
+        with open(os.path.join(DIR, file_name + '.txt'), 'w', errors="ignore") as out:
             out.write(text)
+
+    with open(os.path.join(META_DIR, "scriptsavant.json"), "w") as outfile: 
+        json.dump(metadata, outfile)
