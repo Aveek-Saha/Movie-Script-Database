@@ -40,26 +40,25 @@ def get_dailyscript():
 
         if script_url.endswith('.pdf'):
             text = get_pdf_text(script_url)
-            # name = script_url.split("/")[-1].split('.pdf')[0]
 
         elif script_url.endswith('.html'):
             script_soup = get_soup(script_url)
-            doc = script_soup.pre
-            if doc:
-                text = script_soup.pre.get_text()
-            else:
-                text = script_soup.get_text()
-            # name = script_url.split("/")[-1].split('.html')[0]
+            if script_soup != None:
+                doc = script_soup.pre
+                if doc:
+                    text = script_soup.pre.get_text()
+                else:
+                    text = script_soup.get_text()
 
         elif script_url.endswith('.htm'):
             script_soup = get_soup(script_url)
-            text = script_soup.pre.get_text()
-            # name = script_url.split("/")[-1].split('.htm')[0]
+            if script_soup != None:
+                text = script_soup.pre.get_text()
 
         elif script_url.endswith('.txt'):
             script_soup = get_soup(script_url)
-            text = script_soup.get_text()
-            # name = script_url.split("/")[-1].split('.txt')[0]
+            if script_soup != None:
+                text = script_soup.get_text()
 
         if text == "" or name == "":
             continue
