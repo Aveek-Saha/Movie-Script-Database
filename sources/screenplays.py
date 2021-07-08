@@ -46,4 +46,4 @@ def get_screenplays():
             out.write(text)
     
     with open(os.path.join(META_DIR, "screenplays.json"), "w") as outfile: 
-        json.dump(metadata, outfile)
+        json.dump(metadata, outfile, indent=4)

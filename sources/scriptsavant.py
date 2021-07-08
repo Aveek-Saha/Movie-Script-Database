@@ -53,4 +53,4 @@ def get_scriptsavant():
             out.write(text)
 
     with open(os.path.join(META_DIR, "scriptsavant.json"), "w") as outfile: 
-        json.dump(metadata, outfile)
+        json.dump(metadata, outfile, indent=4)
