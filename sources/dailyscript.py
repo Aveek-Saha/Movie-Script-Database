@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import urllib
 import os
+import json
 from tqdm import tqdm
 from .utilities import format_filename, get_soup, get_pdf_text
 
@@ -10,10 +11,14 @@ def get_dailyscript():
     ALL_URL_2 = "https://www.dailyscript.com/movie_n-z.html"
     BASE_URL = "https://www.dailyscript.com/"
     DIR = os.path.join("scripts", "unprocessed", "dailyscript")
+    META_DIR = os.path.join("scripts", "metadata")
 
     if not os.path.exists(DIR):
         os.makedirs(DIR)
+    if not os.path.exists(META_DIR):
+        os.makedirs(META_DIR)
 
+    metadata = {}
     soup_1 = get_soup(ALL_URL_1)
     soup_2 = get_soup(ALL_URL_2)
 
@@ -28,17 +33,17 @@ def get_dailyscript():
         if len(script_url) < 2:
             continue
         script_url = movie.find('a').get('href')
-        # print(script_url)
+        script_url = BASE_URL + urllib.parse.quote(script_url)
 
         text = ""
-        name = movie.find('a').text
+        name = movie.find('a').text.strip()
 
         if script_url.endswith('.pdf'):
-            text = get_pdf_text(BASE_URL + urllib.parse.quote(script_url))
+            text = get_pdf_text(script_url)
             # name = script_url.split("/")[-1].split('.pdf')[0]
 
         elif script_url.endswith('.html'):
-            script_soup = get_soup(BASE_URL + urllib.parse.quote(script_url))
+            script_soup = get_soup(script_url)
             doc = script_soup.pre
             if doc:
                 text = script_soup.pre.get_text()
@@ -47,19 +52,27 @@ def get_dailyscript():
             # name = script_url.split("/")[-1].split('.html')[0]
 
         elif script_url.endswith('.htm'):
-            script_soup = get_soup(BASE_URL + urllib.parse.quote(script_url))
+            script_soup = get_soup(script_url)
             text = script_soup.pre.get_text()
             # name = script_url.split("/")[-1].split('.htm')[0]
 
         elif script_url.endswith('.txt'):
-            script_soup = get_soup(BASE_URL + urllib.parse.quote(script_url))
+            script_soup = get_soup(script_url)
             text = script_soup.get_text()
             # name = script_url.split("/")[-1].split('.txt')[0]
 
         if text == "" or name == "":
             continue
 
-        name = format_filename(name)
+        file_name = format_filename(name)
 
-        with open(os.path.join(DIR, name + '.txt'), 'w', errors="ignore") as out:
+        metadata[name] = {
+            "file_name": file_name,
+            "script_url": script_url
+        }
+
+        with open(os.path.join(DIR, file_name + '.txt'), 'w', errors="ignore") as out:
             out.write(text)
+    
+    with open(os.path.join(META_DIR, "dailyscript.json"), "w") as outfile: 
+        json.dump(metadata, outfile, indent=4)
