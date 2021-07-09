@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import urllib
 import os
+import json
 from tqdm import tqdm
 import re
 from .utilities import format_filename, get_soup, get_pdf_text, get_doc_text
@@ -10,38 +11,48 @@ def get_awesomefilm():
     ALL_URL = "http://www.awesomefilm.com/"
     BASE_URL = "http://www.awesomefilm.com/"
     DIR = os.path.join("scripts", "unprocessed", "awesomefilm")
+    META_DIR = os.path.join("scripts", "metadata")
 
     if not os.path.exists(DIR):
         os.makedirs(DIR)
+    if not os.path.exists(META_DIR):
+        os.makedirs(META_DIR)
 
+    metadata = {}
     soup = get_soup(ALL_URL)
     movielist = list(set(soup.find_all('td', class_="tbl")))
+
+    def clean_name(name):
+        name = re.sub(' +', ' ', name)
+        name = re.sub('\n', ' ', name)
+        name = re.sub(r'\([^)]*\)', '', name).strip()
+        return name
 
     for movie in tqdm(movielist):
         script_ele = movie.a
         if not script_ele:
             continue
 
-        script_url = script_ele.get('href')
-        # print()
+        ele_url = script_ele.get('href')
+        script_url = BASE_URL + urllib.parse.quote(ele_url)
 
         text = ""
-        name = re.sub(r'\([^)]*\)', '',
-                      format_filename(script_ele.text)).strip()
+        name = clean_name(script_ele.text)
+        file_name = format_filename(name)
+
         try:
             if script_url.endswith('.pdf'):
-                text = get_pdf_text(BASE_URL + urllib.parse.quote(script_url))
+                text = get_pdf_text(script_url)
 
             elif script_url.endswith('.doc'):
-                text = get_doc_text(BASE_URL + urllib.parse.quote(script_url))
+                text = get_doc_text(script_url)
 
             elif script_url.endswith('.txt'):
-                f = urllib.request.urlopen(BASE_URL + script_url)
+                f = urllib.request.urlopen(script_url)
                 text = f.read().decode("utf-8", errors="ignore")
 
             else:
-                script_soup = get_soup(
-                    BASE_URL + urllib.parse.quote(script_url))
+                script_soup = get_soup(script_url)
                 page = script_soup.pre
                 if page:
                     text = page.get_text()
@@ -52,5 +63,13 @@ def get_awesomefilm():
         if text == "":
             continue
 
-        with open(os.path.join(DIR, name + '.txt'), 'w', errors="ignore") as out:
+        metadata[name] = {
+            "file_name": file_name,
+            "script_url": script_url
+        }
+
+        with open(os.path.join(DIR, file_name + '.txt'), 'w', errors="ignore") as out:
             out.write(text)
+    
+    with open(os.path.join(META_DIR, "awesomefilm.json"), "w") as outfile: 
+        json.dump(metadata, outfile, indent=4)
