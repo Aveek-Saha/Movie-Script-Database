@@ -62,8 +62,8 @@ def get_sfy():
             "script_url": script_url
         }
 
-        # with open(os.path.join(DIR, file_name + '.txt'), 'w', errors="ignore") as out:
-        #     out.write(text)
+        with open(os.path.join(DIR, file_name + '.txt'), 'w', errors="ignore") as out:
+            out.write(text)
     
     with open(os.path.join(META_DIR, "sfy.json"), "w") as outfile: 
         json.dump(metadata, outfile, indent=4)
