@@ -3,8 +3,8 @@
     "screenplays": "false",
     "scriptsavant": "false",
     "dailyscript": "false",
-    "awesomefilm": "true",
-    "sfy": "false",
+    "awesomefilm": "false",
+    "sfy": "true",
     "scriptslug": "false",
     "actorpoint": "false",
     "scriptpdf": "false"

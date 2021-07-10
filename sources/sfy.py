@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 import os
+import json
 from tqdm import tqdm
 import re
 from .utilities import format_filename, get_soup, get_pdf_text
@@ -9,20 +10,31 @@ def get_sfy():
     ALL_URL = "https://sfy.ru/scripts"
     BASE_URL = "https://sfy.ru"
     DIR = os.path.join("scripts", "unprocessed", "sfy")
+    META_DIR = os.path.join("scripts", "metadata")
 
     if not os.path.exists(DIR):
         os.makedirs(DIR)
+    if not os.path.exists(META_DIR):
+        os.makedirs(META_DIR)
 
+    metadata = {}
     soup = get_soup(ALL_URL)
     movielist = soup.find_all('div', class_='row')[1]
     unwanted = movielist.find('ul')
     unwanted.extract()
     movielist = movielist.find_all('a')
 
+    def clean_name(name):
+        name = re.sub(r"(\d{4})", "", name).replace('()', "").strip()
+        name = re.sub(' +', ' ', name)
+
+        return name
+
     for movie in tqdm(movielist):
         script_url = movie.get('href')
-        name = re.sub(r"(\d{4})", "", format_filename(
-            movie.text)).replace('()', "").strip("-")
+        name = clean_name(movie.text)
+        file_name = format_filename(name)
+
         text = ""
         if not script_url.startswith('https'):
             script_url = BASE_URL + script_url
@@ -45,5 +57,13 @@ def get_sfy():
         if text == "" or name == "":
             continue
 
-        with open(os.path.join(DIR, name + '.txt'), 'w', errors="ignore") as out:
-            out.write(text)
+        metadata[name] = {
+            "file_name": file_name,
+            "script_url": script_url
+        }
+
+        # with open(os.path.join(DIR, file_name + '.txt'), 'w', errors="ignore") as out:
+        #     out.write(text)
+    
+    with open(os.path.join(META_DIR, "sfy.json"), "w") as outfile: 
+        json.dump(metadata, outfile, indent=4)
