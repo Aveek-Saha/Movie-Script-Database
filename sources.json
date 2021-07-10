@@ -4,8 +4,8 @@
     "scriptsavant": "false",
     "dailyscript": "false",
     "awesomefilm": "false",
-    "sfy": "true",
-    "scriptslug": "false",
+    "sfy": "false",
+    "scriptslug": "true",
     "actorpoint": "false",
     "scriptpdf": "false"
 }
