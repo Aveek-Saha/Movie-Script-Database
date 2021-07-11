@@ -10,7 +10,8 @@ def get_scriptsavant():
     ALL_URL_1 = "https://thescriptsavant.com/free-movie-screenplays-am/"
     ALL_URL_2 = "https://thescriptsavant.com/free-movie-screenplays-nz/"
     BASE_URL = "http://www.thescriptsavant.com/"
-    DIR = os.path.join("scripts", "unprocessed", "scriptsavant")
+    SOURCE = "scriptsavant"
+    DIR = os.path.join("scripts", "unprocessed", SOURCE)
     META_DIR = os.path.join("scripts", "metadata")
 
     if not os.path.exists(DIR):
@@ -52,5 +53,5 @@ def get_scriptsavant():
         with open(os.path.join(DIR, file_name + '.txt'), 'w', errors="ignore") as out:
             out.write(text)
 
-    with open(os.path.join(META_DIR, "scriptsavant.json"), "w") as outfile: 
+    with open(os.path.join(META_DIR, SOURCE + ".json"), "w") as outfile: 
         json.dump(metadata, outfile, indent=4)

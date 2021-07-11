@@ -12,7 +12,8 @@ from .utilities import format_filename, get_soup, get_pdf_text
 def get_scriptpdf():
     ALL_URL = "https://scriptpdf.com/full-list/"
     BASE_URL = "https://scriptpdf.com/"
-    DIR = os.path.join("scripts", "unprocessed", "scriptpdf")
+    SOURCE = "scriptpdf"
+    DIR = os.path.join("scripts", "unprocessed", SOURCE)
     META_DIR = os.path.join("scripts", "metadata")
 
     if not os.path.exists(DIR):
@@ -60,5 +61,5 @@ def get_scriptpdf():
             with open(os.path.join(DIR, file_name + '.txt'), 'w', errors="ignore") as out:
                 out.write(text)
     
-    with open(os.path.join(META_DIR, "scriptpdf.json"), "w") as outfile: 
+    with open(os.path.join(META_DIR, SOURCE + ".json"), "w") as outfile: 
         json.dump(metadata, outfile, indent=4)

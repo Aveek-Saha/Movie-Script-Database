@@ -10,7 +10,8 @@ from .utilities import format_filename, get_soup, get_pdf_text, get_doc_text
 def get_awesomefilm():
     ALL_URL = "http://www.awesomefilm.com/"
     BASE_URL = "http://www.awesomefilm.com/"
-    DIR = os.path.join("scripts", "unprocessed", "awesomefilm")
+    SOURCE = "awesomefilm"
+    DIR = os.path.join("scripts", "unprocessed", SOURCE)
     META_DIR = os.path.join("scripts", "metadata")
 
     if not os.path.exists(DIR):
@@ -71,5 +72,5 @@ def get_awesomefilm():
         with open(os.path.join(DIR, file_name + '.txt'), 'w', errors="ignore") as out:
             out.write(text)
     
-    with open(os.path.join(META_DIR, "awesomefilm.json"), "w") as outfile: 
+    with open(os.path.join(META_DIR, SOURCE + ".json"), "w") as outfile: 
         json.dump(metadata, outfile, indent=4)

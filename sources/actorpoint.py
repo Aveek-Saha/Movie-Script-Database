@@ -11,7 +11,8 @@ from .utilities import format_filename, get_soup
 def get_actorpoint():
     ALL_URL = "https://www.actorpoint.com/movie-scripts/mscr-%s.html"
     BASE_URL = "https://www.actorpoint.com"
-    DIR = os.path.join("scripts", "unprocessed", "actorpoint")
+    SOURCE = "actorpoint"
+    DIR = os.path.join("scripts", "unprocessed", SOURCE)
     META_DIR = os.path.join("scripts", "metadata")
 
     if not os.path.exists(DIR):
@@ -72,5 +73,5 @@ def get_actorpoint():
         with open(os.path.join(DIR, file_name + '.txt'), 'w', errors="ignore") as out:
             out.write(text)
     
-    with open(os.path.join(META_DIR, "actorpoint.json"), "w") as outfile: 
+    with open(os.path.join(META_DIR, SOURCE + ".json"), "w") as outfile: 
         json.dump(metadata, outfile, indent=4)

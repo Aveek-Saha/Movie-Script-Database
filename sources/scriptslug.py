@@ -12,7 +12,8 @@ from .utilities import format_filename, get_soup, get_pdf_text
 def get_scriptslug():
     ALL_URL = "https://www.scriptslug.com/request/?pg="
     BASE_URL = "https://www.scriptslug.com/assets/uploads/scripts/"
-    DIR = os.path.join("scripts", "unprocessed", "scriptslug")
+    SOURCE = "scriptslug"
+    DIR = os.path.join("scripts", "unprocessed", SOURCE)
     META_DIR = os.path.join("scripts", "metadata")
 
     if not os.path.exists(DIR):
@@ -67,5 +68,5 @@ def get_scriptslug():
         with open(os.path.join(DIR, file_name + '.txt'), 'w', errors="ignore") as out:
             out.write(text)
     
-    with open(os.path.join(META_DIR, "scriptslug.json"), "w") as outfile: 
+    with open(os.path.join(META_DIR, SOURCE + ".json"), "w") as outfile: 
         json.dump(metadata, outfile, indent=4)

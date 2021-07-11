@@ -10,7 +10,8 @@ def get_dailyscript():
     ALL_URL_1 = "https://www.dailyscript.com/movie.html"
     ALL_URL_2 = "https://www.dailyscript.com/movie_n-z.html"
     BASE_URL = "https://www.dailyscript.com/"
-    DIR = os.path.join("scripts", "unprocessed", "dailyscript")
+    SOURCE = "dailyscript"
+    DIR = os.path.join("scripts", "unprocessed", SOURCE)
     META_DIR = os.path.join("scripts", "metadata")
 
     if not os.path.exists(DIR):
@@ -73,5 +74,5 @@ def get_dailyscript():
         with open(os.path.join(DIR, file_name + '.txt'), 'w', errors="ignore") as out:
             out.write(text)
     
-    with open(os.path.join(META_DIR, "dailyscript.json"), "w") as outfile: 
+    with open(os.path.join(META_DIR, SOURCE + ".json"), "w") as outfile: 
         json.dump(metadata, outfile, indent=4)

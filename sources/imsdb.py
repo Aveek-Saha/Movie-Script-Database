@@ -10,7 +10,8 @@ from .utilities import format_filename, get_soup, get_pdf_text
 def get_imsdb():
     ALL_URL = "https://imsdb.com/all-scripts.html"
     BASE_URL = "https://imsdb.com"
-    DIR = os.path.join("scripts", "unprocessed", "imsdb")
+    SOURCE = "imsdb"
+    DIR = os.path.join("scripts", "unprocessed", SOURCE)
     META_DIR = os.path.join("scripts", "metadata")
 
     if not os.path.exists(DIR):
@@ -96,5 +97,5 @@ def get_imsdb():
         with open(os.path.join(DIR, file_name + '.txt'), 'w', errors="ignore") as out:
             out.write(text)
 
-    with open(os.path.join(META_DIR, "imsdb.json"), "w") as outfile: 
+    with open(os.path.join(META_DIR, SOURCE + ".json"), "w") as outfile: 
         json.dump(metadata, outfile, indent=4)

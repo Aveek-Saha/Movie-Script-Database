@@ -9,7 +9,8 @@ from .utilities import format_filename, get_soup, get_pdf_text
 def get_sfy():
     ALL_URL = "https://sfy.ru/scripts"
     BASE_URL = "https://sfy.ru"
-    DIR = os.path.join("scripts", "unprocessed", "sfy")
+    SOURCE = "sfy"
+    DIR = os.path.join("scripts", "unprocessed", SOURCE)
     META_DIR = os.path.join("scripts", "metadata")
 
     if not os.path.exists(DIR):
@@ -65,5 +66,5 @@ def get_sfy():
         with open(os.path.join(DIR, file_name + '.txt'), 'w', errors="ignore") as out:
             out.write(text)
     
-    with open(os.path.join(META_DIR, "sfy.json"), "w") as outfile: 
+    with open(os.path.join(META_DIR, SOURCE + ".json"), "w") as outfile: 
         json.dump(metadata, outfile, indent=4)

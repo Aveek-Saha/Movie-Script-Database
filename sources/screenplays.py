@@ -9,7 +9,8 @@ from .utilities import format_filename, get_soup
 def get_screenplays():
     ALL_URL = "https://www.screenplays-online.de/"
     BASE_URL = "https://www.screenplays-online.de/"
-    DIR = os.path.join("scripts", "unprocessed", "screenplays")
+    SOURCE = "screenplays"
+    DIR = os.path.join("scripts", "unprocessed", SOURCE)
     META_DIR = os.path.join("scripts", "metadata")
 
     if not os.path.exists(DIR):
@@ -45,5 +46,5 @@ def get_screenplays():
         with open(os.path.join(DIR, file_name + '.txt'), 'w', errors="ignore") as out:
             out.write(text)
     
-    with open(os.path.join(META_DIR, "screenplays.json"), "w") as outfile: 
+    with open(os.path.join(META_DIR, SOURCE + ".json"), "w") as outfile: 
         json.dump(metadata, outfile, indent=4)
