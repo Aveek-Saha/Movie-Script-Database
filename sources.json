@@ -5,7 +5,7 @@
     "dailyscript": "false",
     "awesomefilm": "false",
     "sfy": "false",
-    "scriptslug": "true",
-    "actorpoint": "false",
+    "scriptslug": "false",
+    "actorpoint": "true",
     "scriptpdf": "false"
 }
