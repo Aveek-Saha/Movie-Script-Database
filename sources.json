@@ -6,6 +6,6 @@
     "awesomefilm": "false",
     "sfy": "false",
     "scriptslug": "false",
-    "actorpoint": "true",
-    "scriptpdf": "false"
+    "actorpoint": "false",
+    "scriptpdf": "true"
 }
