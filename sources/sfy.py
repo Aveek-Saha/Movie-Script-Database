@@ -42,7 +42,7 @@ def get_sfy():
 
         if script_url.endswith('.pdf'):
             try:
-                text = get_pdf_text(script_url)
+                text = get_pdf_text(script_url, file_name)
             except Exception as err:
                 print(err)
                 continue

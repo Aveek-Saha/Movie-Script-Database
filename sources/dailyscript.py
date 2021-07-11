@@ -40,7 +40,7 @@ def get_dailyscript():
         name = movie.find('a').text.strip()
 
         if script_url.endswith('.pdf'):
-            text = get_pdf_text(script_url)
+            text = get_pdf_text(script_url, file_name)
 
         elif script_url.endswith('.html'):
             script_soup = get_soup(script_url)

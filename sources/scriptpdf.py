@@ -21,11 +21,11 @@ def get_scriptpdf():
     if not os.path.exists(META_DIR):
         os.makedirs(META_DIR)
 
-    def get_script_from_url(script_url):
+    def get_script_from_url(script_url, file_name):
         text = ""
         try:
             if script_url.endswith('.pdf'):
-                text = get_pdf_text(script_url)
+                text = get_pdf_text(script_url, file_name)
                 return text
 
         except Exception as err:
@@ -49,7 +49,7 @@ def get_scriptpdf():
         if movie['href'].endswith('.pdf'):
             script_url, file_name, name = get_script_url(movie)
 
-            text = get_script_from_url(script_url)
+            text = get_script_from_url(script_url, file_name)
             if text == "" or name == "":
                 continue
 

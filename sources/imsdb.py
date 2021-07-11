@@ -25,7 +25,7 @@ def get_imsdb():
         try:
 
             if script_url.endswith('.pdf'):
-                text = get_pdf_text(BASE_URL + urllib.parse.quote(script_url))
+                text = get_pdf_text(BASE_URL + urllib.parse.quote(script_url), file_name)
                 return text
 
             if script_url.endswith('.html'):

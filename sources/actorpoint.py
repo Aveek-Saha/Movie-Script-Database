@@ -42,7 +42,7 @@ def get_actorpoint():
 
         script_url = movie.a['href']
 
-        name = re.sub(r'\([^)]*\)', '', movie.a.text.strip())
+        name = re.sub(r'\([^)]*\)', '', movie.a.text).strip()
         file_name = format_filename(name)
 
         return script_url, file_name, name

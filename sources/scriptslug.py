@@ -21,11 +21,11 @@ def get_scriptslug():
     if not os.path.exists(META_DIR):
         os.makedirs(META_DIR)
 
-    def get_script_from_url(script_url):
+    def get_script_from_url(script_url, file_name):
         text = ""
 
         try:
-            text = get_pdf_text(script_url)
+            text = get_pdf_text(script_url, file_name)
             return text
 
         except Exception as err:
@@ -56,7 +56,7 @@ def get_scriptslug():
     for movie in tqdm(movielist):
         script_url, file_name, name = get_script_url(movie)
         script_url = BASE_URL + urllib.parse.quote(script_url) + ".pdf"
-        text = get_script_from_url(script_url)
+        text = get_script_from_url(script_url, file_name)
         if text == "" or name == "":
             continue
 

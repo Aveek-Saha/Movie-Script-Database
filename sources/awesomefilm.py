@@ -43,10 +43,10 @@ def get_awesomefilm():
 
         try:
             if script_url.endswith('.pdf'):
-                text = get_pdf_text(script_url)
+                text = get_pdf_text(script_url, file_name)
 
             elif script_url.endswith('.doc'):
-                text = get_doc_text(script_url)
+                text = get_doc_text(script_url, file_name)
 
             elif script_url.endswith('.txt'):
                 f = urllib.request.urlopen(script_url)

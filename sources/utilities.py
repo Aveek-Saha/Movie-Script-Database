@@ -31,8 +31,8 @@ def get_soup(url):
     return soup
 
 
-def get_pdf_text(url):
-    doc = os.path.join("scripts", "document.pdf")
+def get_pdf_text(url, name):
+    doc = os.path.join("scripts", "temp", name + ".pdf")
     result = urllib.request.urlopen(url)
     f = open(doc, 'wb')
     f.write(result.read())
@@ -47,8 +47,8 @@ def get_pdf_text(url):
     return text
 
 
-def get_doc_text(url):
-    doc = os.path.join("scripts", "document.doc")
+def get_doc_text(url, name):
+    doc = os.path.join("scripts", "temp", name + ".doc")
     result = urllib.request.urlopen(url)
     f = open(doc, 'wb')
     f.write(result.read())

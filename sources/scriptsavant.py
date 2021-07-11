@@ -36,7 +36,7 @@ def get_scriptsavant():
             continue
 
         try:
-            text = get_pdf_text(script_url)
+            text = get_pdf_text(script_url, file_name)
 
         except Exception as err:
             print(err)
