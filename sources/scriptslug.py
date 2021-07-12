@@ -53,7 +53,7 @@ def get_scriptslug():
         linklist = soup.find_all(class_="script__wrap")
         movielist.extend(linklist)
 
-    for movie in tqdm(movielist):
+    for movie in tqdm(movielist, desc=SOURCE):
         script_url, file_name, name = get_script_url(movie)
         script_url = BASE_URL + urllib.parse.quote(script_url) + ".pdf"
         text = get_script_from_url(script_url, file_name)

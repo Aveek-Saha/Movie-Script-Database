@@ -29,7 +29,7 @@ def get_dailyscript():
 
     # print(movielist)
 
-    for movie in tqdm(movielist):
+    for movie in tqdm(movielist, desc=SOURCE):
         script_url = movie.contents
         if len(script_url) < 2:
             continue

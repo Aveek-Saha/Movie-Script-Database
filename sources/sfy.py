@@ -31,7 +31,7 @@ def get_sfy():
 
         return name
 
-    for movie in tqdm(movielist):
+    for movie in tqdm(movielist, desc=SOURCE):
         script_url = movie.get('href')
         name = clean_name(movie.text)
         file_name = format_filename(name)

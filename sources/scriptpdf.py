@@ -45,7 +45,7 @@ def get_scriptpdf():
     soup = get_soup(ALL_URL)
     movielist = soup.find_all('a')
 
-    for movie in tqdm(movielist):
+    for movie in tqdm(movielist, desc=SOURCE):
         if movie['href'].endswith('.pdf'):
             script_url, file_name, name = get_script_url(movie)
 

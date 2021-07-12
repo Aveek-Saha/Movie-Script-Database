@@ -27,7 +27,7 @@ def get_scriptsavant():
     movielist_2 = soup_2.find_all('div', class_='fusion-text')[0].find_all('a')
     movielist += movielist_2
 
-    for movie in tqdm(movielist):
+    for movie in tqdm(movielist, desc=SOURCE):
         name = movie.text.replace("script", "").strip()
         file_name = format_filename(name)
         script_url = movie.get('href')

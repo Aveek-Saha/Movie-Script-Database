@@ -29,7 +29,7 @@ def get_awesomefilm():
         name = re.sub(r'\([^)]*\)', '', name).strip()
         return name
 
-    for movie in tqdm(movielist):
+    for movie in tqdm(movielist, desc=SOURCE):
         script_ele = movie.a
         if not script_ele:
             continue

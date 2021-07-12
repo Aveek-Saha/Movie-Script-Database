@@ -57,7 +57,7 @@ def get_actorpoint():
     soup = get_soup(ALL_URL % "num")
     movielist.extend(soup.find_all(attrs={"data-th": "Script name"}))
 
-    for movie in tqdm(movielist):
+    for movie in tqdm(movielist, desc=SOURCE):
         script_url, file_name, name = get_script_url(movie)
         script_url = BASE_URL + urllib.parse.quote(script_url)
 
@@ -72,6 +72,6 @@ def get_actorpoint():
 
         with open(os.path.join(DIR, file_name + '.txt'), 'w', errors="ignore") as out:
             out.write(text)
-    
-    with open(os.path.join(META_DIR, SOURCE + ".json"), "w") as outfile: 
+
+    with open(os.path.join(META_DIR, SOURCE + ".json"), "w") as outfile:
         json.dump(metadata, outfile, indent=4)

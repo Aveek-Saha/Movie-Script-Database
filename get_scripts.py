@@ -2,6 +2,12 @@ import sources
 import json
 import time
 import multiprocessing
+import os
+
+DIR = os.path.join("scripts", "temp")
+
+if not os.path.exists(DIR):
+    os.makedirs(DIR)
 
 f = open('sources.json', 'r')
 data = json.load(f)

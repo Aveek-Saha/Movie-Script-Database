@@ -24,7 +24,7 @@ def get_screenplays():
         'table', class_="screenplay-listing")[0].find_all("a")
     movielist = [x for x in mlist if x.get('href').startswith("screenplay")]
 
-    for movie in tqdm(movielist):
+    for movie in tqdm(movielist, desc=SOURCE):
         name = movie.text
         file_name = format_filename(name)
         script_url = BASE_URL + urllib.parse.quote(movie.get('href'))

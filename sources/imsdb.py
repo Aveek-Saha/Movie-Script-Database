@@ -74,7 +74,7 @@ def get_imsdb():
     soup = get_soup(ALL_URL)
     movielist = soup.find_all('p')
 
-    for movie in tqdm(movielist):
+    for movie in tqdm(movielist, desc=SOURCE):
         script_url, name = get_script_url(movie)
         if script_url == "":
             continue
