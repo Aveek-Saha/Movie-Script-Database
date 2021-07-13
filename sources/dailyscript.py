@@ -12,12 +12,15 @@ def get_dailyscript():
     BASE_URL = "https://www.dailyscript.com/"
     SOURCE = "dailyscript"
     DIR = os.path.join("scripts", "unprocessed", SOURCE)
+    TEMP_DIR = os.path.join("scripts", "temp", SOURCE)
     META_DIR = os.path.join("scripts", "metadata")
 
     if not os.path.exists(DIR):
         os.makedirs(DIR)
     if not os.path.exists(META_DIR):
         os.makedirs(META_DIR)
+    if not os.path.exists(TEMP_DIR):
+        os.makedirs(TEMP_DIR)
 
     metadata = {}
     soup_1 = get_soup(ALL_URL_1)
@@ -40,7 +43,7 @@ def get_dailyscript():
         name = movie.find('a').text.strip()
 
         if script_url.endswith('.pdf'):
-            text = get_pdf_text(script_url, file_name)
+            text = get_pdf_text(script_url, os.path.join(SOURCE, file_name))
 
         elif script_url.endswith('.html'):
             script_soup = get_soup(script_url)

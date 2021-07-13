@@ -13,12 +13,15 @@ def get_actorpoint():
     BASE_URL = "https://www.actorpoint.com"
     SOURCE = "actorpoint"
     DIR = os.path.join("scripts", "unprocessed", SOURCE)
+    TEMP_DIR = os.path.join("scripts", "temp", SOURCE)
     META_DIR = os.path.join("scripts", "metadata")
 
     if not os.path.exists(DIR):
         os.makedirs(DIR)
     if not os.path.exists(META_DIR):
         os.makedirs(META_DIR)
+    if not os.path.exists(TEMP_DIR):
+        os.makedirs(TEMP_DIR)
 
     def get_script_from_url(script_url):
         text = ""

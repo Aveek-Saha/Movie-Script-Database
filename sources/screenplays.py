@@ -11,12 +11,15 @@ def get_screenplays():
     BASE_URL = "https://www.screenplays-online.de/"
     SOURCE = "screenplays"
     DIR = os.path.join("scripts", "unprocessed", SOURCE)
+    TEMP_DIR = os.path.join("scripts", "temp", SOURCE)
     META_DIR = os.path.join("scripts", "metadata")
 
     if not os.path.exists(DIR):
         os.makedirs(DIR)
     if not os.path.exists(META_DIR):
         os.makedirs(META_DIR)
+    if not os.path.exists(TEMP_DIR):
+        os.makedirs(TEMP_DIR)
 
     metadata = {}
     soup = get_soup(ALL_URL)

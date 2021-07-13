@@ -12,12 +12,15 @@ def get_imsdb():
     BASE_URL = "https://imsdb.com"
     SOURCE = "imsdb"
     DIR = os.path.join("scripts", "unprocessed", SOURCE)
+    TEMP_DIR = os.path.join("scripts", "temp", SOURCE)
     META_DIR = os.path.join("scripts", "metadata")
 
     if not os.path.exists(DIR):
         os.makedirs(DIR)
     if not os.path.exists(META_DIR):
         os.makedirs(META_DIR)
+    if not os.path.exists(TEMP_DIR):
+        os.makedirs(TEMP_DIR)
 
     def get_script_from_url(script_url):
         text = ""
@@ -25,12 +28,12 @@ def get_imsdb():
         try:
 
             if script_url.endswith('.pdf'):
-                text = get_pdf_text(BASE_URL + urllib.parse.quote(script_url), file_name)
+                text = get_pdf_text(script_url, os.path.join(SOURCE, file_name))
                 return text
 
             if script_url.endswith('.html'):
                 script_soup = get_soup(
-                    BASE_URL + urllib.parse.quote(script_url))
+                    script_url)
                 if script_soup == None:
                     return text
                 if len(script_soup.find_all('td', class_="scrtext")) < 1:
@@ -82,6 +85,8 @@ def get_imsdb():
         #     name = script_url.split("/")[-1].split('.html')[0]
         # elif script_url.endswith('.pdf'):
         #     name = script_url.split("/")[-1].split('.pdf')[0]
+
+        script_url = BASE_URL + urllib.parse.quote(script_url)
 
         text = get_script_from_url(script_url)
 

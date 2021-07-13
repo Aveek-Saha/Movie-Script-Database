@@ -42,8 +42,8 @@ def get_pdf_text(url, name):
     except Exception as err:
         print(err)
         text = ""
-    if os.path.isfile(doc):
-        os.remove(doc)
+    # if os.path.isfile(doc):
+    #     os.remove(doc)
     return text
 
 
@@ -58,6 +58,6 @@ def get_doc_text(url, name):
     except Exception as err:
         print(err)
         text = ""
-    if os.path.isfile(doc):
-        os.remove(doc)
+    # if os.path.isfile(doc):
+    #     os.remove(doc)
     return text

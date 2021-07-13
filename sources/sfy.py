@@ -11,12 +11,15 @@ def get_sfy():
     BASE_URL = "https://sfy.ru"
     SOURCE = "sfy"
     DIR = os.path.join("scripts", "unprocessed", SOURCE)
+    TEMP_DIR = os.path.join("scripts", "temp", SOURCE)
     META_DIR = os.path.join("scripts", "metadata")
 
     if not os.path.exists(DIR):
         os.makedirs(DIR)
     if not os.path.exists(META_DIR):
         os.makedirs(META_DIR)
+    if not os.path.exists(TEMP_DIR):
+        os.makedirs(TEMP_DIR)
 
     metadata = {}
     soup = get_soup(ALL_URL)
@@ -42,7 +45,7 @@ def get_sfy():
 
         if script_url.endswith('.pdf'):
             try:
-                text = get_pdf_text(script_url, file_name)
+                text = get_pdf_text(script_url, os.path.join(SOURCE, file_name))
             except Exception as err:
                 print(err)
                 continue

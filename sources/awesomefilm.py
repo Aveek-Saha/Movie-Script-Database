@@ -12,12 +12,15 @@ def get_awesomefilm():
     BASE_URL = "http://www.awesomefilm.com/"
     SOURCE = "awesomefilm"
     DIR = os.path.join("scripts", "unprocessed", SOURCE)
+    TEMP_DIR = os.path.join("scripts", "temp", SOURCE)
     META_DIR = os.path.join("scripts", "metadata")
 
     if not os.path.exists(DIR):
         os.makedirs(DIR)
     if not os.path.exists(META_DIR):
         os.makedirs(META_DIR)
+    if not os.path.exists(TEMP_DIR):
+        os.makedirs(TEMP_DIR)
 
     metadata = {}
     soup = get_soup(ALL_URL)
@@ -43,10 +46,10 @@ def get_awesomefilm():
 
         try:
             if script_url.endswith('.pdf'):
-                text = get_pdf_text(script_url, file_name)
+                text = get_pdf_text(script_url, os.path.join(SOURCE, file_name))
 
             elif script_url.endswith('.doc'):
-                text = get_doc_text(script_url, file_name)
+                text = get_doc_text(script_url, os.path.join(SOURCE, file_name))
 
             elif script_url.endswith('.txt'):
                 f = urllib.request.urlopen(script_url)

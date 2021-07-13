@@ -12,12 +12,15 @@ def get_scriptsavant():
     BASE_URL = "http://www.thescriptsavant.com/"
     SOURCE = "scriptsavant"
     DIR = os.path.join("scripts", "unprocessed", SOURCE)
+    TEMP_DIR = os.path.join("scripts", "temp", SOURCE)
     META_DIR = os.path.join("scripts", "metadata")
 
     if not os.path.exists(DIR):
         os.makedirs(DIR)
     if not os.path.exists(META_DIR):
         os.makedirs(META_DIR)
+    if not os.path.exists(TEMP_DIR):
+        os.makedirs(TEMP_DIR)
 
     metadata = {}
     soup_1 = get_soup(ALL_URL_1)
@@ -36,7 +39,7 @@ def get_scriptsavant():
             continue
 
         try:
-            text = get_pdf_text(script_url, file_name)
+            text = get_pdf_text(script_url, os.path.join(SOURCE, file_name))
 
         except Exception as err:
             print(err)

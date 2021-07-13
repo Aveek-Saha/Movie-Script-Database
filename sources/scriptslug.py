@@ -14,18 +14,21 @@ def get_scriptslug():
     BASE_URL = "https://www.scriptslug.com/assets/uploads/scripts/"
     SOURCE = "scriptslug"
     DIR = os.path.join("scripts", "unprocessed", SOURCE)
+    TEMP_DIR = os.path.join("scripts", "temp", SOURCE)
     META_DIR = os.path.join("scripts", "metadata")
 
     if not os.path.exists(DIR):
         os.makedirs(DIR)
     if not os.path.exists(META_DIR):
         os.makedirs(META_DIR)
+    if not os.path.exists(TEMP_DIR):
+        os.makedirs(TEMP_DIR)
 
     def get_script_from_url(script_url, file_name):
         text = ""
 
         try:
-            text = get_pdf_text(script_url, file_name)
+            text = get_pdf_text(script_url, os.path.join(SOURCE, file_name))
             return text
 
         except Exception as err:
