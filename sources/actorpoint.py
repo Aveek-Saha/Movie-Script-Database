@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import urllib
 import os
+from os.path import isfile, join, getsize
 import json
 from tqdm import tqdm
 import string
@@ -36,6 +37,7 @@ def get_actorpoint():
                 print("No script at " + script_url)
 
         except Exception as err:
+            print(script_url)
             print(err)
             text = ""
 
@@ -50,6 +52,8 @@ def get_actorpoint():
 
         return script_url, file_name, name
 
+    files = [join(DIR, f) for f in os.listdir(DIR) if isfile(
+            join(DIR, f)) and getsize(join(DIR, f)) > 3000]
     alphabet = string.ascii_lowercase
     metadata = {}
     movielist = []
@@ -63,6 +67,9 @@ def get_actorpoint():
     for movie in tqdm(movielist, desc=SOURCE):
         script_url, file_name, name = get_script_url(movie)
         script_url = BASE_URL + urllib.parse.quote(script_url)
+
+        if os.path.join(DIR, file_name + '.txt') in files:
+            continue
 
         text = get_script_from_url(script_url)
         if text == "" or name == "":
