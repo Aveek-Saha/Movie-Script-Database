@@ -46,6 +46,11 @@ def get_awesomefilm():
         name = clean_name(script_ele.text)
         file_name = format_filename(name)
 
+        metadata[name] = {
+            "file_name": file_name,
+            "script_url": script_url
+        }
+
         if os.path.join(DIR, file_name + '.txt') in files:
             continue
 
@@ -68,15 +73,12 @@ def get_awesomefilm():
         except Exception as err:
             print(script_url)
             print(err)
+            metadata.pop(name, None)
             continue
 
         if text == "":
+            metadata.pop(name, None)
             continue
-
-        metadata[name] = {
-            "file_name": file_name,
-            "script_url": script_url
-        }
 
         with open(os.path.join(DIR, file_name + '.txt'), 'w', errors="ignore") as out:
             out.write(text)

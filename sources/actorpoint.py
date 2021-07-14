@@ -67,17 +67,18 @@ def get_actorpoint():
         script_url, file_name, name = get_script_url(movie)
         script_url = BASE_URL + urllib.parse.quote(script_url)
 
+        metadata[name] = {
+            "file_name": file_name,
+            "script_url": script_url
+        }
+
         if os.path.join(DIR, file_name + '.txt') in files:
             continue
 
         text = get_script_from_url(script_url)
         if text == "" or name == "":
+            metadata.pop(name, None)
             continue
-
-        metadata[name] = {
-            "file_name": file_name,
-            "script_url": script_url
-        }
 
         with open(os.path.join(DIR, file_name + '.txt'), 'w', errors="ignore") as out:
             out.write(text)
