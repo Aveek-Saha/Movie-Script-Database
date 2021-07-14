@@ -1,7 +1,6 @@
 from bs4 import BeautifulSoup
 import urllib
 import os
-from os.path import isfile, join, getsize
 import json
 from tqdm import tqdm
 import string
@@ -52,8 +51,8 @@ def get_actorpoint():
 
         return script_url, file_name, name
 
-    files = [join(DIR, f) for f in os.listdir(DIR) if isfile(
-            join(DIR, f)) and getsize(join(DIR, f)) > 3000]
+    files = [os.path.join(DIR, f) for f in os.listdir(DIR) if os.path.isfile(
+        os.path.join(DIR, f)) and os.path.getsize(os.path.join(DIR, f)) > 3000]
     alphabet = string.ascii_lowercase
     metadata = {}
     movielist = []

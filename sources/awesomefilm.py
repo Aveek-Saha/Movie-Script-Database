@@ -21,7 +21,9 @@ def get_awesomefilm():
         os.makedirs(META_DIR)
     if not os.path.exists(TEMP_DIR):
         os.makedirs(TEMP_DIR)
-
+    
+    files = [os.path.join(DIR, f) for f in os.listdir(DIR) if os.path.isfile(
+        os.path.join(DIR, f)) and os.path.getsize(os.path.join(DIR, f)) > 3000]
     metadata = {}
     soup = get_soup(ALL_URL)
     movielist = list(set(soup.find_all('td', class_="tbl")))
@@ -44,6 +46,9 @@ def get_awesomefilm():
         name = clean_name(script_ele.text)
         file_name = format_filename(name)
 
+        if os.path.join(DIR, file_name + '.txt') in files:
+            continue
+
         try:
             if script_url.endswith('.pdf'):
                 text = get_pdf_text(script_url, os.path.join(SOURCE, file_name))
@@ -61,6 +66,7 @@ def get_awesomefilm():
                 if page:
                     text = page.get_text()
         except Exception as err:
+            print(script_url)
             print(err)
             continue
 
