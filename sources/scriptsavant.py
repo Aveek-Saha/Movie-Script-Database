@@ -22,6 +22,9 @@ def get_scriptsavant():
     if not os.path.exists(TEMP_DIR):
         os.makedirs(TEMP_DIR)
 
+    files = [os.path.join(DIR, f) for f in os.listdir(DIR) if os.path.isfile(
+        os.path.join(DIR, f)) and os.path.getsize(os.path.join(DIR, f)) > 3000]
+
     metadata = {}
     soup_1 = get_soup(ALL_URL_1)
     soup_2 = get_soup(ALL_URL_2)
@@ -35,24 +38,30 @@ def get_scriptsavant():
         file_name = format_filename(name)
         script_url = movie.get('href')
 
+        metadata[unidecode(name)] = {
+            "file_name": file_name,
+            "script_url": script_url
+        }
+
+        if os.path.join(DIR, file_name + '.txt') in files:
+            continue
+
         if not script_url.endswith('.pdf'):
+            metadata.pop(name, None)
             continue
 
         try:
             text = get_pdf_text(script_url, os.path.join(SOURCE, file_name))
 
         except Exception as err:
+            print(script_url)
             print(err)
             continue
 
         if text == "" or file_name == "":
+            metadata.pop(name, None)
             continue
         
-        metadata[unidecode(name)] = {
-            "file_name": file_name,
-            "script_url": script_url
-        }
-
         with open(os.path.join(DIR, file_name + '.txt'), 'w', errors="ignore") as out:
             out.write(text)
 
