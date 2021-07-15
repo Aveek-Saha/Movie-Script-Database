@@ -43,7 +43,7 @@ def get_sfy():
         file_name = format_filename(name)
 
         text = ""
-        if not script_url.startswith('https'):
+        if not script_url.startswith('https') and not script_url.startswith('http') and not script_url.startswith('www'):
             script_url = BASE_URL + script_url
 
         metadata[name] = {
@@ -56,7 +56,8 @@ def get_sfy():
 
         if script_url.endswith('.pdf'):
             try:
-                text = get_pdf_text(script_url, os.path.join(SOURCE, file_name))
+                text = get_pdf_text(
+                    script_url, os.path.join(SOURCE, file_name))
             except Exception as err:
                 print(script_url)
                 print(err)
@@ -79,6 +80,6 @@ def get_sfy():
 
         with open(os.path.join(DIR, file_name + '.txt'), 'w', errors="ignore") as out:
             out.write(text)
-    
-    with open(os.path.join(META_DIR, SOURCE + ".json"), "w") as outfile: 
+
+    with open(os.path.join(META_DIR, SOURCE + ".json"), "w") as outfile:
         json.dump(metadata, outfile, indent=4)
