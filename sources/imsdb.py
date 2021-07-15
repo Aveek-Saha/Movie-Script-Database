@@ -52,6 +52,7 @@ def get_imsdb():
                             'td', class_="scrtext")[0].pre
                         text = script_text.get_text()
         except Exception as err:
+            print(script_url)
             print(err)
             text = ""
 
@@ -73,6 +74,9 @@ def get_imsdb():
 
         return script_url, name
 
+    files = [os.path.join(DIR, f) for f in os.listdir(DIR) if os.path.isfile(
+        os.path.join(DIR, f)) and os.path.getsize(os.path.join(DIR, f)) > 3000]
+
     metadata = {}
     soup = get_soup(ALL_URL)
     movielist = soup.find_all('p')
@@ -87,17 +91,21 @@ def get_imsdb():
         #     name = script_url.split("/")[-1].split('.pdf')[0]
 
         script_url = BASE_URL + urllib.parse.quote(script_url)
-
-        text = get_script_from_url(script_url)
-
-        if text == "" or name == "":
-            continue
-
         file_name = format_filename(name)
         metadata[name] = {
             "file_name": file_name,
             "script_url": script_url
         }
+
+        if os.path.join(DIR, file_name + '.txt') in files:
+            continue
+
+        text = get_script_from_url(script_url)
+
+        if text == "" or name == "":
+            metadata.pop(name, None)
+            continue
+
 
         with open(os.path.join(DIR, file_name + '.txt'), 'w', errors="ignore") as out:
             out.write(text)
