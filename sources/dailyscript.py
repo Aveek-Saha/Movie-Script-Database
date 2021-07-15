@@ -21,6 +21,9 @@ def get_dailyscript():
         os.makedirs(META_DIR)
     if not os.path.exists(TEMP_DIR):
         os.makedirs(TEMP_DIR)
+    
+    files = [os.path.join(DIR, f) for f in os.listdir(DIR) if os.path.isfile(
+        os.path.join(DIR, f)) and os.path.getsize(os.path.join(DIR, f)) > 3000]
 
     metadata = {}
     soup_1 = get_soup(ALL_URL_1)
@@ -41,6 +44,15 @@ def get_dailyscript():
 
         text = ""
         name = movie.find('a').text.strip()
+        file_name = format_filename(name)
+
+        metadata[name] = {
+            "file_name": file_name,
+            "script_url": script_url
+        }
+
+        if os.path.join(DIR, file_name + '.txt') in files:
+            continue
 
         if script_url.endswith('.pdf'):
             text = get_pdf_text(script_url, os.path.join(SOURCE, file_name))
@@ -65,14 +77,8 @@ def get_dailyscript():
                 text = script_soup.get_text()
 
         if text == "" or name == "":
+            metadata.pop(name, None)
             continue
-
-        file_name = format_filename(name)
-
-        metadata[name] = {
-            "file_name": file_name,
-            "script_url": script_url
-        }
 
         with open(os.path.join(DIR, file_name + '.txt'), 'w', errors="ignore") as out:
             out.write(text)
