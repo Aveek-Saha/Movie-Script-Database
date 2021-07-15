@@ -32,6 +32,7 @@ def get_scriptslug():
             return text
 
         except Exception as err:
+            print(script_url)
             print(err)
             text = ""
 
@@ -47,6 +48,9 @@ def get_scriptslug():
 
         return script_url, file_name, name
 
+    files = [os.path.join(DIR, f) for f in os.listdir(DIR) if os.path.isfile(
+        os.path.join(DIR, f)) and os.path.getsize(os.path.join(DIR, f)) > 3000]
+
     metadata = {}
     movielist = []
 
@@ -59,14 +63,19 @@ def get_scriptslug():
     for movie in tqdm(movielist, desc=SOURCE):
         script_url, file_name, name = get_script_url(movie)
         script_url = BASE_URL + urllib.parse.quote(script_url) + ".pdf"
-        text = get_script_from_url(script_url, file_name)
-        if text == "" or name == "":
-            continue
 
         metadata[name] = {
             "file_name": file_name,
             "script_url": script_url
         }
+
+        if os.path.join(DIR, file_name + '.txt') in files:
+            continue
+
+        text = get_script_from_url(script_url, file_name)
+        if text == "" or name == "":
+            metadata.pop(name, None)
+            continue
 
         with open(os.path.join(DIR, file_name + '.txt'), 'w', errors="ignore") as out:
             out.write(text)
