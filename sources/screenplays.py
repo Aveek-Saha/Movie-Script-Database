@@ -21,6 +21,9 @@ def get_screenplays():
     if not os.path.exists(TEMP_DIR):
         os.makedirs(TEMP_DIR)
 
+    files = [os.path.join(DIR, f) for f in os.listdir(DIR) if os.path.isfile(
+        os.path.join(DIR, f)) and os.path.getsize(os.path.join(DIR, f)) > 3000]
+
     metadata = {}
     soup = get_soup(ALL_URL)
     mlist = soup.find_all(
@@ -33,18 +36,24 @@ def get_screenplays():
         script_url = BASE_URL + urllib.parse.quote(movie.get('href'))
         # if script_url.startswith("screenplay"):
 
-        script_soup = get_soup(script_url)
-        if script_soup == None:
-            print("Error fetching ", script_url)
-        
-        if not script_soup.pre:
-            continue
-        text = script_soup.pre.get_text()
-
         metadata[name] = {
             "file_name": file_name,
             "script_url": script_url
         }
+
+        if os.path.join(DIR, file_name + '.txt') in files:
+            continue
+
+        script_soup = get_soup(script_url)
+        if script_soup == None:
+            print("Error fetching ", script_url)
+            metadata.pop(name, None)
+            continue
+        
+        if not script_soup.pre:
+            metadata.pop(name, None)
+            continue
+        text = script_soup.pre.get_text()
 
         with open(os.path.join(DIR, file_name + '.txt'), 'w', errors="ignore") as out:
             out.write(text)
