@@ -21,6 +21,9 @@ def get_sfy():
     if not os.path.exists(TEMP_DIR):
         os.makedirs(TEMP_DIR)
 
+    files = [os.path.join(DIR, f) for f in os.listdir(DIR) if os.path.isfile(
+        os.path.join(DIR, f)) and os.path.getsize(os.path.join(DIR, f)) > 3000]
+
     metadata = {}
     soup = get_soup(ALL_URL)
     movielist = soup.find_all('div', class_='row')[1]
@@ -43,11 +46,21 @@ def get_sfy():
         if not script_url.startswith('https'):
             script_url = BASE_URL + script_url
 
+        metadata[name] = {
+            "file_name": file_name,
+            "script_url": script_url
+        }
+
+        if os.path.join(DIR, file_name + '.txt') in files:
+            continue
+
         if script_url.endswith('.pdf'):
             try:
                 text = get_pdf_text(script_url, os.path.join(SOURCE, file_name))
             except Exception as err:
+                print(script_url)
                 print(err)
+                metadata.pop(name, None)
                 continue
         else:
             try:
@@ -55,16 +68,14 @@ def get_sfy():
                 if script_soup:
                     text = script_soup.get_text()
             except Exception as err:
+                print(script_url)
                 print(err)
+                metadata.pop(name, None)
                 continue
 
         if text == "" or name == "":
+            metadata.pop(name, None)
             continue
-
-        metadata[name] = {
-            "file_name": file_name,
-            "script_url": script_url
-        }
 
         with open(os.path.join(DIR, file_name + '.txt'), 'w', errors="ignore") as out:
             out.write(text)
