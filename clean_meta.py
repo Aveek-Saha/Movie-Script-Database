@@ -1,14 +1,24 @@
 from os import dup, listdir, makedirs
 from os.path import isfile, join, sep, getsize, exists
 
+import urllib
+import urllib.request
 import re
 import json
 import string
+from unidecode import unidecode
+from tqdm.std import tqdm
+
+import config
 
 f = open('sources.json', 'r')
 data = json.load(f)
 
 META_DIR = join("scripts", "metadata")
+TMDB_URL = "https://api.themoviedb.org/3/search/movie?api_key=%s&language=en-US&query=%s&page=1"
+
+tmdb_api_key = config.tmdb_api_key
+
 
 metadata = {}
 for source in data:
@@ -39,29 +49,56 @@ for source in metadata:
         name = "".join(name.split())
         unique.append(name)
         if name not in origin:
-            origin[name] = []
+            origin[name] = {"files": []}
         curr_script = metadata[source][script]
         curr_file = join("scripts", "unprocessed", source, curr_script["file_name"] + ".txt") 
         
         if curr_file in files:
-            file_info = {
-                source: {
-                        "name": script,
-                        "file_name": curr_script["file_name"],
-                        "script_url": curr_script["script_url"],
-                        "size": getsize(curr_file)
-                    }
-                }
-            origin[name].append(file_info)
+            origin[name]["files"].append({
+                "name": script,
+                "source": source,
+                "file_name": curr_script["file_name"],
+                "script_url": curr_script["script_url"],
+                "size": getsize(curr_file)
+            })
+            
+        else:
+            origin.pop(name)
 
 final = sorted(list(set(unique)))
 # print(final)
 # print(len(final))
 
+# with open(join(META_DIR, "clean_meta.json"), "w") as outfile:
+#     json.dump(origin, outfile, indent=4)
+
+print(len(origin))
+count = 0
+missing_count = 0
+for script in tqdm(origin):
+    name = origin[script]["files"][0]["name"]
+    url = TMDB_URL % (tmdb_api_key, urllib.parse.quote(name))
+    response = urllib.request.urlopen(url)
+    data = response.read()
+    jres = json.loads(data)
+    if jres['total_results'] > 0:
+        movie = jres['results'][0]
+        if "title" in movie and "release_date" in movie and "id" in movie and "overview" in movie:
+            origin[script]["tmdb"] = {
+                "title": unidecode(movie["title"]),
+                "release_date": movie["release_date"],
+                "id": movie["id"],
+                "overview": unidecode(movie["overview"])
+            }
+        else:
+            missing_count += 1
+    else:
+        print(name)
+        count += 1
+
 with open(join(META_DIR, "clean_meta.json"), "w") as outfile:
     json.dump(origin, outfile, indent=4)
 
-print(len(origin))
+print(count)
+print(missing_count)
 
-# for script in final:
-#     print(origin[script])
