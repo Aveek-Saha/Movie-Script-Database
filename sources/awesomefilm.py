@@ -32,6 +32,7 @@ def get_awesomefilm():
         name = re.sub(' +', ' ', name)
         name = re.sub('\n', ' ', name)
         name = re.sub(r'\([^)]*\)', '', name).strip()
+        name = name.rstrip("script").strip()
         return name
 
     for movie in tqdm(movielist, desc=SOURCE):
