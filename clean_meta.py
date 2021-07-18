@@ -15,7 +15,8 @@ f = open('sources.json', 'r')
 data = json.load(f)
 
 META_DIR = join("scripts", "metadata")
-TMDB_URL = "https://api.themoviedb.org/3/search/movie?api_key=%s&language=en-US&query=%s&page=1"
+TMDB_MOVIE_URL = "https://api.themoviedb.org/3/search/movie?api_key=%s&language=en-US&query=%s&page=1"
+TMDB_TV_URL = "https://api.themoviedb.org/3/search/tv?api_key=%s&language=en-US&query=%s&page=1"
 
 tmdb_api_key = config.tmdb_api_key
 
@@ -66,18 +67,53 @@ for source in metadata:
             origin.pop(name)
 
 final = sorted(list(set(unique)))
-# print(final)
-# print(len(final))
 
-# with open(join(META_DIR, "clean_meta.json"), "w") as outfile:
-#     json.dump(origin, outfile, indent=4)
+# Remove ", The"
+# Remove ", A"
+# Split by "_"
+# If name has filmed as or released as, use those names instead
+# Remove brackets ()
+# Remove "Pilot"
+# Remove "First Draft"
+# Remove "Transcript"
+# Remove "Script"
+# Remove "Early/Final Pilot TV Script PDF"
+# Remove text after ":"
+
+def clean_name(name):
+    name = name.lower()
+    name = " ".join(name.split("_"))
+    
+    name = name.replace(", the", "")
+    name = name.replace(", a", "")
+    
+    alt_name = name.split("filmed as")
+    if len(alt_name) > 1:
+        name = re.sub(r"[\([{})\]]", "", name).split("filmed as")[-1].strip()
+    
+    alt_name = name.split("released as")
+    if len(alt_name) > 1:
+        name = re.sub(r"[\([{})\]]", "", name).split("released as")[-1].strip()
+        
+    name = re.sub(r'\([^)]*\)', '', name)
+
+    name = name.replace("early pilot", "")
+    name = name.replace("final pilot", "")
+    name = name.replace("transcript", "")
+    name = name.replace("first draft", "")
+    name = name.replace("tv script pdf", "")
+    name = name.replace("pilot", "")
+    name = name.strip()
+
+    return name
 
 print(len(origin))
 count = 0
 missing_count = 0
 for script in tqdm(origin):
+    # Use original name
     name = origin[script]["files"][0]["name"]
-    url = TMDB_URL % (tmdb_api_key, urllib.parse.quote(name))
+    url = TMDB_MOVIE_URL % (tmdb_api_key, urllib.parse.quote(name))
     response = urllib.request.urlopen(url)
     data = response.read()
     jres = json.loads(data)
@@ -93,8 +129,43 @@ for script in tqdm(origin):
         else:
             missing_count += 1
     else:
-        print(name)
-        count += 1
+        # Try with cleaned name
+        name = clean_name(name)
+        url = TMDB_MOVIE_URL % (tmdb_api_key, urllib.parse.quote(name))
+        response = urllib.request.urlopen(url)
+        data = response.read()
+        jres = json.loads(data)
+        if jres['total_results'] > 0:
+            movie = jres['results'][0]
+            if "title" in movie and "release_date" in movie and "id" in movie and "overview" in movie:
+                origin[script]["tmdb"] = {
+                    "title": unidecode(movie["title"]),
+                    "release_date": movie["release_date"],
+                    "id": movie["id"],
+                    "overview": unidecode(movie["overview"])
+                }
+            else:
+                missing_count += 1
+        else:
+            # Try with TV search
+            url = TMDB_TV_URL % (tmdb_api_key, urllib.parse.quote(name))
+            response = urllib.request.urlopen(url)
+            data = response.read()
+            jres = json.loads(data)
+            if jres['total_results'] > 0:
+                tv_show = jres['results'][0]
+                if "title" in tv_show and "first_air_date" in tv_show and "id" in tv_show and "overview" in tv_show:
+                    origin[script]["tmdb"] = {
+                        "title": unidecode(tv_show["title"]),
+                        "first_air_date": tv_show["first_air_date"],
+                        "id": tv_show["id"],
+                        "overview": unidecode(tv_show["overview"])
+                    }
+                else:
+                    missing_count += 1
+            else:
+                print(name)
+                count += 1
 
 with open(join(META_DIR, "clean_meta.json"), "w") as outfile:
     json.dump(origin, outfile, indent=4)
