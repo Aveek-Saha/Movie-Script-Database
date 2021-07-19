@@ -22,7 +22,7 @@ data = json.load(f)
 META_DIR = join("scripts", "metadata")
 TMDB_MOVIE_URL = "https://api.themoviedb.org/3/search/movie?api_key=%s&language=en-US&query=%s&page=1"
 TMDB_TV_URL = "https://api.themoviedb.org/3/search/tv?api_key=%s&language=en-US&query=%s&page=1"
-
+TMDB_ID_URL = "https://api.themoviedb.org/3/find/%s?api_key=%s&language=en-US&external_source=imdb_id"
 tmdb_api_key = config.tmdb_api_key
 
 forbidden = ["the", "a", "an", "and", "or", "part",
@@ -223,6 +223,60 @@ for script in tqdm(origin):
     else:
         origin[script]["imdb"] = movie_data
 
+with open(join(META_DIR, "clean_meta.json"), "w") as outfile:
+    json.dump(origin, outfile, indent=4)
+
+print(count)
+
+
+def get_tmdb_from_id(id):
+
+    url = TMDB_ID_URL % (id, tmdb_api_key)
+    response = urllib.request.urlopen(url)
+    res_data = response.read()
+    jres = json.loads(res_data)
+
+    if len(jres['movie_results']) > 0:
+        results = 'movie_results'
+        date = "release_date"
+        title = "title"
+    elif len(jres['tv_results']) > 0:
+        results = 'tv_results'
+        date = "first_air_date"
+        title = "name"
+    else:
+        return {}
+    
+    movie = jres[results][0]
+    if title in movie and date in movie and "id" in movie and "overview" in movie:
+        return {
+            "title": unidecode(movie[title]),
+            "release_date": movie[date],
+            "id": movie["id"],
+            "overview": unidecode(movie["overview"])
+        }
+    else:
+        print("Field missing in response")
+        return {}
+
+# f = open(join(META_DIR, "clean_meta.json"), 'r')
+# origin = json.load(f)
+
+# Use IMDb id to search TMDb
+count = 0
+
+for script in tqdm(origin):
+    if "imdb" in origin[script] and "tmdb" not in origin[script]:
+        # print(origin[script]["files"][0]["name"])
+        imdb_id = "tt" + origin[script]["imdb"]["id"]
+        movie_data = get_tmdb_from_id(imdb_id)
+        if movie_data:
+            origin[script]["tmdb"] = movie_data
+
+        else:
+            print(origin[script]["imdb"]["title"], imdb_id)
+            count += 1
+        
 with open(join(META_DIR, "clean_meta.json"), "w") as outfile:
     json.dump(origin, outfile, indent=4)
 
