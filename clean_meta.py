@@ -43,7 +43,7 @@ for source in metadata:
     DIR = join("scripts", "unprocessed", source)
     files = [join(DIR, f) for f in listdir(DIR) if isfile(
         join(DIR, f)) and getsize(join(DIR, f)) > 3000]
-    
+
     source_meta = metadata[source]
     for script in source_meta:
         name = re.sub(r'\([^)]*\)', '', script.strip()).lower()
@@ -57,8 +57,9 @@ for source in metadata:
         if name not in origin:
             origin[name] = {"files": []}
         curr_script = metadata[source][script]
-        curr_file = join("scripts", "unprocessed", source, curr_script["file_name"] + ".txt") 
-        
+        curr_file = join("scripts", "unprocessed", source,
+                         curr_script["file_name"] + ".txt")
+
         if curr_file in files:
             origin[name]["files"].append({
                 "name": script,
@@ -67,41 +68,31 @@ for source in metadata:
                 "script_url": curr_script["script_url"],
                 "size": getsize(curr_file)
             })
-            
+
         else:
             origin.pop(name)
 
 final = sorted(list(set(unique)))
 
-# Remove ", The"
-# Remove ", A"
-# Split by "_"
-# If name has filmed as or released as, use those names instead
-# Remove brackets ()
-# Remove "Pilot"
-# Remove "First Draft"
-# Remove "Transcript"
-# Remove "Script"
-# Remove "Early/Final Pilot TV Script PDF"
-# Remove text after ":"
 
 def clean_name(name):
     name = name.lower()
+    # Split by "_"
     name = " ".join(name.split("_"))
-    
+    # Remove ", The" and ", A"
     name = name.replace(", the", "")
     name = name.replace(", a", "")
-    
+    # If name has filmed as or released as, use those names instead
     alt_name = name.split("filmed as")
     if len(alt_name) > 1:
         name = re.sub(r"[\([{})\]]", "", name).split("filmed as")[-1].strip()
-    
     alt_name = name.split("released as")
     if len(alt_name) > 1:
         name = re.sub(r"[\([{})\]]", "", name).split("released as")[-1].strip()
-        
+    # Remove brackets ()
     name = re.sub(r'\([^)]*\)', '', name)
-
+    # Remove "Early/Final Pilot TV Script PDF", "Script",
+    # "Transcript", "Pilot", "First Draft"
     name = name.replace("early pilot", "")
     name = name.replace("final pilot", "")
     name = name.replace("transcript", "")
@@ -112,74 +103,83 @@ def clean_name(name):
 
     return name
 
+
 print(len(origin))
-count = 0
-missing_count = 0
-for script in tqdm(origin):
-    # Use original name
-    name = origin[script]["files"][0]["name"]
-    url = TMDB_MOVIE_URL % (tmdb_api_key, urllib.parse.quote(name))
+
+
+def get_tmdb(name, type="movie"):
+    if type == "movie":
+        base_url = TMDB_MOVIE_URL
+        date = "release_date"
+        title = "title"
+    elif type == "tv":
+        base_url = TMDB_TV_URL
+        date = "first_air_date"
+        title = "name"
+
+    url = base_url % (tmdb_api_key, urllib.parse.quote(name))
     response = urllib.request.urlopen(url)
-    data = response.read()
-    jres = json.loads(data)
+    res_data = response.read()
+    jres = json.loads(res_data)
+
     if jres['total_results'] > 0:
         movie = jres['results'][0]
-        if "title" in movie and "release_date" in movie and "id" in movie and "overview" in movie:
-            origin[script]["tmdb"] = {
-                "title": unidecode(movie["title"]),
-                "release_date": movie["release_date"],
+        if title in movie and date in movie and "id" in movie and "overview" in movie:
+            return {
+                "title": unidecode(movie[title]),
+                "release_date": movie[date],
                 "id": movie["id"],
                 "overview": unidecode(movie["overview"])
             }
         else:
-            missing_count += 1
+            print("Field missing in response")
+            return {}
+    else:
+        return {}
+
+
+count = 0
+missing_count = 0
+
+print("Get metadata from TMDb")
+
+for script in tqdm(origin):
+    # Use original name
+    name = origin[script]["files"][0]["name"]
+    movie_data = get_tmdb(name)
+
+    if movie_data:
+        origin[script]["tmdb"] = movie_data
+
     else:
         # Try with cleaned name
         name = clean_name(name)
-        url = TMDB_MOVIE_URL % (tmdb_api_key, urllib.parse.quote(name))
-        response = urllib.request.urlopen(url)
-        data = response.read()
-        jres = json.loads(data)
-        if jres['total_results'] > 0:
-            movie = jres['results'][0]
-            if "title" in movie and "release_date" in movie and "id" in movie and "overview" in movie:
-                origin[script]["tmdb"] = {
-                    "title": unidecode(movie["title"]),
-                    "release_date": movie["release_date"],
-                    "id": movie["id"],
-                    "overview": unidecode(movie["overview"])
-                }
-            else:
-                missing_count += 1
+        movie_data = get_tmdb(name)
+
+        if movie_data:
+            origin[script]["tmdb"] = movie_data
+
         else:
             # Try with TV search
-            url = TMDB_TV_URL % (tmdb_api_key, urllib.parse.quote(name))
-            response = urllib.request.urlopen(url)
-            data = response.read()
-            jres = json.loads(data)
-            if jres['total_results'] > 0:
-                tv_show = jres['results'][0]
-                if "title" in tv_show and "first_air_date" in tv_show and "id" in tv_show and "overview" in tv_show:
-                    origin[script]["tmdb"] = {
-                        "title": unidecode(tv_show["title"]),
-                        "first_air_date": tv_show["first_air_date"],
-                        "id": tv_show["id"],
-                        "overview": unidecode(tv_show["overview"])
-                    }
-                else:
-                    missing_count += 1
+            tv_data = get_tmdb(name, "tv")
+
+            if tv_data:
+                origin[script]["tmdb"] = tv_data
+
             else:
                 print(name)
                 count += 1
 
+print(count)
 # with open(join(META_DIR, "clean_meta.json"), "w") as outfile:
 #     json.dump(origin, outfile, indent=4)
 
-# print(count)
 # print(missing_count)
 
 # f = open(join(META_DIR, "clean_meta.json"), 'r')
 # origin = json.load(f)
+
+print("Get metadata from IMDb")
 
 def get_imdb(name):
     try:
@@ -191,18 +191,20 @@ def get_imdb(name):
             if 'year' in movie:
                 release_date = movie['year']
             else:
+                print("Field missing in response")
                 return {}
-            
+
             return {
-                    "title": movie['title'],
-                    "release_date": release_date,
-                    "id": movie_id,
-                }
+                "title": movie['title'],
+                "release_date": release_date,
+                "id": movie_id,
+            }
         else:
             return {}
     except Exception as err:
         print(err)
         return {}
+
 
 count = 0
 for script in tqdm(origin):
@@ -212,9 +214,10 @@ for script in tqdm(origin):
     if not movie_data:
         name = clean_name(name)
         movie_data = get_imdb(name)
-        
+
         if not movie_data:
             print(name)
+            count += 1
         else:
             origin[script]["imdb"] = movie_data
     else:
