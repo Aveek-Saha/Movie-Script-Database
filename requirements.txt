@@ -1,6 +1,6 @@
 tqdm==4.61.1
+fuzzywuzzy==0.18.0
+Unidecode==1.2.0
 textract==1.6.3
 beautifulsoup4==4.9.3
-fuzzywuzzy==0.18.0
-numpy==1.21.0
-Unidecode==1.2.0
+IMDbPY==2021.4.18
