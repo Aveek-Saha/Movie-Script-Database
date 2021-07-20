@@ -8,7 +8,7 @@ import json
 import string
 from unidecode import unidecode
 from tqdm.std import tqdm
-import multiprocessing
+from fuzzywuzzy import fuzz
 
 import imdb
 
@@ -195,7 +195,7 @@ def get_imdb(name):
                 return {}
 
             return {
-                "title": movie['title'],
+                "title": unidecode(movie['title']),
                 "release_date": release_date,
                 "id": movie_id,
             }
@@ -246,7 +246,7 @@ def get_tmdb_from_id(id):
         title = "name"
     else:
         return {}
-    
+
     movie = jres[results][0]
     if title in movie and date in movie and "id" in movie and "overview" in movie:
         return {
@@ -276,8 +276,82 @@ for script in tqdm(origin):
         else:
             print(origin[script]["imdb"]["title"], imdb_id)
             count += 1
-        
+
 with open(join(META_DIR, "clean_meta.json"), "w") as outfile:
     json.dump(origin, outfile, indent=4)
 
 print(count)
+
+def average_ratio(n, m):
+    return ((fuzz.token_sort_ratio(n,  m) + fuzz.token_sort_ratio(m,  n)) // 2)
+
+def roman_to_int(num):
+    string = num.split()
+    res = []
+    for s in string:
+        if s == "ii":
+            res.append("2")
+        elif s == "iii":
+            res.append("3")
+        elif s == "iv":
+            res.append("4")
+        elif s == "v":
+            res.append("5")
+        elif s == "vi":
+            res.append("6")
+        elif s == "vii":
+            res.append("7")
+        elif s == "viii":
+            res.append("8")
+        elif s == "ix":
+            res.append("9")
+        else:
+            res.append(s)
+    return " ".join(res)
+
+def extra_clean(name):
+    name = roman_to_int(clean_name(name)).replace(
+            "the ", "").replace("-", "").replace(":", "").replace("episode", "").replace(".", "")
+    return name
+
+# f = open(join(META_DIR, "clean_meta_tmdb.json"), 'r')
+# origin = json.load(f)
+
+count = 0
+for script in tqdm(origin):
+    if "imdb" in origin[script] and "tmdb" in origin[script]:
+        imdb_name = extra_clean(unidecode(origin[script]["imdb"]["title"]))
+        tmdb_name = extra_clean(unidecode(origin[script]["tmdb"]["title"]))
+        file_name = extra_clean(origin[script]["files"][0]["name"])
+
+        if imdb_name != tmdb_name and average_ratio(file_name, tmdb_name) < 85 and average_ratio(file_name, imdb_name) > 85:
+            imdb_id = "tt" + origin[script]["imdb"]["id"]
+            movie_data = get_tmdb_from_id(imdb_id)
+            if movie_data:
+                origin[script]["tmdb"] = movie_data
+
+            else:
+                print(origin[script]["imdb"]["title"], imdb_id)
+                count += 1
+
+        if imdb_name != tmdb_name and average_ratio(file_name, tmdb_name) > 85 and average_ratio(file_name, imdb_name) < 85:
+            name = origin[script]["tmdb"]["title"]
+            movie_data = get_imdb(name)
+
+            if not movie_data:
+                name = clean_name(name)
+                movie_data = get_imdb(name)
+
+                if not movie_data:
+                    print(name)
+                    count += 1
+                else:
+                    origin[script]["imdb"] = movie_data
+            else:
+                origin[script]["imdb"] = movie_data
+
+
+print(count)
+
+with open(join(META_DIR, "clean_meta.json"), "w") as outfile:
+    json.dump(origin, outfile, indent=4)
