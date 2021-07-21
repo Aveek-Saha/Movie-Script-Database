@@ -15,6 +15,7 @@ SCRIPT_DIR = join("scripts", "unprocessed")
 META_DIR = join("scripts", "metadata")
 CLEAN_DIR = join("scripts", "filtered")
 META_FILE = join(META_DIR, "clean_meta_imdb.json")
+CLEAN_META = join(META_DIR, "clean_files_meta.json")
 
 if not exists(CLEAN_DIR):
     makedirs(CLEAN_DIR)
@@ -63,13 +64,13 @@ def compare_scripts(scripts):
     for combo in combos:
         if combo[0]["text"] == combo[1]["text"]:
             # print(combo[0]["file_name"], combo[1]["file_name"])
+            index = next((index for (index, d) in enumerate(scripts) if d["source"] == combo[0]["source"]), None)
+            scripts[index]["matches"] += 1
             count_same += 1
-    if len(combos) == count_same:
-        # print(scripts[0]["file_name"])
-        return 1
-    else:
-        return 0
 
+    return sorted(scripts, key = lambda i: (i['matches'], i["size"]),reverse=True)[0]
+
+clean_dict = {}
 
 count = 0
 count_total = 0
@@ -89,25 +90,6 @@ for script in tqdm(metadata):
     #     with open(join(CLEAN_DIR, files[0]["source"] + "_" + files[0]["file_name"] + ".txt"), 'w', errors="ignore") as out:
     #         out.write(final_data)
 
-    # if  len(files) == 2:
-        
-    #     file_1 = join(SCRIPT_DIR, files[0]["source"],
-    #                 files[0]["file_name"] + ".txt")
-    #     file_2 = join(SCRIPT_DIR, files[1]["source"],
-    #                 files[1]["file_name"] + ".txt")
-    #     f_1 = open(file_1, 'r', errors="ignore")
-    #     f_2 = open(file_2, 'r', errors="ignore")
-    #     text_1 = f_1.read()
-    #     text_2 = f_2.read()
-    #     f_1.close()
-    #     f_2.close()
-    #     final_data_1 = clean_script(text_1)
-    #     final_data_2 = clean_script(text_2)
-    #     if final_data_1[:10000] == final_data_2[:10000]:
-    #         count +=1
-    #         # print(files)
-    #     count_total += 1
-
     if  len(files) != 1:
         script_arr = []
 
@@ -119,9 +101,17 @@ for script in tqdm(metadata):
             f.close()
             clean_text = clean_script(text)
             file["text"] = clean_text[:10000]
+            file["matches"] = 0
 
             script_arr.append(file)
-        count += compare_scripts(script_arr)
+        final = compare_scripts(script_arr)
+        final.pop('text', 'No Key found')
 
-print(count)
+        clean_dict[script] = final
+
+   
+with open(join(CLEAN_META), "w") as outfile:
+    json.dump(clean_dict, outfile, indent=4)
+
+print(len(clean_dict))
 # print(count_total)
