@@ -2,14 +2,14 @@
 This is an utility that allows you to collect movie scripts from several sources and create a database of 2.5k+ movie scripts as `.txt` files along with the metadata for the movies.
  
 There are three steps to the whole process:
-1. Collect data from various [sources](https://github.com/Aveek-Saha/Movie-Script-Database#sources) - Scrape websites for scripts in HTML, txt, doc or pdf format
-2. Remove duplicates from different sources - Automatically remove as many duplicates from different sources as possible
-3. Collect metadata - Get metadata about the scripts for additional processing
-4. Parse Scripts - Convert scripts into lines with just Character => dialogue
+1. Collect scripts from various [sources](https://github.com/Aveek-Saha/Movie-Script-Database#sources) - Scrape websites for scripts in HTML, txt, doc or pdf format
+1. Collect metadata - Get metadata about the scripts for additional processing
+1. Find duplicates from different sources - Automatically group duplicates from different sources as possible
+1. Parse Scripts - Convert scripts into lines with just Character => dialogue
  
-# Usage
+## Usage
 
-## Dependencies
+### Dependencies
 Read the instructions for installing `textract` first [here](https://textract.readthedocs.io/en/stable/installation.html).
 
 Then install all dependencies using pip
@@ -17,7 +17,7 @@ Then install all dependencies using pip
 pip install -r requirements.txt
 ```
 
-## Collect movie scripts
+### Collect movie scripts
 
 Modify the sources you want to download in `sources.json`. If you want a source to be included, set the value to `true`, or else set it as `false`.
 
@@ -26,12 +26,12 @@ Collect all the scripts from the sources listed below:
 python get_scripts.py
 ```
 
-* This might take a while(4+ hrs) depending on your network connection.
+* This might take a while (4+ hrs) depending on your network connection.
 * The script takes advantage of parallel processing to speed up the download process.
-* If there are missing/incomplete downloads, the script will only attempt to download the missing scripts.
+* If there are missing/incomplete downloads, the script will only download the missing scripts if run again.
 * In case of scripts in PDF or DOC format, the original file is stored in the `temp` directory.
 
-## Collect metadata
+### Collect metadata
 
 Collect metadata from TMDb and IMDb: 
 ```
@@ -82,7 +82,7 @@ This step will also combine duplicates, and your final metadata will be in this 
 <!-- 3. Remove duplicates and empty files: `python clean_files.py`.
 5. Parse scripts: `python parse_files.py`. -->
 
-# Sources
+## Sources
 
 ### Metadata:
 
