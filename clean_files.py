@@ -76,21 +76,25 @@ count = 0
 count_total = 0
 for script in tqdm(metadata):
     files = metadata[script]["files"]
-    # if len(files) == 1:
-    #     file = join(SCRIPT_DIR, files[0]["source"],
-    #                 files[0]["file_name"] + ".txt")
-    #     f = open(file, 'r', errors="ignore")
-    #     text = f.read()
-    #     f.close()
-    #     final_data = clean_script(text)
+    if len(files) == 1:
+        path = join(SCRIPT_DIR, files[0]["source"],
+                    files[0]["file_name"] + ".txt")
+        f = open(path, 'r', errors="ignore")
+        text = f.read()
+        f.close()
+        clean_text = clean_script(text)
 
-    #     if final_data.strip() == "":
-    #         print(files)
+        if clean_text.strip() == "":
+            print(files)
+            continue
+        
+        clean_dict[script] = { "file": files[0] }
+        if "tmdb" in metadata[script]:
+            clean_dict[script]["tmdb"] = metadata[script]["tmdb"]
+        if "imdb" in metadata[script]:
+            clean_dict[script]["imdb"] = metadata[script]["imdb"]
 
-    #     with open(join(CLEAN_DIR, files[0]["source"] + "_" + files[0]["file_name"] + ".txt"), 'w', errors="ignore") as out:
-    #         out.write(final_data)
-
-    if  len(files) != 1:
+    else:
         script_arr = []
 
         for file in files:
@@ -100,6 +104,9 @@ for script in tqdm(metadata):
             text = f.read()
             f.close()
             clean_text = clean_script(text)
+            if clean_text.strip() == "":
+                print(files)
+                continue
             file["text"] = clean_text[:10000]
             file["matches"] = 0
 
@@ -107,8 +114,22 @@ for script in tqdm(metadata):
         final = compare_scripts(script_arr)
         final.pop('text', 'No Key found')
 
-        clean_dict[script] = final
+        clean_dict[script] = { "file": final }
+        if "tmdb" in metadata[script]:
+            clean_dict[script]["tmdb"] = metadata[script]["tmdb"]
+        if "imdb" in metadata[script]:
+            clean_dict[script]["imdb"] = metadata[script]["imdb"]
 
+    
+    path = join(SCRIPT_DIR, clean_dict[script]["file"]["source"],
+            clean_dict[script]["file"]["file_name"] + ".txt")
+    f = open(path, 'r', errors="ignore")
+    text = f.read()
+    f.close()
+    clean_text = clean_script(text)
+
+    with open(join(CLEAN_DIR, clean_dict[script]["file"]["file_name"] + ".txt"), 'w', errors="ignore") as out:
+        out.write(clean_text)
    
 with open(join(CLEAN_META), "w") as outfile:
     json.dump(clean_dict, outfile, indent=4)
