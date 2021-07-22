@@ -59,16 +59,23 @@ def clean_script(text):
 
 def compare_scripts(scripts):
     combos = list(itertools.combinations(scripts, 2))
-    count_same = 0
 
     for combo in combos:
         if combo[0]["text"] == combo[1]["text"]:
-            # print(combo[0]["file_name"], combo[1]["file_name"])
-            index = next((index for (index, d) in enumerate(scripts) if d["source"] == combo[0]["source"]), None)
-            scripts[index]["matches"] += 1
-            count_same += 1
+            index_1 = next((index for (index, d) in enumerate(scripts) if d["source"] == combo[0]["source"]), None)
+            index_2 = next((index for (index, d) in enumerate(scripts) if d["source"] == combo[1]["source"]), None)
+            scripts[index_1]["matches"] += 1
+            scripts[index_2]["matches"] += 1
 
     return sorted(scripts, key = lambda i: (i['matches'], i["size"]),reverse=True)[0]
+
+def get_clean_text(path):
+    f = open(path, 'r', errors="ignore")
+    text = f.read()
+    f.close()
+    clean_text = clean_script(text).strip()
+
+    return clean_text
 
 clean_dict = {}
 
@@ -79,10 +86,7 @@ for script in tqdm(metadata):
     if len(files) == 1:
         path = join(SCRIPT_DIR, files[0]["source"],
                     files[0]["file_name"] + ".txt")
-        f = open(path, 'r', errors="ignore")
-        text = f.read()
-        f.close()
-        clean_text = clean_script(text)
+        clean_text = get_clean_text(path)
 
         if clean_text.strip() == "":
             print(files)
@@ -100,10 +104,7 @@ for script in tqdm(metadata):
         for file in files:
             path = join(SCRIPT_DIR, file["source"],
                     file["file_name"] + ".txt")
-            f = open(path, 'r', errors="ignore")
-            text = f.read()
-            f.close()
-            clean_text = clean_script(text)
+            clean_text = get_clean_text(path)
             if clean_text.strip() == "":
                 print(files)
                 continue
@@ -123,10 +124,7 @@ for script in tqdm(metadata):
     
     path = join(SCRIPT_DIR, clean_dict[script]["file"]["source"],
             clean_dict[script]["file"]["file_name"] + ".txt")
-    f = open(path, 'r', errors="ignore")
-    text = f.read()
-    f.close()
-    clean_text = clean_script(text)
+    clean_text = get_clean_text(path)
 
     with open(join(CLEAN_DIR, clean_dict[script]["file"]["file_name"] + ".txt"), 'w', errors="ignore") as out:
         out.write(clean_text)
