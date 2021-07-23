@@ -53,9 +53,10 @@ def clean_script(text):
         if line != '' and allspecialchars.match(line):
             continue
 
-        lines.append(copy)
+        lines.append(copy.strip())
 
     final_data = '\n'.join(lines)
+    final_data = re.sub(r'\n\n+', '\n\n', final_data).strip()
     return final_data
 
 
@@ -139,3 +140,9 @@ with open(join(CLEAN_META), "w") as outfile:
 
 print(len(clean_dict))
 # print(count_total)
+
+count = 0
+for script in clean_dict:
+    if "tmdb" in clean_dict[script] and "imdb" in clean_dict[script]:
+        count += 1
+print(count)

@@ -79,6 +79,43 @@ This step will also combine duplicates, and your final metadata will be in this 
 }
 ```
 
+### Remove duplicates
+Run:
+```
+python clean_files.py
+```
+
+This will remove the duplicate files as best as possible without false positives. In the end, the files will be stored in the `scripts\filtered` directory.
+
+A new metadata file is created where only one file exists for each unique script name, in this format:
+
+```json
+{
+    "uniquescriptname": {
+        "file": {
+            "name": "Movie name from source",
+            "source": "Source of the script",
+            "file_name": "name of the file",
+            "script_url": "Original link to script",
+            "size": "size of file"
+        },
+        "tmdb": {
+            "title": "Title from TMDb",
+            "release_date": "Date released",
+            "id": "TMDb ID",
+            "overview": "Plot summary"
+        },
+        "imdb": {
+            "title": "Title from IMDb",
+            "release_date": "Year released",
+            "id": "IMDb ID"
+        }
+    }
+}
+```
+
+The scripts are also cleaned to remove any formatting weirdness that comes from using OCR to read from a PDF.
+
 <!-- 3. Remove duplicates and empty files: `python clean_files.py`.
 5. Parse scripts: `python parse_files.py`. -->
 
