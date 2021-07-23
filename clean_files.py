@@ -14,7 +14,7 @@ data = json.load(f)
 SCRIPT_DIR = join("scripts", "unprocessed")
 META_DIR = join("scripts", "metadata")
 CLEAN_DIR = join("scripts", "filtered")
-META_FILE = join(META_DIR, "clean_meta_imdb.json")
+META_FILE = join(META_DIR, "clean_meta.json")
 CLEAN_META = join(META_DIR, "clean_files_meta.json")
 
 if not exists(CLEAN_DIR):
@@ -23,8 +23,9 @@ if not exists(CLEAN_DIR):
 f = open(META_FILE, 'r')
 metadata = json.load(f)
 
+
 def clean_script(text):
-    
+
     text = text.encode('utf-8', 'ignore').decode('utf-8').strip()
     text = text.replace("", "")
 
@@ -57,17 +58,21 @@ def clean_script(text):
     final_data = '\n'.join(lines)
     return final_data
 
+
 def compare_scripts(scripts):
     combos = list(itertools.combinations(scripts, 2))
 
     for combo in combos:
         if combo[0]["text"] == combo[1]["text"]:
-            index_1 = next((index for (index, d) in enumerate(scripts) if d["source"] == combo[0]["source"]), None)
-            index_2 = next((index for (index, d) in enumerate(scripts) if d["source"] == combo[1]["source"]), None)
+            index_1 = next((index for (index, d) in enumerate(
+                scripts) if d["source"] == combo[0]["source"]), None)
+            index_2 = next((index for (index, d) in enumerate(
+                scripts) if d["source"] == combo[1]["source"]), None)
             scripts[index_1]["matches"] += 1
             scripts[index_2]["matches"] += 1
 
-    return sorted(scripts, key = lambda i: (i['matches'], i["size"]),reverse=True)[0]
+    return sorted(scripts, key=lambda i: (i['matches'], i["size"]), reverse=True)[0]
+
 
 def get_clean_text(path):
     f = open(path, 'r', errors="ignore")
@@ -76,6 +81,7 @@ def get_clean_text(path):
     clean_text = clean_script(text).strip()
 
     return clean_text
+
 
 clean_dict = {}
 
@@ -91,8 +97,8 @@ for script in tqdm(metadata):
         if clean_text.strip() == "":
             print(files)
             continue
-        
-        clean_dict[script] = { "file": files[0] }
+
+        clean_dict[script] = {"file": files[0]}
         if "tmdb" in metadata[script]:
             clean_dict[script]["tmdb"] = metadata[script]["tmdb"]
         if "imdb" in metadata[script]:
@@ -103,7 +109,7 @@ for script in tqdm(metadata):
 
         for file in files:
             path = join(SCRIPT_DIR, file["source"],
-                    file["file_name"] + ".txt")
+                        file["file_name"] + ".txt")
             clean_text = get_clean_text(path)
             if clean_text.strip() == "":
                 print(files)
@@ -115,20 +121,19 @@ for script in tqdm(metadata):
         final = compare_scripts(script_arr)
         final.pop('text', 'No Key found')
 
-        clean_dict[script] = { "file": final }
+        clean_dict[script] = {"file": final}
         if "tmdb" in metadata[script]:
             clean_dict[script]["tmdb"] = metadata[script]["tmdb"]
         if "imdb" in metadata[script]:
             clean_dict[script]["imdb"] = metadata[script]["imdb"]
 
-    
     path = join(SCRIPT_DIR, clean_dict[script]["file"]["source"],
-            clean_dict[script]["file"]["file_name"] + ".txt")
+                clean_dict[script]["file"]["file_name"] + ".txt")
     clean_text = get_clean_text(path)
 
     with open(join(CLEAN_DIR, clean_dict[script]["file"]["file_name"] + ".txt"), 'w', errors="ignore") as out:
         out.write(clean_text)
-   
+
 with open(join(CLEAN_META), "w") as outfile:
     json.dump(clean_dict, outfile, indent=4)
 

@@ -29,50 +29,6 @@ forbidden = ["the", "a", "an", "and", "or", "part",
              "vol", "chapter", "movie", "transcript"]
 
 metadata = {}
-for source in data:
-    included = data[source]
-    meta_file = join(META_DIR, source + ".json")
-    if included == "true" and isfile(meta_file):
-        with open(meta_file) as json_file:
-            source_meta = json.load(json_file)
-            metadata[source] = source_meta
-
-unique = []
-origin = {}
-for source in metadata:
-    DIR = join("scripts", "unprocessed", source)
-    files = [join(DIR, f) for f in listdir(DIR) if isfile(
-        join(DIR, f)) and getsize(join(DIR, f)) > 3000]
-
-    source_meta = metadata[source]
-    for script in source_meta:
-        name = re.sub(r'\([^)]*\)', '', script.strip()).lower()
-        name = " ".join(name.split('-'))
-        name = re.sub(r'['+string.punctuation+']', ' ', name)
-        name = re.sub(' +', ' ', name).strip()
-        name = name.split()
-        name = " ".join(list(filter(lambda a: a not in forbidden, name)))
-        name = "".join(name.split())
-        unique.append(name)
-        if name not in origin:
-            origin[name] = {"files": []}
-        curr_script = metadata[source][script]
-        curr_file = join("scripts", "unprocessed", source,
-                         curr_script["file_name"] + ".txt")
-
-        if curr_file in files:
-            origin[name]["files"].append({
-                "name": script,
-                "source": source,
-                "file_name": curr_script["file_name"],
-                "script_url": curr_script["script_url"],
-                "size": getsize(curr_file)
-            })
-
-        else:
-            origin.pop(name)
-
-final = sorted(list(set(unique)))
 
 
 def clean_name(name):
@@ -82,6 +38,8 @@ def clean_name(name):
     # Remove ", The" and ", A"
     name = name.replace(", the", "")
     name = name.replace(", a", "")
+    name = re.sub(' +', ' ', name).strip()
+
     # If name has filmed as or released as, use those names instead
     alt_name = name.split("filmed as")
     if len(alt_name) > 1:
@@ -226,6 +184,53 @@ def get_imdb(name):
         return {}
 
 
+for source in data:
+    included = data[source]
+    meta_file = join(META_DIR, source + ".json")
+    if included == "true" and isfile(meta_file):
+        with open(meta_file) as json_file:
+            source_meta = json.load(json_file)
+            metadata[source] = source_meta
+
+unique = []
+origin = {}
+for source in metadata:
+    DIR = join("scripts", "unprocessed", source)
+    files = [join(DIR, f) for f in listdir(DIR) if isfile(
+        join(DIR, f)) and getsize(join(DIR, f)) > 3000]
+
+    source_meta = metadata[source]
+    for script in source_meta:
+        name = re.sub(r'\([^)]*\)', '', script.strip()).lower()
+        name = " ".join(name.split('-'))
+        name = re.sub(r'['+string.punctuation+']', ' ', name)
+        name = re.sub(' +', ' ', name).strip()
+        name = name.split()
+        name = " ".join(list(filter(lambda a: a not in forbidden, name)))
+        name = "".join(name.split())
+        name = roman_to_int(name)
+        unique.append(name)
+        if name not in origin:
+            origin[name] = {"files": []}
+        curr_script = metadata[source][script]
+        curr_file = join("scripts", "unprocessed", source,
+                         curr_script["file_name"] + ".txt")
+
+        if curr_file in files:
+            origin[name]["files"].append({
+                "name": script,
+                "source": source,
+                "file_name": curr_script["file_name"],
+                "script_url": curr_script["script_url"],
+                "size": getsize(curr_file)
+            })
+
+        else:
+            origin.pop(name)
+
+final = sorted(list(set(unique)))
+print(len(final))
+
 count = 0
 
 print("Get metadata from TMDb")
@@ -240,7 +245,7 @@ for script in tqdm(origin):
 
     else:
         # Try with cleaned name
-        name = clean_name(name)
+        name = extra_clean(name)
         movie_data = get_tmdb(name)
 
         if movie_data:
@@ -267,7 +272,7 @@ for script in tqdm(origin):
     movie_data = get_imdb(name)
 
     if not movie_data:
-        name = clean_name(name)
+        name = extra_clean(name)
         movie_data = get_imdb(name)
 
         if not movie_data:
@@ -278,8 +283,6 @@ for script in tqdm(origin):
     else:
         origin[script]["imdb"] = movie_data
 
-with open(join(META_DIR, "clean_meta.json"), "w") as outfile:
-    json.dump(origin, outfile, indent=4)
 
 print(count)
 
@@ -328,7 +331,7 @@ for script in tqdm(origin):
             movie_data = get_imdb(name)
 
             if not movie_data:
-                name = clean_name(name)
+                name = extra_clean(name)
                 movie_data = get_imdb(name)
 
                 if not movie_data:
