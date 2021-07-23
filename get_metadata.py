@@ -209,6 +209,7 @@ for source in metadata:
         name = " ".join(list(filter(lambda a: a not in forbidden, name)))
         name = "".join(name.split())
         name = roman_to_int(name)
+        name = unidecode(name)
         unique.append(name)
         if name not in origin:
             origin[name] = {"files": []}
@@ -218,7 +219,7 @@ for source in metadata:
 
         if curr_file in files:
             origin[name]["files"].append({
-                "name": script,
+                "name": unidecode(script),
                 "source": source,
                 "file_name": curr_script["file_name"],
                 "script_url": curr_script["script_url"],
