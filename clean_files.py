@@ -6,6 +6,8 @@ import re
 import itertools
 import string
 
+from unidecode import unidecode
+
 import json
 
 f = open('sources.json', 'r')
@@ -28,11 +30,14 @@ def clean_script(text):
 
     text = text.encode('utf-8', 'ignore').decode('utf-8').strip()
     text = text.replace("", "")
+    text = text.replace("•", "")
+    text = text.replace("·", "")
 
     whitespace = re.compile(r'^[\s]+')
+    scenenumber = re.compile(r'^\d+\s+.*\s+\d+$')
     pagenumber = re.compile(
         r'^[(]?\d{1,3}[)]?[\.]?$|^.[(]?\d{1,3}[)]?[\.]?$|^[(]?\d{1,3}[)]?.?[(]?\d{1,3}[)]?[\.]?$')
-    cont = re.compile(r'^\(continued\)$|^continued:$')
+    cont = re.compile(r'^\(continued\)$|^continued:$|^continued: \(\d+\)$')
     allspecialchars = re.compile(r'^[^\w\s ]*$')
 
     lines = []
@@ -47,12 +52,23 @@ def clean_script(text):
         # skip lines containing page numbers
         if pagenumber.match(line):
             continue
+        # Lines which just say continued
         if cont.match(line):
             continue
         # skip lines containing just special characters
         if line != '' and allspecialchars.match(line):
             continue
-
+        # Filter lines with numbers before and after scene details
+        if scenenumber.match(line):
+            numbers = copy.split()
+            if numbers[0] == numbers[-1]:
+                copy = " ".join(numbers[1:-1]).strip()
+                line = copy.lower().strip()
+        # Lines which just say continued
+        if cont.match(line):
+            continue
+        if line == "omitted":
+            continue
         lines.append(copy.strip())
 
     final_data = '\n'.join(lines)
@@ -121,12 +137,15 @@ for script in tqdm(metadata):
             script_arr.append(file)
         final = compare_scripts(script_arr)
         final.pop('text', 'No Key found')
+        final.pop('matches', 'No Key found')
 
         clean_dict[script] = {"file": final}
         if "tmdb" in metadata[script]:
             clean_dict[script]["tmdb"] = metadata[script]["tmdb"]
         if "imdb" in metadata[script]:
             clean_dict[script]["imdb"] = metadata[script]["imdb"]
+
+    clean_dict[script]["file"].pop('size', 'No Key found')
 
     path = join(SCRIPT_DIR, clean_dict[script]["file"]["source"],
                 clean_dict[script]["file"]["file_name"] + ".txt")
@@ -138,11 +157,18 @@ for script in tqdm(metadata):
 with open(join(CLEAN_META), "w") as outfile:
     json.dump(clean_dict, outfile, indent=4)
 
-print(len(clean_dict))
+print("Total scripts: ", len(clean_dict))
 # print(count_total)
 
 count = 0
+score = {}
 for script in clean_dict:
     if "tmdb" in clean_dict[script] and "imdb" in clean_dict[script]:
         count += 1
-print(count)
+    if clean_dict[script]["file"]["source"] in score:
+        score[clean_dict[script]["file"]["source"]] +=1
+    else:
+        score[clean_dict[script]["file"]["source"]] =1
+
+print("Scripts with complete metadata: ", count)
+print("Source Breakdown: ", score)
