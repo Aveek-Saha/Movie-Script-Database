@@ -7,6 +7,7 @@ import argparse
 import re
 import time
 import codecs
+import json
 
 from os import listdir, makedirs
 from os.path import isfile, join, sep, getsize, exists
@@ -517,7 +518,7 @@ def parse(file_orig, save_dir, abr_flag, tag_flag, char_flag, off_flag, save_nam
         save_name = os.path.join(save_dir, '.'.join(
             file_orig.split('/')[-1].split('.')[: -1]) + '_parsed.txt')
     else:
-        save_name = os.path.join(save_dir, "full", save_name)
+        save_name = os.path.join(save_dir, "tagged", save_name)
 
     fid = open(save_name, 'w')
     for tag_ind in range(len(tag_valid)):
@@ -534,7 +535,7 @@ def parse(file_orig, save_dir, abr_flag, tag_flag, char_flag, off_flag, save_nam
             abridged_name = os.path.join(save_dir, '.'.join(
                 file_orig.split('/')[-1].split('.')[: -1]) + '_abridged.txt')
         else:
-            abridged_name = os.path.join(save_dir, "abridged", abridged_name)
+            abridged_name = os.path.join(save_dir, "dialogue", abridged_name)
 
         abridged_ind = [i for i, x in enumerate(parsed_script) if x.startswith('C:') and
                         parsed_script[i + 1].startswith('D:')]
@@ -561,7 +562,7 @@ def parse(file_orig, save_dir, abr_flag, tag_flag, char_flag, off_flag, save_nam
                 num_lines = len([i for i in spk_ind if i != (len(tag_str_vec) - 1) and
                                  tag_str_vec[i + 1] == 'D'])
                 charinfo_str = char_id + ': ' + \
-                    str(num_lines) + '|'.join([' ', ' ', ' ', ' '])
+                    str(num_lines)
                 charinfo_vec.append(charinfo_str)
         if charinfo_name is None:
             charinfo_name = os.path.join(save_dir, '.'.join(
@@ -576,9 +577,12 @@ def parse(file_orig, save_dir, abr_flag, tag_flag, char_flag, off_flag, save_nam
 if __name__ == "__main__":
     DIR_FINAL = join("scripts", "filtered")
     DIR_OUT = join("scripts", "parsed_new")
-    DIR_OUT_FULL = join(DIR_OUT, "full")
-    DIR_OUT_ABRIDGED = join(DIR_OUT, "abridged")
+    DIR_OUT_FULL = join(DIR_OUT, "tagged")
+    DIR_OUT_ABRIDGED = join(DIR_OUT, "dialogue")
     DIR_OUT_CHARINFO = join(DIR_OUT, "charinfo")
+    META_DIR = join("scripts", "metadata")
+    CLEAN_META = join(META_DIR, "clean_files_meta.json")
+    PARSED_META = join(META_DIR, "clean_parsed_meta.json")
 
     if not os.path.exists(DIR_OUT):
         os.makedirs(DIR_OUT)
@@ -591,12 +595,34 @@ if __name__ == "__main__":
 
     files = [join(DIR_FINAL, f) for f in listdir(DIR_FINAL)
              if isfile(join(DIR_FINAL, f)) and getsize(join(DIR_FINAL, f)) > 3000]
-    for f in tqdm(files):
-        file_orig, save_dir, abr_flag, tag_flag, char_flag, off_flag, save_name, abridged_name, charinfo_name = f, DIR_OUT, 'on', 'off', 'on', 'off', f.split(
-            sep)[-1], f.split(sep)[-1].split('.txt')[0] + '_abridged.txt', f.split(sep)[-1].split('.txt')[0] + '_charinfo.txt'
+
+    f = open(CLEAN_META, 'r')
+    meta = json.load(f)
+    f.close()
+
+    for script in tqdm(meta):
+        file = meta[script]["file"]
+        file_orig = join(DIR_FINAL, file["file_name"] + ".txt")
+        save_dir = DIR_OUT
+        abr_flag = "on"
+        tag_flag = "off"
+        char_flag = "on"
+        off_flag = "off"
+        save_name = file["file_name"] + "_parsed.txt"
+        abridged_name = file["file_name"] + "_dialogue.txt"
+        tag_name = None
+        charinfo_name = file["file_name"] + "_charinfo.txt"
+
         try:
             parse(file_orig, save_dir, abr_flag, tag_flag, char_flag,
-                  off_flag, save_name, abridged_name, None, charinfo_name)
+                  off_flag, save_name, abridged_name, tag_name, charinfo_name)
+            meta[script]["parsed"] = {
+                "dialogue": abridged_name,
+                "charinfo": charinfo_name,
+                "tagged": save_name
+            }
         except Exception as err:
             print(err)
             pass
+    with open(join(PARSED_META), "w") as outfile:
+        json.dump(meta, outfile, indent=4)
