@@ -298,12 +298,12 @@ def find_arrange(tag_valid):
 
 
 # PARSER FUNCTION
-def parse(file_orig, save_dir, abr_flag, tag_flag, char_flag, save_name=None, abridged_name=None, tag_name=None):
+def parse(file_orig, save_dir, abr_flag, tag_flag, char_flag, save_name=None, abridged_name=None, tag_name=None, charinfo_name=None):
     #------------------------------------------------------------------------------------
     # DEFINE
     tag_set = ['S', 'N', 'C', 'D', 'E', 'T', 'M']
     meta_set = ['BLACK', 'darkness']
-    bound_set = ['int. ', 'ext. ', 'int ', 'ext ']
+    bound_set = ['int. ', 'ext. ', 'int ', 'ext ', 'EXTERIOR ', 'INTERIOR ']
     trans_set = ['CUT ', 'FADE ', 'cut ']
     char_max_words = 7
     meta_thresh = 2
@@ -418,17 +418,20 @@ def parse(file_orig, save_dir, abr_flag, tag_flag, char_flag, save_name=None, ab
                 charinfo_str = char_id + ': ' + \
                     str(num_lines) + '|'.join([' ', ' ', ' ', ' '])
                 charinfo_vec.append(charinfo_str)
-
-        charinfo_name = os.path.join(save_dir, '.'.join(
-            file_orig.split('/')[-1].split('.')[: -1]) + '_charinfo.txt')
-        np.savetxt(charinfo_name, charinfo_vec, fmt='%s', delimiter='\n')
+        if charinfo_name is None:
+            charinfo_name = os.path.join(save_dir, '.'.join(
+                file_orig.split('/')[-1].split('.')[: -1]) + '_charinfo.txt')
+        else:
+            charinfo_name = os.path.join(save_dir, "charinfo", charinfo_name)
+        np.savetxt(charinfo_name, charinfo_vec, fmt='%s', delimiter='\n', encoding="utf-8")
 
 # MAIN FUNCTION
 if __name__ == "__main__":
-    DIR_FINAL = join("scripts", "final")
+    DIR_FINAL = join("scripts", "filtered")
     DIR_OUT = join("scripts", "parsed")
     DIR_OUT_FULL = join(DIR_OUT, "full")
     DIR_OUT_ABRIDGED = join(DIR_OUT, "abridged")
+    DIR_OUT_CHARINFO = join(DIR_OUT, "charinfo")
 
     if not os.path.exists(DIR_OUT):
         os.makedirs(DIR_OUT)
@@ -436,15 +439,18 @@ if __name__ == "__main__":
         os.makedirs(DIR_OUT_FULL)
     if not os.path.exists(DIR_OUT_ABRIDGED):
         os.makedirs(DIR_OUT_ABRIDGED)
+    if not os.path.exists(DIR_OUT_CHARINFO):
+        os.makedirs(DIR_OUT_CHARINFO)
 
     files = [join(DIR_FINAL, f) for f in listdir(DIR_FINAL)
              if isfile(join(DIR_FINAL, f)) and getsize(join(DIR_FINAL, f)) > 3000]
     for f in tqdm(files):
 
-        file_orig, save_dir, abr_flag, tag_flag, char_flag, save_name, abridged_name = f, DIR_OUT, 'on', 'off', 'off', f.split(
-            sep)[-1], f.split(sep)[-1].split('.txt')[0] + '_abridged.txt'
+        file_orig, save_dir, abr_flag, tag_flag, char_flag, save_name, abridged_name, charinfo_name = f, DIR_OUT, 'on', 'off', 'on', f.split(
+            sep)[-1], f.split(sep)[-1].split('.txt')[0] + '_abridged.txt', f.split(sep)[-1].split('.txt')[0] + '_charinfo.txt'
         try:
             parse(file_orig, save_dir, abr_flag,
-                  tag_flag, char_flag, save_name, abridged_name)
-        except:
+                  tag_flag, char_flag, save_name, abridged_name, None, charinfo_name)
+        except Exception as err:
+            print(err)
             pass
