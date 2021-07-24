@@ -576,7 +576,7 @@ def parse(file_orig, save_dir, abr_flag, tag_flag, char_flag, off_flag, save_nam
 # MAIN FUNCTION
 if __name__ == "__main__":
     DIR_FINAL = join("scripts", "filtered")
-    DIR_OUT = join("scripts", "parsed_new")
+    DIR_OUT = join("scripts", "parsed")
     DIR_OUT_FULL = join(DIR_OUT, "tagged")
     DIR_OUT_ABRIDGED = join(DIR_OUT, "dialogue")
     DIR_OUT_CHARINFO = join(DIR_OUT, "charinfo")
