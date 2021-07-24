@@ -13,6 +13,15 @@ There are four steps to the whole process:
 
 The following steps MUST be run in order
 
+### Clone
+
+Clone this repository:
+
+```
+git clone https://github.com/Aveek-Saha/Movie-Script-Database.git
+cd Movie-Script-Database
+```
+
 ### Dependencies
 
 Read the instructions for installing `textract` first [here](https://textract.readthedocs.io/en/stable/installation.html).
@@ -30,6 +39,7 @@ Modify the sources you want to download in `sources.json`. If you want a source 
 ```
 python get_scripts.py
 ```
+
 Collect all the scripts from the sources listed below:
 
 ```json
