@@ -6,23 +6,14 @@ import re
 import json
 
 from tqdm import tqdm
-from .utilities import format_filename, get_soup, get_pdf_text
+from .utilities import format_filename, get_soup, get_pdf_text, create_script_dirs
 
 
 def get_scriptslug():
     ALL_URL = "https://www.scriptslug.com/request/?pg="
     BASE_URL = "https://www.scriptslug.com/assets/uploads/scripts/"
     SOURCE = "scriptslug"
-    DIR = os.path.join("scripts", "unprocessed", SOURCE)
-    TEMP_DIR = os.path.join("scripts", "temp", SOURCE)
-    META_DIR = os.path.join("scripts", "metadata")
-
-    if not os.path.exists(DIR):
-        os.makedirs(DIR)
-    if not os.path.exists(META_DIR):
-        os.makedirs(META_DIR)
-    if not os.path.exists(TEMP_DIR):
-        os.makedirs(TEMP_DIR)
+    DIR, TEMP_DIR, META_DIR = create_script_dirs(SOURCE)
 
     def get_script_from_url(script_url, file_name):
         text = ""

@@ -5,23 +5,14 @@ import json
 from tqdm import tqdm
 import string
 import re
-from .utilities import format_filename, get_soup
+from .utilities import format_filename, get_soup, create_script_dirs
 
 
 def get_actorpoint():
     ALL_URL = "https://www.actorpoint.com/movie-scripts/mscr-%s.html"
     BASE_URL = "https://www.actorpoint.com"
     SOURCE = "actorpoint"
-    DIR = os.path.join("scripts", "unprocessed", SOURCE)
-    TEMP_DIR = os.path.join("scripts", "temp", SOURCE)
-    META_DIR = os.path.join("scripts", "metadata")
-
-    if not os.path.exists(DIR):
-        os.makedirs(DIR)
-    if not os.path.exists(META_DIR):
-        os.makedirs(META_DIR)
-    if not os.path.exists(TEMP_DIR):
-        os.makedirs(TEMP_DIR)
+    DIR, TEMP_DIR, META_DIR = create_script_dirs(SOURCE)
 
     def get_script_from_url(script_url):
         text = ""

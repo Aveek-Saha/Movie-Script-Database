@@ -24,7 +24,7 @@ def get_soup(url):
         resulttext = result.read()
 
         soup = BeautifulSoup(resulttext, 'html.parser')
-    
+
     except Exception as err:
         print(err)
         soup = None
@@ -61,3 +61,18 @@ def get_doc_text(url, name):
     # if os.path.isfile(doc):
     #     os.remove(doc)
     return text
+
+
+def create_script_dirs(source):
+    DIR = os.path.join("scripts", "unprocessed", source)
+    TEMP_DIR = os.path.join("scripts", "temp", source)
+    META_DIR = os.path.join("scripts", "metadata")
+
+    if not os.path.exists(DIR):
+        os.makedirs(DIR)
+    if not os.path.exists(META_DIR):
+        os.makedirs(META_DIR)
+    if not os.path.exists(TEMP_DIR):
+        os.makedirs(TEMP_DIR)
+
+    return DIR, TEMP_DIR, META_DIR

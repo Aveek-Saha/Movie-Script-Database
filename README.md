@@ -69,7 +69,7 @@ Collect metadata from TMDb and IMDb:
 python get_metadata.py
 ```
 
-You'll need an API key for using the TMDb api and you can find out more about it here. Once you get the API key it has to be stored in a file called `config.py` in this format:
+You'll need an API key for using the TMDb api and you can find out more about it [here](https://www.themoviedb.org/documentation/api). Once you get the API key it has to be stored in a file called `config.py` in this format:
 
 ```py
 tmdb_api_key = "<Your API key>"
