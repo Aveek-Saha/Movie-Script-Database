@@ -257,6 +257,21 @@ scripts
 
 -   [~~Weeklyscript~~](https://www.weeklyscript.com/) (Site no longer active)
 
+
+## Citing
+
+If you use The Movie Script Database, please cite:
+
+```
+@misc{Saha_Movie_Script_Database_2021,
+    author = {Saha, Aveek},
+    month = {7},
+    title = {{Movie Script Database}},
+    url = {https://github.com/Aveek-Saha/Movie-Script-Database},
+    year = {2021}
+}
+```
+
 ## Credits
 
 The script for parsing the movie scripts come from this paper: `Linguistic analysis of differences in portrayal of movie characters, in: Proceedings of Association for Computational Linguistics, Vancouver, Canada, 2017` and the code can be found here: https://github.com/usc-sail/mica-text-script-parser
