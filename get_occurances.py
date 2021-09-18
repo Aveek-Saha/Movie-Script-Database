@@ -13,9 +13,9 @@ for filename in tqdm(glob.glob('scripts/parsed/dialogue/*.txt')):
        words = dict()
        for line in f:
            dialogue = line.split(">",1)[1].lower()
-           for word in dialogue.split(" "):
+           for word in dialogue.split():
                if (word):
-                   list_of_chars = ['(', ')', '.', '\n', '\"', '!', '?']
+                   list_of_chars = '''!()-[]{};:'"\,<>./?@#$%^&*_~'''
                    for char in list_of_chars:
                       word = word.replace(char,'')
                    if (word in words):
