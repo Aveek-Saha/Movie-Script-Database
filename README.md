@@ -201,6 +201,15 @@ A new metadata file is created with the following format:
         }
     }
 }
+
+### Get Word Occurance in Dialogue
+
+Run
+```
+python get_occurances.py
+```
+
+
 ```
 
 ## Directory structure
