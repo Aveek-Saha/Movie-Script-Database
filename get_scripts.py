@@ -6,26 +6,33 @@ import os
 
 DIR = os.path.join("scripts", "temp")
 
-if not os.path.exists(DIR):
-    os.makedirs(DIR)
+def get_scripts():
+    if not os.path.exists(DIR):
+        os.makedirs(DIR)
 
-f = open('sources.json', 'r')
-data = json.load(f)
-processes = []
-starttime = time.time()
+    f = open('sources.json', 'r')
+    data = json.load(f)
+    processes = []
+    starttime = time.time()
 
-for source in data:
-    included = data[source]
-    if included == "true":
-        # print("Fetching scripts from %s" % (source))
-        # sources.get_scripts(source=source)
-        # print()
-        p = multiprocessing.Process(target=sources.get_scripts, args=(source,))
-        processes.append(p)
-        p.start()
+    multiprocessing.freeze_support()
 
-for process in processes:
-    process.join()
+    for source in data:
+        included = data[source]
+        if included == "true":
+            # print("Fetching scripts from %s" % (source))
+            # sources.get_scripts(source=source)
+            # print()
+            p = multiprocessing.Process(target=sources.get_scripts, args=(source,))
+            processes.append(p)
+            p.start()
 
-print()    
-print('Time taken = {} seconds'.format(time.time() - starttime))
+    for process in processes:
+        process.join()
+    print()    
+    print('Time taken = {} seconds'.format(time.time() - starttime))
+
+
+if __name__ == '__main__':
+    get_scripts()
+
