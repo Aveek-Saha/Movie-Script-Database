@@ -192,6 +192,7 @@ for source in data:
 
 unique = []
 origin = {}
+names_with_bad_files = []
 for source in metadata:
     DIR = join("scripts", "unprocessed", source)
     files = [join(DIR, f) for f in listdir(DIR) if isfile(
@@ -209,13 +210,13 @@ for source in metadata:
         name = roman_to_int(name)
         name = unidecode(name)
         unique.append(name)
-        if name not in origin:
-            origin[name] = {"files": []}
         curr_script = metadata[source][script]
         curr_file = join("scripts", "unprocessed", source,
                          curr_script["file_name"] + ".txt")
 
         if curr_file in files:
+            if name not in origin:
+                origin[name] = {"files": []}
             origin[name]["files"].append({
                 "name": unidecode(script),
                 "source": source,
@@ -223,9 +224,6 @@ for source in metadata:
                 "script_url": curr_script["script_url"],
                 "size": getsize(curr_file)
             })
-
-        else:
-            origin.pop(name)
 
 final = sorted(list(set(unique)))
 print(len(final))
