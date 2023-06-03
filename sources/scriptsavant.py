@@ -7,8 +7,7 @@ from .utilities import format_filename, get_soup, get_pdf_text, create_script_di
 
 
 def get_scriptsavant():
-    ALL_URL_1 = "https://thescriptsavant.com/free-movie-screenplays-am/"
-    ALL_URL_2 = "https://thescriptsavant.com/free-movie-screenplays-nz/"
+    ALL_URL = "https://thescriptsavant.com/movies.html"
     BASE_URL = "http://www.thescriptsavant.com/"
     SOURCE = "scriptsavant"
     DIR, TEMP_DIR, META_DIR = create_script_dirs(SOURCE)
@@ -17,15 +16,11 @@ def get_scriptsavant():
         os.path.join(DIR, f)) and os.path.getsize(os.path.join(DIR, f)) > 3000]
 
     metadata = {}
-    soup_1 = get_soup(ALL_URL_1)
-    soup_2 = get_soup(ALL_URL_2)
-
-    movielist = soup_1.find_all('tbody')[0].find_all('a')
-    movielist_2 = soup_2.find_all('div', class_='fusion-text')[0].find_all('a')
-    movielist += movielist_2
+    soup = get_soup(ALL_URL)
+    movielist = soup.find_all('a')
 
     for movie in tqdm(movielist, desc=SOURCE):
-        name = movie.text.replace("script", "").strip()
+        name = movie.text.replace("script", "").replace("Script", "").strip()
         file_name = format_filename(name)
         script_url = movie.get('href')
 
@@ -42,7 +37,7 @@ def get_scriptsavant():
             continue
 
         try:
-            text = get_pdf_text(script_url, os.path.join(SOURCE, file_name))
+            text = get_pdf_text(os.path.join(BASE_URL, script_url), os.path.join(SOURCE, file_name))
 
         except Exception as err:
             print(script_url)

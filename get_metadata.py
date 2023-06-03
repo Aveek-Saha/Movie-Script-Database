@@ -9,12 +9,11 @@ import string
 from unidecode import unidecode
 from tqdm.std import tqdm
 from fuzzywuzzy import fuzz
-
-import imdb
+from PyMovieDb import IMDB
 
 import config
 
-ia = imdb.IMDb()
+imdb = IMDB()
 
 f = open('sources.json', 'r')
 data = json.load(f)
@@ -161,24 +160,23 @@ def get_tmdb_from_id(id):
 
 def get_imdb(name):
     try:
-        movies = ia.search_movie(name)
-        if len(movies) > 0:
-            movie_id = movies[0].movieID
-            movie = movies[0]
-
-            if 'year' in movie:
-                release_date = movie['year']
-            else:
-                print("Field missing in response")
-                return {}
-
-            return {
-                "title": unidecode(movie['title']),
-                "release_date": release_date,
-                "id": movie_id,
-            }
-        else:
+        movie = imdb.get_by_name(name)
+        movie = json.loads(movie)
+        if movie == imdb.NA:
             return {}
+
+        if 'datePublished' in movie:
+            release_date = movie['datePublished']
+        else:
+            print("datePublished missing in response")
+            return {}
+        movie_id = movie["url"].split("/")[-2]
+        return {
+            "title": unidecode(movie['name']),
+            "release_date": release_date,
+            "id": movie_id,
+            "overview": movie["description"] if "description" in movie else "",
+        }
     except Exception as err:
         print(err)
         return {}
@@ -194,6 +192,7 @@ for source in data:
 
 unique = []
 origin = {}
+names_with_bad_files = []
 for source in metadata:
     DIR = join("scripts", "unprocessed", source)
     files = [join(DIR, f) for f in listdir(DIR) if isfile(
@@ -211,13 +210,13 @@ for source in metadata:
         name = roman_to_int(name)
         name = unidecode(name)
         unique.append(name)
-        if name not in origin:
-            origin[name] = {"files": []}
         curr_script = metadata[source][script]
         curr_file = join("scripts", "unprocessed", source,
                          curr_script["file_name"] + ".txt")
 
         if curr_file in files:
+            if name not in origin:
+                origin[name] = {"files": []}
             origin[name]["files"].append({
                 "name": unidecode(script),
                 "source": source,
@@ -225,9 +224,6 @@ for source in metadata:
                 "script_url": curr_script["script_url"],
                 "size": getsize(curr_file)
             })
-
-        else:
-            origin.pop(name)
 
 final = sorted(list(set(unique)))
 print(len(final))
@@ -294,7 +290,7 @@ print("Use IMDb id to search TMDb")
 for script in tqdm(origin):
     if "imdb" in origin[script] and "tmdb" not in origin[script]:
         # print(origin[script]["files"][0]["name"])
-        imdb_id = "tt" + origin[script]["imdb"]["id"]
+        imdb_id = origin[script]["imdb"]["id"]
         movie_data = get_tmdb_from_id(imdb_id)
         if movie_data:
             origin[script]["tmdb"] = movie_data
@@ -318,7 +314,7 @@ for script in tqdm(origin):
         file_name = extra_clean(origin[script]["files"][0]["name"])
 
         if imdb_name != tmdb_name and average_ratio(file_name, tmdb_name) < 85 and average_ratio(file_name, imdb_name) > 85:
-            imdb_id = "tt" + origin[script]["imdb"]["id"]
+            imdb_id = origin[script]["imdb"]["id"]
             movie_data = get_tmdb_from_id(imdb_id)
             if movie_data:
                 origin[script]["tmdb"] = movie_data
